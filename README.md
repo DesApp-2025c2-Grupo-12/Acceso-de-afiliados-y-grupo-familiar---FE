@@ -15,9 +15,9 @@ El proyecto de afiliados es una aplicación web desarrollada con el fin de que l
 # 🗂️ Estructura del Proyecto
 
 # 🚀 Uso
-Clonar el repositorio.
-Instalar las dependencias con npm install.
-Ejecutar el servidor de desarrollo con npm run dev.
+* Clonar el repositorio.
+* Instalar las dependencias con npm install.
+* Ejecutar el servidor de desarrollo con npm run dev.
 
 # 🧑‍💻 Autores
 Proyecto académico desarrollado en el marco de la Universidad Nacional de Hurlingham (UnaHur). Equipo de desarrollo:
