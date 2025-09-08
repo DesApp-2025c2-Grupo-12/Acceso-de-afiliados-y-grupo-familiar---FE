@@ -23,7 +23,7 @@ El proyecto de afiliados es una aplicación web desarrollada con el fin de que l
 Proyecto académico desarrollado en el marco de la Universidad Nacional de Hurlingham (UnaHur). Equipo de desarrollo:
 
 * Diego Andrés Primera.
-* Facundo Gabriel Gutiérrez.
+* Gabriel Facundo Gutiérrez.
 * Ezequiel Escobar.
 * Franco Cantero.
 * Luana Belén Calderón.
