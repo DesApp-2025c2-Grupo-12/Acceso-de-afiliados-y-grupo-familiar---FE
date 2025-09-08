@@ -1,29 +1,29 @@
-# Acceso-de-afiliados-y-grupo-familiar---FE
+# Acceso de afiliados y grupo familiar desde el Front End
 
-🖱️ Objetivo
-El proyecto Afiliados es una aplicación web desarrollada con el fin de que los afiliados a la empresa (Medicina Integral) y algunos miembros del grupo familiar pueden:
+# 🖱️ Objetivo
+El proyecto de afiliados es una aplicación web desarrollada con el fin de que los afiliados a la empresa (Medicina Integral) y algunos miembros del grupo familiar puedan:
 
-Solicitar turnos de atención.
-Gestionar reintegros.
-Abrir pedidos de autorización de prestaciones que deben ser autorizadas.
-Registrar recetas para las que se solicita cobertura por parte de la empresa.
-Consultar la cartilla de prestadores.
+* Solicitar turnos de atención.
+* Gestionar reintegros.
+* Abrir pedidos de autorización de prestaciones que deben ser autorizadas.
+* Registrar recetas para las que se solicita cobertura por parte de la empresa.
+* Consultar la cartilla de prestadores.
 
-💾 Tecnologías utilizadas
+# 💾 Tecnologías utilizadas
 
 
-🗂️ Estructura del Proyecto
+# 🗂️ Estructura del Proyecto
 
-🚀 Uso
+# 🚀 Uso
 Clonar el repositorio.
 Instalar las dependencias con npm install.
 Ejecutar el servidor de desarrollo con npm run dev.
 
-🧑‍💻 Autores
+# 🧑‍💻 Autores
 Proyecto académico desarrollado en el marco de la Universidad Nacional de Hurlingham (UnaHur). Equipo de desarrollo:
 
-Diego Andrés Primera.
-Facundo Gabriel Gutiérrez.
-Ezequiel Escobar.
-Franco Cantero.
-Luana Belén Calderón.
+* Diego Andrés Primera.
+* Facundo Gabriel Gutiérrez.
+* Ezequiel Escobar.
+* Franco Cantero.
+* Luana Belén Calderón.
