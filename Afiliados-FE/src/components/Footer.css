@@ -1,0 +1,21 @@
+.footer {
+  background-color: #132074;
+  font-size: 0.9rem;
+}
+
+.footer a {
+  color: #ffffff;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 767px) {
+  .footer .border-end {
+    border-right: none !important;
+    border-bottom: 1px solid #ffffff;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+  }
+}
