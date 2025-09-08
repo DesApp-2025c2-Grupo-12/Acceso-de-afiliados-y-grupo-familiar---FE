@@ -1,44 +1,40 @@
-import React from 'react'
-import "./Form.css"
+import React from "react";
+import "./Form.css";
 
-export default function Form() {
+export default function Form({ title, subtitle, buttonText, onSubmit }) {
   return (
     <>
-    <h1>Bienvenido</h1>,
-    <h3>Iniciar sesión en el Portal Afiliado</h3>,
-    <div className='form-container'>
-      <div className="card" style={{ width: "18rem" }}>
-        <div className="card-body">
-          <form>
-            <div className="mb-3">
-              <label htmlFor="exampleInputEmail1" className="form-label">Credencial</label>
-              <input
-                type="email"
-                className="form-control"
-                id="exampleInputEmail1"
-                aria-describedby="emailHelp"
-              /> 
-            </div>
-            <div className="mb-3">
-              <label htmlFor="exampleInputPassword1" className="form-label">Contraseña</label>
-              <input
-                type="password"
-                className="form-control"
-                id="exampleInputPassword1"
-              />
-            </div>
-            <button type="submit" className="btn btn-primary">Iniciar sesión</button>
-            <div className="form-text mt-2">
-              <a href="#">¿Olvidaste tu nombre de usuario o contraseña?</a>
-            </div>
-            <div className="form-text">¿No tienes una cuenta?</div>
-            <div className="form-text">
-              <a href="#">Crear una cuenta</a>
-            </div>
-          </form>
+      {title && <h1>{title}</h1>}
+      {subtitle && <h3>{subtitle}</h3>}
+      <div className="form-container">
+        <div className="card" style={{ width: "18rem" }}>
+          <div className="card-body">
+            <form onSubmit={onSubmit}>
+              <div className="mb-3">
+                <label htmlFor="credential" className="form-label">Usuario</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="credential"
+                  placeholder="Ingresa tu documento"
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="password" className="form-label">Contraseña</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  id="password"
+                  placeholder="Ingresa tu contraseña"
+                  required
+                />
+              </div>
+              <button type="submit" className="btn btn-primary w-100">{buttonText}</button>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
     </>
-  )
+  );
 }
