@@ -2,6 +2,8 @@ import './App.css'
 import Navbar from './components/Navbar'
 import Form from './components/Form'
 import Footer from './components/Footer'
+import Header from './components/Header'
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -10,6 +12,7 @@ function App() {
  return (
   <Router>
     <div className="d-flex flex-column min-vh-100">
+      <Header/>
       <Navbar/>
       <main className="container my-5 flex-grow-1">
         <Routes>
