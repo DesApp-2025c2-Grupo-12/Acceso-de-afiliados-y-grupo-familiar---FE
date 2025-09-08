@@ -1,6 +1,5 @@
 # Acceso-de-afiliados-y-grupo-familiar---FE
 
-💻 UnahurAntiSocial
 🖱️ Objetivo
 El proyecto Afiliados es una aplicación web desarrollada con el fin de que los afiliados a la empresa (Medicina Integral) y algunos miembros del grupo familiar pueden:
 
