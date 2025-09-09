@@ -18,6 +18,14 @@ export default function Register() {
       subtitle="Completa tus datos"
       buttonText="Registrarse"
       onSubmit={handleRegister}
+      extraFields={
+        <>
+          <div className="mb-3">
+            <label htmlFor="nombre" className="form-label">Confirmar Contraseña</label>
+            <input type="password" className="form-control" id="password" placeholder="Confirma la contraseña" required />
+          </div>
+        </>
+      }
     />
   );
 }
