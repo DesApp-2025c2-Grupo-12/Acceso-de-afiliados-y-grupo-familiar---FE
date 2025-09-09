@@ -1,0 +1,72 @@
+body {
+  background-color: #e0e8f9; 
+}
+
+.recetas-page {
+  display: flex;
+  min-height: 80vh;
+}
+
+
+.sidebar-placeholder {
+  display: none;
+}
+
+.tituloRecetas {
+  color: #000000;
+  font-weight: 700;
+  font-size: 1.8rem;
+}
+
+/*BOTÓN NUEVA RECETA*/
+.miBoton {
+  background-color: #132074;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.miBoton:hover {
+  background-color: #6e6f73;
+}
+
+/*ESTADOS*/
+.badge.badge-pendiente {
+  background-color: #eeb94e;
+  color: #000;
+  border-radius: 10px;
+  font-size: 1rem;
+  
+}
+
+.badge.badge-entregada {
+  background-color: #7fc05c;
+  color: #000;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+/*BOTON VER y RENOVAR*/
+
+.BotonVer,
+.BotonRenovar {
+  background-color: white;
+  border: 1.5px solid black;
+  color: black;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.BotonVer:hover,
+.BotonRenovar:hover {
+  border-color: #222;
+  color: #222;
+  background-color: #f8f8f8;
+}

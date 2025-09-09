@@ -5,6 +5,7 @@ import Header from './components/Header'
 import Login from './pages/login'
 import Register from './pages/register'
 import Home from './pages/home'
+import Recetas from './pages/recetas'  
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -21,6 +22,7 @@ function App() {
           <Route path="/register" element={<Register/>} />
           <Route path="/home" element={<p>Home...</p>} />
           <Route path="/about" element={<p>Contacto...</p>} />
+          <Route path="/recetas" element={<Recetas />} />
         </Routes>
       </main>
       <Footer/>

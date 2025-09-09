@@ -26,6 +26,17 @@ export default function Login() {
         <p>
           ¿No tienes una cuenta? <Link to="/register">Crear una cuenta</Link>
         </p>
+        
+
+
+      {/*BOTON TEMPORAL PARA VER RECETAS*/}
+         <div className="mt-3">
+          <Link to="/recetas" className="btn btn-success">
+            Ir a Recetas
+          </Link>
+        </div>
+
+        
       </div>
     </>
   );
