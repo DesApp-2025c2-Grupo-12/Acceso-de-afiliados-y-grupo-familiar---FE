@@ -7,6 +7,7 @@ import Register from './pages/register/register'
 import Home from './pages/home/home'
 import Recetas from './pages/recetas/recetas'  
 import Turnos from './pages/turnos/turnos'
+import Autorizaciones from './pages/autorizaciones/autorizaciones'
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -27,6 +28,9 @@ function App() {
           <Route path="/recetas" element={<Recetas />} />
           <Route path="/turnos" element={<Turnos />} />
           <Route path="/reintegros" element={<Reintegros />} />
+          <Route path="/autorizaciones" element={<Autorizaciones />} />
+          
+          
         </Routes>
       </main>
       <Footer/>
