@@ -56,6 +56,9 @@ export default function Home() {
                 <Link to="/recetas" className="btn btn-lg btn-success">
                   Mis Recetas
                 </Link>
+                 <Link to="/autorizaciones" className="btn btn-lg btn-success">
+                  Autorizaciones
+                </Link>
                 <Link to="/" className="btn btn-lg btn-warning">
                   Cerrar sesión
                 </Link>

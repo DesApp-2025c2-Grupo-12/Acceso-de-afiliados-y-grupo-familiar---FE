@@ -44,9 +44,20 @@ export default function Recetas() {
         <div className="recetas-page d-flex">
             <div className="recetas-content flex-grow-1 p-4">
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h2 className="tituloRecetas">MIS RECETAS - Bianca Margarita</h2>
+                    <h2 className="tituloRecetas">MIS RECETAS - Juan Salvo</h2>
                     <button className="miBoton">+ Nueva Receta</button>
                 </div>
+
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <input
+                        className="form-control"
+                        type="search"
+                        placeholder="Search"
+                        aria-label="Search"
+                    />
+                    <button className="botonBusqueda ms-2" type="submit">Buscar</button>
+                </div>
+
 
                 <div className="row">
                     {recetasData.map((receta) => (
@@ -59,8 +70,8 @@ export default function Recetas() {
                                     <div className="d-flex justify-content-between align-items-center mt-3">
                                         <span
                                             className={`badge badge-pendiente px-3 py-2 ${receta.estado === "Pendiente"
-                                                    ? "badge-pendiente"
-                                                    : "badge-entregada"
+                                                ? "badge-pendiente"
+                                                : "badge-entregada"
                                                 }`}
                                         >
                                             {receta.estado}

@@ -86,3 +86,20 @@
 .miBotonReceta:hover {
   background-color: #2b47b9;
 }
+
+
+.botonBusqueda {
+  background-color: #132074;
+  border: none;
+  padding: 6px 16px;  
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  transition: background-color 0.3s;
+  height: 38px; 
+}
+
+.botonBusqueda:hover {
+  background-color: #2b47b9;
+}

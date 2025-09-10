@@ -78,10 +78,15 @@ export default function Recetas() {
                     <h2 className="tituloAtorizaciones">MIS AUTORIZACIONES</h2>
                     <button className="miBoton">+ Nueva Autorizacion</button>
                 </div>
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <input className="form-control mr-sm-2 " type="search" placeholder="Search" aria-label="Search"/>
-                        <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Buscar</button>
-                </div>
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                <input
+                    className="form-control"
+                    type="search"
+                    placeholder="Search"
+                    aria-label="Search"
+                />
+                <button className="botonBusqueda ms-2" type="submit">Buscar</button>
+            </div>
 
                 <div className="row">
                     {AutorizacionesData.map((auto) => (
