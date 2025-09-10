@@ -1,7 +1,66 @@
-import React from 'react'
+import React from "react";
+import { Link } from "react-router-dom";
 
-export default function home() {
+export default function Home() {
   return (
-    <div>home...</div>
-  )
+    <div className="container my-5">
+      <h1 className="mb-4 text-center">Bienvenido a Medicina Integral</h1>
+      <p className="text-center mb-5">
+        Aquí podés ver un resumen de tu información y acceder rápidamente a tus turnos y recetas.
+      </p>
+
+      <div className="row g-4">
+        {/* Próximo turno */}
+        <div className="col-md-6">
+          <div className="card shadow-lg h-100">
+            <div className="card-body">
+              <h5 className="card-title">Próximo turno</h5>
+              <p className="card-text">
+                <strong>Médico:</strong> Dra. Calderon <br />
+                <strong>Especialidad:</strong> Pediatría <br />
+                <strong>Fecha:</strong> Lunes 21 de Septiembre <br />
+                <strong>Hora:</strong> 10:00 AM
+              </p>
+              <button className="btn btn-primary">Ver detalles</button>
+            </div>
+          </div>
+        </div>
+
+        {/* Última receta */}
+        <div className="col-md-6">
+          <div className="card shadow-lg h-100">
+            <div className="card-body">
+              <h5 className="card-title">Última receta</h5>
+              <p className="card-text">
+                <strong>Emitida:</strong> 01/09/2025 <br />
+                <strong>Medicamento:</strong> Ibuprofeno 600mg <br />
+                <strong>Dosis:</strong> Cada 8 horas
+              </p>
+              <button className="btn btn-success">Ver receta</button>
+            </div>
+          </div>
+        </div>
+
+        {/* Accesos rápidos */}
+        <div className="col-12">
+          <div className="card shadow-lg">
+            <div className="card-body text-center">
+              <h5 className="card-title mb-3">Accesos rápidos</h5>
+              <div className="d-flex flex-wrap justify-content-center gap-3">
+                <Link to="/turnos" className="btn btn-lg btn-primary">
+                  Mis Turnos
+                </Link>
+                <Link to="/recetas" className="btn btn-lg btn-success">
+                  Mis Recetas
+                </Link>
+                <Link to="/" className="btn btn-lg btn-warning">
+                  Cerrar sesión
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
