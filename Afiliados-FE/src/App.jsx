@@ -6,6 +6,7 @@ import Login from './pages/login'
 import Register from './pages/register'
 import Home from './pages/home'
 import Recetas from './pages/recetas'  
+import Turnos from './pages/turnos'
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -23,6 +24,7 @@ function App() {
           <Route path="/home" element={<p>Home...</p>} />
           <Route path="/about" element={<p>Contacto...</p>} />
           <Route path="/recetas" element={<Recetas />} />
+          <Route path="/turnos" element={<Turnos />} />
         </Routes>
       </main>
       <Footer/>
