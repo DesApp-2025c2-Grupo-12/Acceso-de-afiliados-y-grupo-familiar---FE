@@ -28,7 +28,7 @@ export default function Reintegros() {
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h3 className="titulo-reintegros">MIS REINTEGROS</h3>
-        <button className="miBotonReceta">+ Nueva Receta</button>
+        <button className="miBotonReceta">+ Nuevo Reintegro</button>
       </div>
 
       {reintegros.map((r) => (
