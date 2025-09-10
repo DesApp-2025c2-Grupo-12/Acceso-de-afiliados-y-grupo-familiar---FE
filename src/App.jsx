@@ -1,12 +1,12 @@
 import './App.css'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import Header from './components/Header'
-import Login from './pages/login'
-import Register from './pages/register'
-import Home from './pages/home'
-import Recetas from './pages/recetas'  
-import Turnos from './pages/turnos'
+import Navbar from './components/Navbar/Navbar'
+import Footer from './components/Footer/Footer'
+import Header from './components/Header/Header'
+import Login from './pages/login/login'
+import Register from './pages/register/register'
+import Home from './pages/home/home'
+import Recetas from './pages/recetas/recetas'  
+import Turnos from './pages/turnos/turnos'
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";

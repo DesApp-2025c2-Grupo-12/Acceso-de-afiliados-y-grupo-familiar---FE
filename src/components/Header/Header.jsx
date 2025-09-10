@@ -1,6 +1,6 @@
 import React from "react";
 import { Dropdown, Container } from "react-bootstrap";
-import logo from "../assets/logo.png"; // Ruta a tu logo
+import logo from "../../assets/logo.png"; // Ruta a tu logo
 
 
 
