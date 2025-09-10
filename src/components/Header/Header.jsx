@@ -27,7 +27,7 @@ export default function Header() {
             <Dropdown.Item href="">Mis datos</Dropdown.Item>
             <Dropdown.Item href="">ver usuarios</Dropdown.Item>
             <Dropdown.Divider />
-            <Dropdown.Item href="">Cerrar sesión</Dropdown.Item>
+            <Dropdown.Item href="/">Cerrar sesión</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </Container>
