@@ -1,0 +1,88 @@
+.titulo-reintegros {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #132074;
+  text-transform: uppercase;
+}
+
+.card-reintegro {
+  border-radius: 16px;   
+  border: 1px solid #ddd;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  padding: 24px;             
+  min-height: 150px;        
+}
+
+.fecha {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-top: 6px;
+}
+
+.monto {
+  font-weight: 700;
+  font-size: 1.4rem;       
+  margin-bottom: 6px;
+}
+
+.paciente {
+  font-weight: bold;
+  font-size: 1.2rem;         
+  margin-bottom: 10px;
+}
+
+.datos-medico {
+  font-size: 1rem;          
+  color: #444;
+}
+
+.datos-medico span {
+  font-weight: 500;
+}
+
+.estado {
+  display: inline-block;
+  padding: 8px 20px;         
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.estado.pendiente {
+  background-color: #eeb94e;
+  color: #000;
+}
+
+.estado.pago {
+  background-color: #7fc05c;
+  color: #000;
+}
+
+.acciones {
+  font-size: 1rem;      
+}
+
+.acciones a {
+  color: #000;
+  text-decoration: none;
+}
+
+.acciones a:hover {
+  text-decoration: underline;
+}
+
+.miBotonReceta {
+  background-color: #132074;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.miBotonReceta:hover {
+  background-color: #2b47b9;
+}

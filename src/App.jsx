@@ -11,6 +11,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Reintegros from './pages/reintegros/reintegros'
 
 function App() {
  return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/about" element={<p>Contacto...</p>} />
           <Route path="/recetas" element={<Recetas />} />
           <Route path="/turnos" element={<Turnos />} />
+          <Route path="/reintegros" element={<Reintegros />} />
         </Routes>
       </main>
       <Footer/>

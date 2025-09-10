@@ -4,37 +4,37 @@ const recetasData = [
     {
         id: 1,
         nombre: "Paracetamol 500 mg, Comprimidos × 15",
-        paciente: "Bianca Margarita",
+        paciente: "Juan Salvo",
         estado: "Pendiente",
     },
     {
         id: 2,
         nombre: "Ibuprofeno 600 mg, Comprimidos × 30",
-        paciente: "Bianca Margarita",
+        paciente: "Juan Salvo",
         estado: "Pendiente",
     },
     {
         id: 3,
         nombre: "Amoxicilina 250 mg, Jarabe × 1 Unidad",
-        paciente: "Bianca Margarita",
+        paciente: "Juan Salvo",
         estado: "Entregada",
     },
     {
         id: 4,
         nombre: "Calcitriol, 0.25 mcg Cápsulas × 30",
-        paciente: "Bianca Margarita",
+        paciente: "Juan Salvo",
         estado: "Entregada",
     },
     {
         id: 5,
         nombre: "Vitamina D, 20 mg Comprimidos × 30",
-        paciente: "Bianca Margarita",
+        paciente: "Juan Salvo",
         estado: "Pendiente",
     },
     {
         id: 6,
         nombre: "Vitamina A, 20 mg Comprimidos × 15",
-        paciente: "Bianca Margarita",
+        paciente: "Juan Salvo",
         estado: "Entregada",
     },
 ];
