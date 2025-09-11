@@ -1,8 +1,21 @@
 #root {
-  /*max-width: 1280px;*/
   width: 100%;
   margin: 0 auto;
-  /*padding: 2rem;*/
   text-align: center;
-  
 }
+
+.content {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+}
+
+.content nav {
+  width: 10%;
+}
+
+.content main {
+  width: 90%;
+}
+

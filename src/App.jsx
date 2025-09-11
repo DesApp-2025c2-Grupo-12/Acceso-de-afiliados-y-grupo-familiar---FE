@@ -5,7 +5,7 @@ import Header from './components/Header/Header'
 import Login from './pages/login/login'
 import Register from './pages/register/register'
 import Home from './pages/home/home'
-import Recetas from './pages/recetas/recetas'  
+import Recetas from './pages/recetas/recetas'
 import Turnos from './pages/turnos/turnos'
 import Autorizaciones from './pages/autorizaciones/autorizaciones'
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -15,28 +15,30 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Reintegros from './pages/reintegros/reintegros'
 
 function App() {
- return (
-  <Router>
-    <div className="d-flex flex-column min-vh-100">
-      <Header/>
-      <main className="container my-5 flex-grow-1">
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register/>} />
-          <Route path="/home" element={<Home/>} />
-          <Route path="/about" element={<p>Contacto...</p>} />
-          <Route path="/recetas" element={<Recetas />} />
-          <Route path="/turnos" element={<Turnos />} />
-          <Route path="/reintegros" element={<Reintegros />} />
-          <Route path="/autorizaciones" element={<Autorizaciones />} />
-          
-          
-        </Routes>
-      </main>
-      <Footer/>
-    </div>
-  </Router>
-)
+  return (
+    <Router>
+      <div className="d-flex flex-column min-vh-100">
+        <Header />
+        <div className="content">
+          <Navbar />
+          <main className="container my-5 flex-grow-1">
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/about" element={<p>Contacto...</p>} />
+              <Route path="/recetas" element={<Recetas />} />
+              <Route path="/turnos" element={<Turnos />} />
+              <Route path="/reintegros" element={<Reintegros />} />
+              <Route path="/autorizaciones" element={<Autorizaciones />} />
+
+            </Routes>
+          </main>
+        </div>
+        <Footer />
+      </div>
+    </Router>
+  )
 
 }
 

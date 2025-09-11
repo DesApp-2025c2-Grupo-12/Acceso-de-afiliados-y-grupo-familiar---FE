@@ -42,30 +42,6 @@ export default function Home() {
         </div>
 
         
-        <div className="col-12">
-          <div className="card shadow-lg">
-            <div className="card-body text-center">
-              <h5 className="card-title mb-3">Accesos rápidos</h5>
-              <div className="d-flex flex-wrap justify-content-center gap-3">
-                <Link to="/turnos" className="btn btn-lg btn-primary">
-                  Mis Turnos
-                </Link>
-                <Link to="/reintegros" className="btn btn-lg btn-primary">
-                  Reintegros
-                </Link>
-                <Link to="/recetas" className="btn btn-lg btn-success">
-                  Mis Recetas
-                </Link>
-                 <Link to="/autorizaciones" className="btn btn-lg btn-success">
-                  Autorizaciones
-                </Link>
-                <Link to="/" className="btn btn-lg btn-warning">
-                  Cerrar sesión
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
