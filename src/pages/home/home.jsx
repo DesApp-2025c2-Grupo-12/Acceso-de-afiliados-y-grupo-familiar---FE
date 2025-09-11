@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import "./home.css"
 
 export default function Home() {
   return (
@@ -21,7 +22,7 @@ export default function Home() {
                 <strong>Fecha:</strong> Lunes 21 de Septiembre.<br />
                 <strong>Hora:</strong> 10:00 AM
               </p>
-              <button className="btn btn-primary mt-auto align-self-center">Ir a Turnos</button>
+              <button className="btn-blue mt-auto align-self-center white">Ir a Turnos</button>
             </div>
           </div>
         </div>
@@ -36,7 +37,7 @@ export default function Home() {
                 <strong>Medicamento:</strong> Ibuprofeno 600mg.<br />
                 <strong>Dosis:</strong> Cada 8 horas.
               </p>
-              <button className="btn btn-primary mt-auto align-self-center">Ir a Recetas</button>
+              <button className="btn-blue mt-auto align-self-center">Ir a Recetas</button>
             </div>
           </div>
         </div>
@@ -50,7 +51,7 @@ export default function Home() {
                 <strong>Especialidad:</strong> Neurocirugia<br />
                 <strong>Reintegro:</strong> $160.000.
               </p>
-              <button className="btn btn-primary mt-auto align-self-center">Ir a Reintegros</button>
+              <button className="btn-blue mt-auto align-self-center">Ir a Reintegros</button>
             </div>
           </div>
         </div>
@@ -64,7 +65,7 @@ export default function Home() {
                 <strong>paciente:</strong> Franco Cantero<br />
                 <strong>Lugar de Prestacion:</strong> Hospital municipal de Hurlingham
               </p>
-              <button className="btn btn-primary mt-auto align-self-center">Ir a Reintegros</button>
+              <button className="btn-blue mt-auto align-self-center">Ir a Reintegros</button>
             </div>
           </div>
         </div>
