@@ -11,6 +11,7 @@
   text-decoration: underline;
 }
 
+
 @media (max-width: 767px) {
   .footer .border-end {
     border-right: none !important;
