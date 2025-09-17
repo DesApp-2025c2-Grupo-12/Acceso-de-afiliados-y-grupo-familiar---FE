@@ -1,8 +1,10 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import "./home.css"
+import { useNavigate } from "react-router-dom";
+import "./home.css";
 
 export default function Home() {
+  const navigate = useNavigate();
+
   return (
     <div className="container my-5">
       <h1 className="mb-4 text-center">Bienvenido a Medicina Integral</h1>
@@ -11,7 +13,6 @@ export default function Home() {
       </p>
 
       <div className="row g-4">
-      
         <div className="col-md-6">
           <div className="card shadow-lg h-100">
             <div className="card-body d-flex flex-column">
@@ -22,12 +23,16 @@ export default function Home() {
                 <strong>Fecha:</strong> Lunes 21 de Septiembre.<br />
                 <strong>Hora:</strong> 10:00 AM
               </p>
-              <button className="btn-blue mt-auto align-self-center white">Ir a Turnos</button>
+              <button 
+                onClick={() => navigate("/turnos")} 
+                className="btn btn-blue mt-auto align-self-center"
+              >
+                Ir a Turnos
+              </button>
             </div>
           </div>
         </div>
 
-      
         <div className="col-md-6">
           <div className="card shadow-lg h-100">
             <div className="card-body d-flex flex-column">
@@ -37,7 +42,12 @@ export default function Home() {
                 <strong>Medicamento:</strong> Ibuprofeno 600mg.<br />
                 <strong>Dosis:</strong> Cada 8 horas.
               </p>
-              <button className="btn-blue mt-auto align-self-center">Ir a Recetas</button>
+              <button 
+                onClick={() => navigate("/recetas")} 
+                className="btn btn-blue mt-auto align-self-center"
+              >
+                Ir a Recetas
+              </button>
             </div>
           </div>
         </div>
@@ -51,7 +61,12 @@ export default function Home() {
                 <strong>Especialidad:</strong> Neurocirugia<br />
                 <strong>Reintegro:</strong> $160.000.
               </p>
-              <button className="btn-blue mt-auto align-self-center">Ir a Reintegros</button>
+              <button 
+                onClick={() => navigate("/reintegros")} 
+                className="btn btn-blue mt-auto align-self-center"
+              >
+                Ir a Reintegros
+              </button>
             </div>
           </div>
         </div>
@@ -62,15 +77,18 @@ export default function Home() {
               <h5 className="card-title">Última Autorizacion</h5>
               <p className="card-text">
                 <strong>Fecha:</strong> Lunes 21 de septiembre.<br />
-                <strong>paciente:</strong> Franco Cantero<br />
+                <strong>Paciente:</strong> Franco Cantero<br />
                 <strong>Lugar de Prestacion:</strong> Hospital municipal de Hurlingham
               </p>
-              <button className="btn-blue mt-auto align-self-center">Ir a Reintegros</button>
+              <button 
+                onClick={() => navigate("/autorizaciones")} 
+                className="btn btn-blue mt-auto align-self-center"
+              >
+                Ir a Autorización
+              </button>
             </div>
           </div>
         </div>
-
-        
       </div>
     </div>
   );
