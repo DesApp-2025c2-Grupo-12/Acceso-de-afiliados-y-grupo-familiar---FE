@@ -78,9 +78,9 @@ export default function Recetas() {
                                         </span>
 
                                         <div>
-                                            <button className="BotonVer me-2">Ver</button>
+                                            <button className="BotonVerReceta">Ver</button>
                                             <button className="BotonRenovar">Renovar</button>
-
+                                            <button className="BotonDescargar"> Descargar</button>
                                         </div>
                                     </div>
                                 </div>

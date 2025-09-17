@@ -68,8 +68,8 @@ export default function Reintegros() {
                                     {r.estado}
                                 </div>
                                 <div className="acciones">
-                                    <a href="#">Ver detalle</a> |{" "}
-                                    <a href="#">Descargar comprobante</a>
+                                    <a href="#">Ver detalle</a> 
+                               
                                 </div>
                             </Col>
                         </Row>

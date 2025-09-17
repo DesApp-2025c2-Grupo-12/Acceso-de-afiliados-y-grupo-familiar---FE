@@ -70,8 +70,8 @@ body {
 
 /*BOTON VER y RENOVAR*/
 
-.BotonVer,
-.BotonRenovar {
+.BotonVerReceta,
+.BotonRenovar,.BotonDescargar {
   background-color: white;
   border: 1.5px solid black;
   color: black;
@@ -79,11 +79,13 @@ body {
   border-radius: 6px;
   font-size: 0.9rem;
   cursor: pointer;
+  margin-left: 6px;
   transition: all 0.3s ease;
 }
 
-.BotonVer:hover,
-.BotonRenovar:hover {
+.BotonVerReceta:hover,
+.BotonRenovar:hover,.BotonDescargar:hover {
   border-color: #132074;
   background-color: #7d89b9;
 }
+
