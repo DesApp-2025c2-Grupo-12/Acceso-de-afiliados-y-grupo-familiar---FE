@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Form from "../../components/Form/Form";
 
 export default function Login() {
-    const navigate = useNavigate();
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
-    //función para redireccionar el home
-    const handleLogin = (e) => { 
-    e.preventDefault(); // evitar que el formulario recargue la pagina
+  // Función para redireccionar al home
+  const handleLogin = (e) => { 
+    e.preventDefault(); // evitar que el formulario recargue la página
     navigate("/home");
   };
 
@@ -18,7 +20,36 @@ export default function Login() {
         subtitle="Iniciar sesión en el Portal Afiliado"
         buttonText="Iniciar sesión"
         onSubmit={handleLogin}
+        extraFields={
+          <>
+            {/* Contraseña */}
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">
+                Contraseña
+              </label>
+              <div className="input-group">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="form-control"
+                  id="password"
+                  placeholder="Ingresa tu contraseña"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <span
+                  className="input-group-text"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                </span>
+              </div>
+            </div>
+          </>
+        }
       />
+
       <div className="text-center mt-2">
         <p>
           <a href="#">¿Olvidaste tu nombre de usuario o contraseña?</a>
@@ -26,15 +57,6 @@ export default function Login() {
         <p>
           ¿No tienes una cuenta? <Link to="/register">Crear una cuenta</Link>
         </p>
-        
-       {/*BOTON TEMPORAL PARA VER RECETAS
-         <div className="mt-3">
-          <Link to="/recetas" className="btn btn-success">
-            Ir a Recetas
-          </Link>
-        </div> 
-        */}
-
       </div>
     </>
   );
