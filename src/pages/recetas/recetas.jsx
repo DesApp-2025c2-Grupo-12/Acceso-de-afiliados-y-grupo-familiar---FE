@@ -161,7 +161,7 @@ export default function Recetas() {
                   <label className="form-label">Observaciones</label>
                   <textarea className="form-control" name="observaciones" value={formData.observaciones} onChange={handleChange} />
                 </div>
-{/*consultar si agregamos iamgen*/}
+
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
