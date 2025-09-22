@@ -87,13 +87,13 @@ export default function Header() {
           <div className="d-flex flex-wrap gap-3">
             {grupoFamiliar.map((persona, index) => (
               <div
-                key={index}
+                key={index} 
                 className="border rounded p-3 flex-grow-1"
                 style={{ minWidth: "200px", maxWidth: "220px" }}
               >
                 <h5>{persona.nombre}</h5>
                 <p className="mb-2">Rol: {persona.relacion}</p>
-                <Button
+                <Button className="btn btn-blue mt-auto align-self-center"
                   variant="primary"
                   size="sm"
                   onClick={() => handleVerPerfilFamiliar(persona)}
