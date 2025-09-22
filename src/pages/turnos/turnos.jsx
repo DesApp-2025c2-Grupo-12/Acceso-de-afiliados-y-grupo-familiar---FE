@@ -1,30 +1,18 @@
 import React, { useState } from "react";
-import { Form, Row, Col, Button, Dropdown, Card, Badge, Container } from "react-bootstrap";
+import { Form, Row, Col, Button, Card, Badge, Container } from "react-bootstrap";
 
 export default function FormularioTurnos() {
-    const [especialidad, setEspecialidad] = useState("");
-    const [medico, setMedico] = useState("");
-    const [lugar, setLugar] = useState("");
-    const [fecha, setFecha] = useState("");
-    const [showEsp, setShowEsp] = useState(false);
-    const [showMed, setShowMed] = useState(false);
-    const [showLugar, setShowLugar] = useState(false);
+    const [busqueda, setBusqueda] = useState("");
     const [resultadosBusqueda, setResultadosBusqueda] = useState([]);
     const [busquedaRealizada, setBusquedaRealizada] = useState(false);
 
-    const especialidades = ["Cardiología", "Dermatología", "Odontología", "Pediatría"];
-    const medicos = ["Dr. Gutierrez", "Dra. Calderon", "Dr. Cantero", "Dr. Primera", "Dr. Escobar"];
-    const lugares = ["Clínica Modelo de Moron", "Hospital Municipal de Hurlingham", "Sanatorio Trinidad"];
+    const meses = {
+        "enero": 0, "febrero": 1, "marzo": 2, "abril": 3, "mayo": 4,
+        "junio": 5, "julio": 6, "agosto": 7, "septiembre": 8,
+        "octubre": 9, "noviembre": 10, "diciembre": 11
+    };
 
-    const resultadosEsp = especialidades.filter((e) =>
-        e.toLowerCase().includes(especialidad.toLowerCase())
-    );
-    const resultadosMed = medicos.filter((m) =>
-        m.toLowerCase().includes(medico.toLowerCase())
-    );
-    const resultadosLugar = lugares.filter((l) =>
-        l.toLowerCase().includes(lugar.toLowerCase())
-    );
+    const nombresMeses = Object.keys(meses); 
 
     const MisTurnos = [
         {
@@ -54,193 +42,125 @@ export default function FormularioTurnos() {
             especialidad: "Odontología",
             medico: "Dr. Primera",
             lugar: "Hospital Municipal de Hurlingham"
+        },
+        {
+            id: 5,
+            fechaYHora: "Jueves 30 de Diciembre, 07:30",
+            especialidad: "Cardiología",
+            medico: "Dr. Gutierrez",
+            lugar: "Clínica Modelo de Moron"
+        },
+        {
+            id: 6,
+            fechaYHora: "Jueves 24 de Septiembre, 08:00",
+            especialidad: "Cardiología",
+            medico: "Dr. Gutierrez",
+            lugar: "Clínica Modelo de Moron"
         }
     ];
 
+    const formatearFecha = (fechaStr) => {
+        const [, dia, , mes, hora] = fechaStr.split(/[\s,]+/);
+        const [horas, minutos] = hora.split(":");
+        const año = new Date().getFullYear();
+        return new Date(año, meses[mes.toLowerCase()], parseInt(dia), parseInt(horas), parseInt(minutos));
+    };
+
     const filtrarTurnos = () => {
+        const term = busqueda
+            .trim()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/\p{Diacritic}/gu, "");
+
         return MisTurnos.filter(turno => {
-            const coincideEspecialidad = !especialidad ||
-                turno.especialidad.toLowerCase().includes(especialidad.toLowerCase());
-
-            const coincideMedico = !medico ||
-                turno.medico.toLowerCase().includes(medico.toLowerCase());
-
-            const coincideLugar = !lugar ||
-                turno.lugar.toLowerCase().includes(lugar.toLowerCase());
-
-
-            const coincideFecha = !fecha;
-
-            return coincideEspecialidad && coincideMedico && coincideLugar && coincideFecha;
+            const especialidad = turno.especialidad
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/\p{Diacritic}/gu, "");
+            const medico = turno.medico
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/\p{Diacritic}/gu, "");
+            return !term || especialidad.includes(term) || medico.includes(term);
         });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         const resultados = filtrarTurnos();
-        setResultadosBusqueda(resultados);
+        const resultadosOrdenados = resultados.sort(
+            (a, b) => formatearFecha(a.fechaYHora) - formatearFecha(b.fechaYHora)
+        );
+        setResultadosBusqueda(resultadosOrdenados);
         setBusquedaRealizada(true);
-        console.log("Resultados de búsqueda:", resultados);
+        console.log("Resultados de búsqueda:", resultadosOrdenados);
     };
 
-    const formatearFecha = (fechaStr) => {
 
-        return fechaStr;
-    };
+    const turnosPorMes = resultadosBusqueda.reduce((acc, turno) => {
+        const mes = formatearFecha(turno.fechaYHora).getMonth();
+        if (!acc[mes]) acc[mes] = [];
+        acc[mes].push(turno);
+        return acc;
+    }, {});
 
     return (
-
         <Container className="px-3 px-md-4 px-lg-5 my-4">
             <div className="d-flex justify-content-end mb-4">
-                <Button variant="primary" size="lg">
-                    Mis Turnos
-                </Button>
+                <Button variant="primary" size="lg">Mis Turnos</Button>
             </div>
+
             <Form onSubmit={handleSubmit} className="p-4 bg-white rounded border border-dark mb-4">
                 <Row className="mb-3">
                     <Col>
-                        <div style={{ position: "relative" }}>
-                            <Form.Control
-                                type="text"
-                                placeholder="Especialidad"
-                                value={especialidad}
-                                onChange={(e) => {
-                                    setEspecialidad(e.target.value);
-                                    setShowEsp(true);
-                                }}
-                                onBlur={() => setTimeout(() => setShowEsp(false), 150)}
-                            />
-                            {showEsp && resultadosEsp.length > 0 && (
-                                <Dropdown.Menu show
-                                    className="w-100 text-wrap overflow-hidden"
-                                    style={{
-                                        maxWidth: "100%",
-                                        left: "0",
-                                        right: "0"
-                                    }}>
-                                    {resultadosEsp.map((r, idx) => (
-                                        <Dropdown.Item key={idx} onClick={() => setEspecialidad(r)}>
-                                            {r}
-                                        </Dropdown.Item>
-                                    ))}
-                                </Dropdown.Menu>
-                            )}
-                        </div>
-                    </Col>
-                    <Col>
-                        <div style={{ position: "relative" }}>
-                            <Form.Control
-                                type="text"
-                                placeholder="Médico"
-                                value={medico}
-                                onChange={(e) => {
-                                    setMedico(e.target.value);
-                                    setShowMed(true);
-                                }}
-                                onBlur={() => setTimeout(() => setShowMed(false), 150)}
-                            />
-                            {showMed && resultadosMed.length > 0 && (
-                                <Dropdown.Menu show
-                                    className="w-100 text-wrap overflow-hidden"
-                                    style={{
-                                        maxWidth: "100%",
-                                        left: "0",
-                                        right: "0"
-                                    }}>
-                                    {resultadosMed.map((r, idx) => (
-                                        <Dropdown.Item key={idx} onClick={() => setMedico(r)}>
-                                            {r}
-                                        </Dropdown.Item>
-                                    ))}
-                                </Dropdown.Menu>
-                            )}
-                        </div>
-                    </Col>
-                </Row>
-
-                <Row className="mb-3">
-                    <Col>
-                        <div style={{ position: "relative" }}>
-                            <Form.Control
-                                type="text"
-                                placeholder="Lugar de atención"
-                                value={lugar}
-                                onChange={(e) => {
-                                    setLugar(e.target.value);
-                                    setShowLugar(true);
-                                }}
-                                onBlur={() => setTimeout(() => setShowLugar(false), 150)}
-                            />
-                            {showLugar && resultadosLugar.length > 0 && (
-                                <Dropdown.Menu show
-                                    className="w-100 text-wrap overflow-hidden"
-                                    style={{
-                                        maxWidth: "100%",
-                                        left: "0",
-                                        right: "0"
-                                    }}>
-                                    {resultadosLugar.map((r, idx) => (
-                                        <Dropdown.Item key={idx} onClick={() => setLugar(r)}>
-                                            {r}
-                                        </Dropdown.Item>
-                                    ))}
-                                </Dropdown.Menu>
-                            )}
-                        </div>
-                    </Col>
-
-                    <Col>
                         <Form.Control
-                            type="date"
-                            value={fecha}
-                            onChange={(e) => setFecha(e.target.value)}
+                            type="text"
+                            placeholder="Buscar por médico o especialidad"
+                            value={busqueda}
+                            onChange={(e) => setBusqueda(e.target.value)}
                         />
                     </Col>
                 </Row>
-
-                <Button type="submit" variant="primary">
-                    Buscar Turnos
-                </Button>
+                <Button type="submit" variant="primary">Buscar Turnos</Button>
             </Form>
-
 
             {busquedaRealizada && (
                 <div className="resultados-busqueda">
-                    <h3 className="mb-4">
-                        {resultadosBusqueda.length > 0
-                            ? `Se encontraron ${resultadosBusqueda.length} turno(s) disponible(s)`
-                            : "No se encontraron turnos con los criterios seleccionados"}
-                    </h3>
-
-                    {resultadosBusqueda.length > 0 && (
-                        <Row>
-                            {resultadosBusqueda.map((turno) => (
-                                <Col md={6} lg={4} key={turno.id} className="mb-3">
-                                    <Card className="h-100 shadow-sm">
-                                        <Card.Header className="d-flex justify-content-between align-items-center">
-                                            <Badge bg="primary">{turno.especialidad}</Badge>
-                                            <small className="text-muted">ID: {turno.id}</small>
-                                        </Card.Header>
-                                        <Card.Body>
-                                            <Card.Title className="h6">{turno.medico}</Card.Title>
-                                            <Card.Text>
-                                                <strong>Fecha y Hora:</strong><br />
-                                                {formatearFecha(turno.fechaYHora)}
-                                            </Card.Text>
-                                            <Card.Text>
-                                                <strong>Lugar:</strong><br />
-                                                {turno.lugar}
-                                            </Card.Text>
-                                        </Card.Body>
-                                        <Card.Footer className="text-center">
-                                            <Button variant="outline-success" size="sm" className="me-2">
-                                                RESERVAR
-                                            </Button>
-                                        </Card.Footer>
-                                    </Card>
-                                </Col>
-                            ))}
-                        </Row>
+                    {Object.keys(turnosPorMes).length === 0 ? (
+                        <h3>No se encontraron turnos con los criterios seleccionados</h3>
+                    ) : (
+                        Object.keys(turnosPorMes).map((mesKey) => (
+                            <div key={mesKey} className="mb-4">
+                                <h4>{nombresMeses[mesKey].toUpperCase()}</h4>
+                                <Row>
+                                    {turnosPorMes[mesKey].map((turno) => (
+                                        <Col md={6} lg={4} key={turno.id} className="mb-3">
+                                            <Card className="h-100 shadow-sm">
+                                                <Card.Header className="d-flex justify-content-between align-items-center">
+                                                    <Badge bg="primary">{turno.especialidad}</Badge>
+                                                    <small className="text-muted">ID: {turno.id}</small>
+                                                </Card.Header>
+                                                <Card.Body>
+                                                    <Card.Title className="h6">{turno.medico}</Card.Title>
+                                                    <Card.Text>
+                                                        <strong>Fecha y Hora:</strong><br />
+                                                        {turno.fechaYHora}
+                                                    </Card.Text>
+                                                    <Card.Text>
+                                                        <strong>Lugar:</strong><br />
+                                                        {turno.lugar}
+                                                    </Card.Text>
+                                                </Card.Body>
+                                                <Card.Footer className="text-center">
+                                                    <Button variant="outline-success" size="sm">RESERVAR</Button>
+                                                </Card.Footer>
+                                            </Card>
+                                        </Col>
+                                    ))}
+                                </Row>
+                            </div>
+                        ))
                     )}
                 </div>
             )}
