@@ -10,7 +10,13 @@ El proyecto de afiliados es una aplicación web desarrollada con el fin de que l
 * Consultar la cartilla de prestadores.
 
 # 💾 Tecnologías utilizadas
-
+* Javascript. 
+* React.
+* Express.
+* NodeJS.
+* Sequelice.
+* Vite.
+* Figma.
 
 # 🗂️ Estructura del Proyecto
 
