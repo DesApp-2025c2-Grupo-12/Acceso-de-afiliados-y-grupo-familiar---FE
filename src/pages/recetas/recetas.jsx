@@ -1,13 +1,20 @@
 import { useState } from "react";
 
 export default function Recetas() {
-  const recetasData = [
+
+  //Array con datos de prueba
+  const recetasAfiliado = [
     { id: 1, nombre: "Paracetamol 500 mg, Comprimidos × 15", paciente: "Juan Salvo", estado: "Pendiente" },
     { id: 2, nombre: "Ibuprofeno 600 mg, Comprimidos × 30", paciente: "Juan Salvo", estado: "Pendiente" },
     { id: 3, nombre: "Amoxicilina 250 mg, Jarabe × 1 Unidad", paciente: "Juan Salvo", estado: "Entregada" },
+    { id: 4, nombre: "Lodoxamida 10 ml, Gotas  × 2 Unidad", paciente: "Juan Salvo", estado: "Entregada" },
+    { id: 5, nombre: "Buscapina 10 mg, Comprimidos × 20", paciente: "Juan Salvo", estado: "Pendiente" },
+    { id: 6, nombre: "Metfomina 850 mg, Comprimidos × 100", paciente: "Juan Salvo", estado: "Entregada" },
   ];
 
-  const [recetas, setRecetas] = useState(recetasData);
+  const [recetas, setRecetas] = useState(recetasAfiliado);
+
+  //Va actualizando los datos del form que ingresa el usuario
   const [formData, setFormData] = useState({
     integrante: "",
     nombre: "",
@@ -17,10 +24,13 @@ export default function Recetas() {
     imagen: null,
   });
 
+  //para botones que cambian de color
   const [hoverGuardar, setHoverGuardar] = useState(false);
   const [hoverNueva, setHoverNueva] = useState(false);
   const [hoverBuscar, setHoverBuscar] = useState(false);
 
+
+  //Maneja los eventos cuando se escribe (en un input) en el form
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setFormData({
@@ -29,8 +39,9 @@ export default function Recetas() {
     });
   };
 
+
+  // con tope de 2 para la cantidad de recetas
   const handleGuardar = () => {
-    // con tope de 2
     const cantidadNum = parseInt(formData.cantidad);
     if (cantidadNum < 1 || cantidadNum > 2) {
       alert("La cantidad debe ser 1 o 2");
@@ -45,13 +56,13 @@ export default function Recetas() {
     };
 
     setRecetas([...recetas, nuevaReceta]);
+
     setFormData({
       integrante: "",
       nombre: "",
       cantidad: 1,
       presentacion: "",
       observaciones: "",
-      imagen: null,
     });
 
     
@@ -63,8 +74,6 @@ export default function Recetas() {
   return (
     <div className="bg-light min-vh-100 p-4">
       <div className="container">
-
-     
         <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
           <h2 className="fw-bold text-dark fs-3 mb-0">MIS RECETAS - Juan Salvo</h2>
 
