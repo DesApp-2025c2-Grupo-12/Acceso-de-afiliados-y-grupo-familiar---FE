@@ -14,6 +14,9 @@ export default function Recetas() {
 
   const [recetas, setRecetas] = useState(recetasAfiliado);
 
+  // para la búsqueda de recetas
+  const [searchTerm, setSearchTerm] = useState(""); //Nuevo estado para búsqueda
+
   // Datos del form
   const [formData, setFormData] = useState({
     integrante: "",
@@ -67,14 +70,17 @@ export default function Recetas() {
     modal.hide();
   };
 
-  return (
-    <div className="bg-light min-vh-100 p-4">
-      <div className="container">
+  // Filtra la receta
+  const recetasFiltradas = recetas.filter((receta) =>
+    receta.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
+  return (
+    <div className="">
+      <div className="container">
 
         <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
           <h2 className="fw-bold text-dark fs-3 mb-0">MIS RECETAS - Juan Salvo</h2>
-
           <button
             className="btn text-white px-4 py-2 fs-5"
             style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
@@ -87,13 +93,15 @@ export default function Recetas() {
           </button>
         </div>
 
-        
+        {/* buscar rceta */}
         <div className="d-flex align-items-center mb-4 flex-nowrap" style={{ gap: "8px" }}>
           <input
             className="form-control"
             type="search"
             placeholder="Buscar..."
             aria-label="Buscar"
+            value={searchTerm}                
+            onChange={(e) => setSearchTerm(e.target.value)} //actualizar estado
           />
           <button
             className="btn text-white"
@@ -105,8 +113,9 @@ export default function Recetas() {
           </button>
         </div>
 
+        {/* Listado de recetas filtradas para usar en el buscador*/}
         <div className="row">
-          {recetas.map((receta) => (
+          {recetasFiltradas.map((receta) => (
             <div key={receta.id} className="col-md-6 mb-4">
               <div className="card h-100 shadow-sm">
                 <div className="card-body">
@@ -135,7 +144,7 @@ export default function Recetas() {
           ))}
         </div>
 
-      
+        {/* Modal para la nueva receta */}
         <div className="modal fade" id="nuevaRecetaModal" tabIndex="-1" aria-labelledby="nuevaRecetaModalLabel" aria-hidden="true">
           <div className="modal-dialog">
             <div className="modal-content">
@@ -145,7 +154,7 @@ export default function Recetas() {
               </div>
               <div className="modal-body">
 
-               {/* opciones para integrante */}
+                {/* opciones para integrante */}
                 <div className="mb-3">
                   <label className="form-label">Seleccionar integrante</label>
                   <select
@@ -162,7 +171,6 @@ export default function Recetas() {
                     ))}
                   </select>
                 </div>
-
                 <div className="mb-3">
                   <label className="form-label">Nombre de medicamento</label>
                   <input type="text" className="form-control" name="nombre" value={formData.nombre} onChange={handleChange} />
@@ -172,22 +180,23 @@ export default function Recetas() {
                   <label className="form-label">Cantidad</label>
                   <input type="number" className="form-control" name="cantidad" value={formData.cantidad} onChange={handleChange} min={1} max={2} />
                 </div>
-  {/* opciones para presentacion */}
-              <div className="mb-3">
-  <label className="form-label">Presentación</label>
-  <select
-    className="form-select"
-    name="presentacion"
-    value={formData.presentacion}
-    onChange={handleChange}
-  >
-    <option value="">Seleccionar...</option>
-    <option value="Comprimidos">Comprimidos</option>
-    <option value="Jarabe">Jarabe</option>
-    <option value="Gotas">Gotas</option>
-    <option value="Otros">Otro</option>
-  </select>
-</div>
+
+                {/* opciones para presentación */}
+                <div className="mb-3">
+                  <label className="form-label">Presentación</label>
+                  <select
+                    className="form-select"
+                    name="presentacion"
+                    value={formData.presentacion}
+                    onChange={handleChange}
+                  >
+                    <option value="">Seleccionar...</option>
+                    <option value="Comprimidos">Comprimidos</option>
+                    <option value="Jarabe">Jarabe</option>
+                    <option value="Gotas">Gotas</option>
+                    <option value="Otros">Otro</option>
+                  </select>
+                </div>
 
                 <div className="mb-3">
                   <label className="form-label">Observaciones</label>
