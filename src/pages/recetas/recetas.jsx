@@ -2,45 +2,42 @@ import { useState } from "react";
 
 export default function Recetas() {
 
-  //Array con datos de prueba
+  // Array con integrantes de la cuenta (ejemplo)
+  const integrantesCuenta = ["Juan Salvo", "Ana Salvo", "María Salvo"];
+
+  // Array con datos de prueba
   const recetasAfiliado = [
     { id: 1, nombre: "Paracetamol 500 mg, Comprimidos × 15", paciente: "Juan Salvo", estado: "Pendiente" },
     { id: 2, nombre: "Ibuprofeno 600 mg, Comprimidos × 30", paciente: "Juan Salvo", estado: "Pendiente" },
     { id: 3, nombre: "Amoxicilina 250 mg, Jarabe × 1 Unidad", paciente: "Juan Salvo", estado: "Entregada" },
-    { id: 4, nombre: "Lodoxamida 10 ml, Gotas  × 2 Unidad", paciente: "Juan Salvo", estado: "Entregada" },
-    { id: 5, nombre: "Buscapina 10 mg, Comprimidos × 20", paciente: "Juan Salvo", estado: "Pendiente" },
-    { id: 6, nombre: "Metfomina 850 mg, Comprimidos × 100", paciente: "Juan Salvo", estado: "Entregada" },
   ];
 
   const [recetas, setRecetas] = useState(recetasAfiliado);
 
-  //Va actualizando los datos del form que ingresa el usuario
+  // Datos del form
   const [formData, setFormData] = useState({
     integrante: "",
     nombre: "",
     cantidad: 1,
     presentacion: "",
     observaciones: "",
-    imagen: null,
   });
 
-  //para botones que cambian de color
+  // hovers para los botones
   const [hoverGuardar, setHoverGuardar] = useState(false);
   const [hoverNueva, setHoverNueva] = useState(false);
   const [hoverBuscar, setHoverBuscar] = useState(false);
 
-
-  //Maneja los eventos cuando se escribe (en un input) en el form
+  // Maneja cambios en inputs
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: files ? files[0] : value,
+      [name]: value,
     });
   };
 
-
-  // con tope de 2 para la cantidad de recetas
+  // Guardar receta nueva (tope 2 en cantidad)
   const handleGuardar = () => {
     const cantidadNum = parseInt(formData.cantidad);
     if (cantidadNum < 1 || cantidadNum > 2) {
@@ -65,7 +62,6 @@ export default function Recetas() {
       observaciones: "",
     });
 
-    
     const modalEl = document.getElementById("nuevaRecetaModal");
     const modal = window.bootstrap.Modal.getInstance(modalEl);
     modal.hide();
@@ -74,6 +70,8 @@ export default function Recetas() {
   return (
     <div className="bg-light min-vh-100 p-4">
       <div className="container">
+
+
         <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
           <h2 className="fw-bold text-dark fs-3 mb-0">MIS RECETAS - Juan Salvo</h2>
 
@@ -89,7 +87,7 @@ export default function Recetas() {
           </button>
         </div>
 
-     
+        
         <div className="d-flex align-items-center mb-4 flex-nowrap" style={{ gap: "8px" }}>
           <input
             className="form-control"
@@ -107,7 +105,6 @@ export default function Recetas() {
           </button>
         </div>
 
-        
         <div className="row">
           {recetas.map((receta) => (
             <div key={receta.id} className="col-md-6 mb-4">
@@ -117,7 +114,6 @@ export default function Recetas() {
                   <p className="text-muted mb-2">{receta.paciente}</p>
 
                   <div className="d-flex justify-content-between align-items-center mt-3 flex-wrap">
-                
                     <span
                       className={`badge px-3 py-2 fs-6 ${
                         receta.estado === "Pendiente"
@@ -127,8 +123,6 @@ export default function Recetas() {
                     >
                       {receta.estado}
                     </span>
-
-                    
                     <div className="mt-2 mt-md-0">
                       <button className="btn btn-outline-dark btn-sm me-2">Ver</button>
                       <button className="btn btn-outline-dark btn-sm me-2">Renovar</button>
@@ -141,7 +135,7 @@ export default function Recetas() {
           ))}
         </div>
 
-     
+      
         <div className="modal fade" id="nuevaRecetaModal" tabIndex="-1" aria-labelledby="nuevaRecetaModalLabel" aria-hidden="true">
           <div className="modal-dialog">
             <div className="modal-content">
@@ -150,28 +144,57 @@ export default function Recetas() {
                 <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div className="modal-body">
+
+               {/* opciones para integrante */}
                 <div className="mb-3">
-                  <label className="form-label">Integrante</label>
-                  <input type="text" className="form-control" name="integrante" value={formData.integrante} onChange={handleChange} />
+                  <label className="form-label">Seleccionar integrante</label>
+                  <select
+                    className="form-select"
+                    name="integrante"
+                    value={formData.integrante}
+                    onChange={handleChange}
+                  >
+                    <option value="">Seleccionar...</option>
+                    {integrantesCuenta.map((integrante, index) => (
+                      <option key={index} value={integrante}>
+                        {integrante}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+
                 <div className="mb-3">
-                  <label className="form-label">Nombre</label>
+                  <label className="form-label">Nombre de medicamento</label>
                   <input type="text" className="form-control" name="nombre" value={formData.nombre} onChange={handleChange} />
                 </div>
+
                 <div className="mb-3">
                   <label className="form-label">Cantidad</label>
                   <input type="number" className="form-control" name="cantidad" value={formData.cantidad} onChange={handleChange} min={1} max={2} />
                 </div>
-                <div className="mb-3">
-                  <label className="form-label">Presentación</label>
-                  <input type="text" className="form-control" name="presentacion" value={formData.presentacion} onChange={handleChange} />
-                </div>
+  {/* opciones para presentacion */}
+              <div className="mb-3">
+  <label className="form-label">Presentación</label>
+  <select
+    className="form-select"
+    name="presentacion"
+    value={formData.presentacion}
+    onChange={handleChange}
+  >
+    <option value="">Seleccionar...</option>
+    <option value="Comprimidos">Comprimidos</option>
+    <option value="Jarabe">Jarabe</option>
+    <option value="Gotas">Gotas</option>
+    <option value="Otros">Otro</option>
+  </select>
+</div>
+
                 <div className="mb-3">
                   <label className="form-label">Observaciones</label>
                   <textarea className="form-control" name="observaciones" value={formData.observaciones} onChange={handleChange} />
                 </div>
-
               </div>
+
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button
