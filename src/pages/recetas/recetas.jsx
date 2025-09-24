@@ -7,9 +7,9 @@ export default function Recetas() {
 
   // Array con datos de prueba
   const recetasAfiliado = [
-    { id: 1, nombre: "Paracetamol 500 mg, Comprimidos × 15", paciente: "Juan Salvo", estado: "Pendiente" },
-    { id: 2, nombre: "Ibuprofeno 600 mg, Comprimidos × 30", paciente: "Juan Salvo", estado: "Pendiente" },
-    { id: 3, nombre: "Amoxicilina 250 mg, Jarabe × 1 Unidad", paciente: "Juan Salvo", estado: "Entregada" },
+    { id: 1, nombre: "Paracetamol 500 mg, Comprimidos × 15", paciente: "Juan Salvo", estado: "Pendiente", observaciones: "Tomar después de comer" },
+    { id: 2, nombre: "Ibuprofeno 600 mg, Comprimidos × 30", paciente: "Juan Salvo", estado: "Pendiente", observaciones: "" },
+    { id: 3, nombre: "Amoxicilina 250 mg, Jarabe × 1 Unidad", paciente: "Juan Salvo", estado: "Entregada", observaciones: "Conservar en heladera" },
   ];
 
   const [recetas, setRecetas] = useState(recetasAfiliado);
@@ -53,6 +53,7 @@ export default function Recetas() {
       nombre: `${formData.nombre}, ${formData.presentacion} × ${formData.cantidad}`,
       paciente: formData.integrante || "Juan Salvo",
       estado: "Pendiente",
+      observaciones: formData.observaciones || "",
     };
 
     setRecetas([...recetas, nuevaReceta]);
@@ -66,8 +67,36 @@ export default function Recetas() {
     });
 
     const modalEl = document.getElementById("nuevaRecetaModal");
-    const modal = window.bootstrap.Modal.getInstance(modalEl);
-    modal.hide();
+    if (modalEl) {
+      modalEl.classList.remove("show");
+      modalEl.setAttribute("aria-hidden", "true");
+      modalEl.style.display = "none";
+      document.body.classList.remove("modal-open");
+    }
+  };
+
+  // 📌 NUEVA FUNCIÓN -> Descargar receta como TXT
+  const handleDescargar = (receta) => {
+    const contenido = `
+Receta Médica
+-----------------------
+Paciente: ${receta.paciente}
+Medicamento: ${receta.nombre}
+Estado: ${receta.estado}
+Observaciones: ${receta.observaciones || "Ninguna"}
+    `;
+
+    const blob = new Blob([contenido], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Receta_${receta.id}.txt`; // nombre del archivo
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url); // limpia memoria
   };
 
   // Filtra la receta
@@ -93,7 +122,7 @@ export default function Recetas() {
           </button>
         </div>
 
-        {/* buscar rceta */}
+        {/* buscar receta */}
         <div className="d-flex align-items-center mb-4 flex-nowrap" style={{ gap: "8px" }}>
           <input
             className="form-control"
@@ -135,7 +164,15 @@ export default function Recetas() {
                     <div className="mt-2 mt-md-0">
                       <button className="btn btn-outline-dark btn-sm me-2">Ver</button>
                       <button className="btn btn-outline-dark btn-sm me-2">Renovar</button>
-                      <button className="btn btn-outline-dark btn-sm">Descargar</button>
+
+                      {/* 📌 BOTÓN DE DESCARGA DE RECETA */}
+                      <button
+                        className="btn btn-outline-dark btn-sm"
+                        onClick={() => handleDescargar(receta)}
+                      >
+                        Descargar
+                      </button>
+
                     </div>
                   </div>
                 </div>
