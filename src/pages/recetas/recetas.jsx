@@ -34,6 +34,9 @@ export default function Recetas() {
   // estado para errores
   const [error, setError] = useState(""); 
 
+  // estado para mensaje de éxito
+  const [success, setSuccess] = useState(""); 
+
   // Maneja cambios en inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,6 +82,10 @@ export default function Recetas() {
 
     setError(""); // limpia errores
 
+    // mostrar mensaje de éxito
+    setSuccess("Su receta se guardó correctamente!");
+    setTimeout(() => setSuccess(""), 3000); // desaparece después de 3s
+
     // cierra modal
     const modalEl = document.getElementById("nuevaRecetaModal");
     if (modalEl) {
@@ -86,9 +93,13 @@ export default function Recetas() {
       modalEl.setAttribute("aria-hidden", "true");
       modalEl.style.display = "none";
       document.body.classList.remove("modal-open");
-    }
 
-    
+      //Entender bien
+      const backdrop = document.querySelector(".modal-backdrop");
+      if (backdrop) {
+        backdrop.parentNode.removeChild(backdrop);
+      }
+    }
   };
 
   // funcion para descargar la receta
@@ -136,6 +147,13 @@ Observaciones: ${receta.observaciones || "Ninguna"}
           + Nueva Receta
         </button>
       </div>
+
+      {/* mensaje de éxito sobre la lista */}
+      {success && (
+        <div className="alert alert-success text-center mb-4" role="alert">
+          {success}
+        </div>
+      )}
 
       {/* busca receta */}
       <div className="d-flex align-items-center mb-4 flex-nowrap" style={{ gap: "8px" }}>
