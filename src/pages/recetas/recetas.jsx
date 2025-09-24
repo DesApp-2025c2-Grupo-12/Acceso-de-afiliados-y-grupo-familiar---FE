@@ -37,6 +37,9 @@ export default function Recetas() {
   // estado para mensaje de éxito
   const [success, setSuccess] = useState(""); 
 
+  // estado para receta seleccionada al ver
+  const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
+
   // Maneja cambios en inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -94,7 +97,7 @@ export default function Recetas() {
       modalEl.style.display = "none";
       document.body.classList.remove("modal-open");
 
-      //Entender bien
+      //BUSCAR BIEN DE QUE TRATA
       const backdrop = document.querySelector(".modal-backdrop");
       if (backdrop) {
         backdrop.parentNode.removeChild(backdrop);
@@ -124,6 +127,37 @@ Observaciones: ${receta.observaciones || "Ninguna"}
     document.body.removeChild(a);
 
     URL.revokeObjectURL(url); // limpia memoria
+  };
+
+  // funcion para ver receta
+  const handleVer = (receta) => {
+    setRecetaSeleccionada(receta);
+
+    const modalEl = document.getElementById("verRecetaModal");
+    if (modalEl) {
+      modalEl.classList.add("show");
+      modalEl.setAttribute("aria-hidden", "false");
+      modalEl.style.display = "block";
+      document.body.classList.add("modal-open");
+
+      const backdrop = document.createElement("div");
+      backdrop.className = "modal-backdrop fade show";
+      document.body.appendChild(backdrop);
+    }
+  };
+
+  // cerrar modal de ver, cierra de forma manual
+  const cerrarModalVer = () => {
+    const modalEl = document.getElementById("verRecetaModal");
+    if (modalEl) {
+      modalEl.classList.remove("show");
+      modalEl.setAttribute("aria-hidden", "true");
+      modalEl.style.display = "none";
+      document.body.classList.remove("modal-open");
+
+      const backdrop = document.querySelector(".modal-backdrop");
+      if (backdrop) backdrop.remove();
+    }
   };
 
   // Filtra la receta
@@ -191,7 +225,7 @@ Observaciones: ${receta.observaciones || "Ninguna"}
                     {receta.estado}
                   </span>
                   <div className="mt-2 mt-md-0">
-                    <button className="btn btn-outline-dark btn-sm me-2">Ver</button>
+                    <button className="btn btn-outline-dark btn-sm me-2" onClick={() => handleVer(receta)}>Ver</button>
                     <button className="btn btn-outline-dark btn-sm me-2">Renovar</button>
                     <button
                       className="btn btn-outline-dark btn-sm"
@@ -287,6 +321,31 @@ Observaciones: ${receta.observaciones || "Ninguna"}
               >
                 Guardar
               </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal para ver receta */}
+      <div className="modal fade" id="verRecetaModal" tabIndex="-1" aria-labelledby="verRecetaModalLabel" aria-hidden="true">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header" style={{ backgroundColor: "#132074", color: "white" }}>
+              <h5 className="modal-title" id="verRecetaModalLabel">Detalle de la Receta</h5>
+              <button type="button" className="btn-close btn-close-white" onClick={() => cerrarModalVer()} aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              {recetaSeleccionada && (
+                <>
+                  <p><strong>Paciente:</strong> {recetaSeleccionada.paciente}</p>
+                  <p><strong>Medicamento:</strong> {recetaSeleccionada.nombre}</p>
+                  <p><strong>Estado:</strong> {recetaSeleccionada.estado}</p>
+                  <p><strong>Observaciones:</strong> {recetaSeleccionada.observaciones || "Ninguna"}</p>
+                </>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => cerrarModalVer()}>Cerrar</button>
             </div>
           </div>
         </div>
