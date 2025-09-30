@@ -199,14 +199,7 @@ Observaciones: ${receta.observaciones || "Ninguna"}
           value={searchTerm}                
           onChange={(e) => setSearchTerm(e.target.value)} 
         />
-        <button
-          className="btn text-white"
-          style={{ backgroundColor: hoverBuscar ? "#b0b0b0" : "#132074" }}
-          onMouseEnter={() => setHoverBuscar(true)}
-          onMouseLeave={() => setHoverBuscar(false)}
-        >
-          Buscar
-        </button>
+        
       </div>
 
       {/* Listado de recetas filtradas para usar en el buscador*/}

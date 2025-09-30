@@ -15,7 +15,7 @@ export default function Header() {
     { nombre: "Lucas Pérez", relacion: "Hijo", edad: 17, DNI: "48658945",mail: "lucasperez@gmail.com" ,  credencial: "27/48658945/00" },
     { nombre: "Sofía Pérez", relacion: "Hija", edad: 12, DNI: "50654965",mail: "sofiaperez@gmail.com" ,  credencial: "27/50654965/00" },
   ];
-
+  
   const handleVerPerfilFamiliar = (persona) => {
     setPerfilSeleccionado(persona);
     setShowModalPerfilFamiliar(true);
