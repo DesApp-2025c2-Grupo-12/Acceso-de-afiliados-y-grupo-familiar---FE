@@ -1,4 +1,10 @@
 import { useState } from "react";
+import CardReceta from "./cardReceta";
+import NuevaReceta from "./nuevaReceta";
+import VerReceta from "./verReceta";
+import RenovarReceta from "./renovarReceta";
+import BuscarReceta from "./buscarReceta";
+import { handleDescargar } from "./descargarReceta";
 
 export default function Recetas() {
 
@@ -10,14 +16,15 @@ export default function Recetas() {
     { id: 1, nombre: "Paracetamol 500 mg, Comprimidos × 15", paciente: "Juan Salvo", estado: "Pendiente", observaciones: "Tomar después de comer" },
     { id: 2, nombre: "Ibuprofeno 600 mg, Comprimidos × 30", paciente: "Juan Salvo", estado: "Pendiente", observaciones: "" },
     { id: 3, nombre: "Amoxicilina 250 mg, Jarabe × 1 Unidad", paciente: "Juan Salvo", estado: "Entregada", observaciones: "Conservar en heladera" },
+    { id: 4, nombre: "Loratadina 10 mg, Comprimidos × 10", paciente: "Ana Salvo", estado: "Pendiente", observaciones: "Tomar por la mañana" },
+    { id: 5, nombre: "Metformina 500 mg, Comprimidos × 20", paciente: "María Salvo", estado: "Entregada", observaciones: "No omitir comidas" },
+    { id: 6, nombre: "Omeprazol 20 mg, Cápsulas × 14", paciente: "Ana Salvo", estado: "Entregada", observaciones: "Tomar antes de desayunar" },
   ];
 
   const [recetas, setRecetas] = useState(recetasAfiliado);
 
-  // para la búsqueda de recetas
+  // Estados
   const [searchTerm, setSearchTerm] = useState(""); 
-
-  // Datos del form
   const [formData, setFormData] = useState({
     integrante: "",
     nombre: "",
@@ -25,114 +32,22 @@ export default function Recetas() {
     presentacion: "",
     observaciones: "",
   });
-
-  // hovers para los botones
   const [hoverGuardar, setHoverGuardar] = useState(false);
   const [hoverNueva, setHoverNueva] = useState(false);
   const [hoverBuscar, setHoverBuscar] = useState(false);
-
-  // estado para errores
   const [error, setError] = useState(""); 
-
-  // estado para mensaje de éxito
   const [success, setSuccess] = useState(""); 
-
-  // estado para receta seleccionada al ver
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
+  const [recetaRenovar, setRecetaRenovar] = useState(null);
 
-  // Maneja cambios en inputs
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+  // Filtra la receta
+  const recetasFiltradas = recetas.filter((receta) =>
+    receta.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  // Guardar receta nueva (tope 2 en cantidad) y campos obligatorios
-  const handleGuardar = () => {
-    const cantidadNum = parseInt(formData.cantidad);
-
-    // Validaciones
-    if (!formData.integrante || !formData.nombre || !formData.presentacion) {
-      setError("Todos los campos obligatorios deben completarse");
-      return;
-    }
-
-    if (cantidadNum < 1 || cantidadNum > 2) {
-      setError("La cantidad debe ser 1 o 2");
-      return;
-    }
-
-    const nuevaReceta = {
-      id: recetas.length + 1,
-      nombre: `${formData.nombre}, ${formData.presentacion} × ${formData.cantidad}`,
-      paciente: formData.integrante || "Juan Salvo",
-      estado: "Pendiente",
-      observaciones: formData.observaciones || "",
-    };
-
-    setRecetas([...recetas, nuevaReceta]);
-
-    // limpiar form
-    setFormData({
-      integrante: "",
-      nombre: "",
-      cantidad: 1,
-      presentacion: "",
-      observaciones: "",
-    });
-
-    setError(""); // limpia errores
-
-    // mostrar mensaje de éxito
-    setSuccess("Su receta se guardó correctamente!");
-    setTimeout(() => setSuccess(""), 3000); // desaparece después de 3s
-
-    // cierra modal
-    const modalEl = document.getElementById("nuevaRecetaModal");
-    if (modalEl) {
-      modalEl.classList.remove("show");
-      modalEl.setAttribute("aria-hidden", "true");
-      modalEl.style.display = "none";
-      document.body.classList.remove("modal-open");
-
-      //BUSCAR BIEN DE QUE TRATA
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) {
-        backdrop.parentNode.removeChild(backdrop);
-      }
-    }
-  };
-
-  // funcion para descargar la receta
-  const handleDescargar = (receta) => {
-    const contenido = `
-Receta Médica
------------------------
-Paciente: ${receta.paciente}
-Medicamento: ${receta.nombre}
-Estado: ${receta.estado}
-Observaciones: ${receta.observaciones || "Ninguna"}
-    `;
-
-    const blob = new Blob([contenido], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Receta_${receta.id}.txt`; // nombre del archivo
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    URL.revokeObjectURL(url); // limpia memoria
-  };
-
-  // funcion para ver receta
-  const handleVer = (receta) => {
+  // Funciones para abrir modales
+  const abrirModalVer = (receta) => {
     setRecetaSeleccionada(receta);
-
     const modalEl = document.getElementById("verRecetaModal");
     if (modalEl) {
       modalEl.classList.add("show");
@@ -146,24 +61,20 @@ Observaciones: ${receta.observaciones || "Ninguna"}
     }
   };
 
-  // cerrar modal de ver, cierra de forma manual
-  const cerrarModalVer = () => {
-    const modalEl = document.getElementById("verRecetaModal");
+  const abrirModalRenovar = (receta) => {
+    setRecetaRenovar(receta);
+    const modalEl = document.getElementById("renovarRecetaModal");
     if (modalEl) {
-      modalEl.classList.remove("show");
-      modalEl.setAttribute("aria-hidden", "true");
-      modalEl.style.display = "none";
-      document.body.classList.remove("modal-open");
+      modalEl.classList.add("show");
+      modalEl.setAttribute("aria-hidden", "false");
+      modalEl.style.display = "block";
+      document.body.classList.add("modal-open");
 
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) backdrop.remove();
+      const backdrop = document.createElement("div");
+      backdrop.className = "modal-backdrop fade show";
+      document.body.appendChild(backdrop);
     }
   };
-
-  // Filtra la receta
-  const recetasFiltradas = recetas.filter((receta) =>
-    receta.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="container">
@@ -189,160 +100,60 @@ Observaciones: ${receta.observaciones || "Ninguna"}
         </div>
       )}
 
-      {/* busca receta */}
-      <div className="d-flex align-items-center mb-4 flex-nowrap" style={{ gap: "8px" }}>
-        <input
-          className="form-control"
-          type="search"
-          placeholder="Buscar..."
-          aria-label="Buscar"
-          value={searchTerm}                
-          onChange={(e) => setSearchTerm(e.target.value)} 
-        />
-        
-      </div>
+      {/* componente buscar receta */}
+      <BuscarReceta
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        hoverBuscar={hoverBuscar}
+        setHoverBuscar={setHoverBuscar}
+      />
 
-      {/* Listado de recetas filtradas para usar en el buscador*/}
+      {/* Listado de recetas */}
       <div className="row">
         {recetasFiltradas.map((receta) => (
-          <div key={receta.id} className="col-md-6 mb-4">
-            <div className="card h-100 shadow-sm">
-              <div className="card-body">
-                <h5 className="card-title">{receta.nombre}</h5>
-                <p className="text-muted mb-2">{receta.paciente}</p>
-
-                <div className="d-flex justify-content-between align-items-center mt-3 flex-wrap">
-                  <span
-                    className={`badge px-3 py-2 fs-6 ${receta.estado === "Pendiente" ? "bg-warning text-dark" : "bg-success text-dark"}`}
-                  >
-                    {receta.estado}
-                  </span>
-                  <div className="mt-2 mt-md-0">
-                    <button className="btn btn-outline-dark btn-sm me-2" onClick={() => handleVer(receta)}>Ver</button>
-                    <button className="btn btn-outline-dark btn-sm me-2">Renovar</button>
-                    <button
-                      className="btn btn-outline-dark btn-sm"
-                      onClick={() => handleDescargar(receta)}
-                    >
-                      Descargar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <CardReceta
+            key={receta.id}
+            receta={receta}
+            handleVer={abrirModalVer}
+            handleRenovar={abrirModalRenovar}
+            handleDescargar={handleDescargar}
+          />
         ))}
       </div>
 
-      {/* Modal para la nueva receta */}
-      <div className="modal fade" id="nuevaRecetaModal" tabIndex="-1" aria-labelledby="nuevaRecetaModalLabel" aria-hidden="true">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header" style={{ backgroundColor: "#132074", color: "white" }}>
-              <h5 className="modal-title" id="nuevaRecetaModalLabel">Nueva Receta</h5>
-              <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div className="modal-body">
+      {/* Modales */}
+      <NuevaReceta
+        integrantesCuenta={integrantesCuenta}
+        formData={formData}
+        setFormData={setFormData}
+        setRecetas={setRecetas}
+        recetas={recetas}
+        error={error}
+        setError={setError}
+        success={success}
+        setSuccess={setSuccess}
+        hoverGuardar={hoverGuardar}
+        setHoverGuardar={setHoverGuardar}
+      />
 
-              {/* Mensaje de error */}
-              {error && (
-                <div className="alert alert-danger" role="alert">
-                  {error}
-                </div>
-              )}
+      <VerReceta
+        receta={recetaSeleccionada}
+        setRecetaSeleccionada={setRecetaSeleccionada}
+      />
 
-              {/* opciones para integrante */}
-              <div className="mb-3">
-                <label className="form-label">Seleccionar integrante</label>
-                <select
-                  className="form-select"
-                  name="integrante"
-                  value={formData.integrante}
-                  onChange={handleChange}
-                >
-                  <option value="">Seleccionar...</option>
-                  {integrantesCuenta.map((integrante, index) => (
-                    <option key={index} value={integrante}>
-                      {integrante}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Nombre de medicamento</label>
-                <input type="text" className="form-control" name="nombre" value={formData.nombre} onChange={handleChange} />
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Cantidad</label>
-                <input type="number" className="form-control" name="cantidad" value={formData.cantidad} onChange={handleChange} min={1} max={2} />
-              </div>
-
-              {/* opciones para presentación */}
-              <div className="mb-3">
-                <label className="form-label">Presentación</label>
-                <select
-                  className="form-select"
-                  name="presentacion"
-                  value={formData.presentacion}
-                  onChange={handleChange}
-                >
-                  <option value="">Seleccionar...</option>
-                  <option value="Comprimidos">Comprimidos</option>
-                  <option value="Jarabe">Jarabe</option>
-                  <option value="Gotas">Gotas</option>
-                  <option value="Otros">Otro</option>
-                </select>
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Observaciones</label>
-                <textarea className="form-control" name="observaciones" value={formData.observaciones} onChange={handleChange} />
-              </div>
-            </div>
-
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <button
-                type="button"
-                className="btn text-white"
-                style={{ backgroundColor: hoverGuardar ? "#b0b0b0" : "#132074" }}
-                onMouseEnter={() => setHoverGuardar(true)}
-                onMouseLeave={() => setHoverGuardar(false)}
-                onClick={handleGuardar}
-              >
-                Guardar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Modal para ver receta */}
-      <div className="modal fade" id="verRecetaModal" tabIndex="-1" aria-labelledby="verRecetaModalLabel" aria-hidden="true">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header" style={{ backgroundColor: "#132074", color: "white" }}>
-              <h5 className="modal-title" id="verRecetaModalLabel">Detalle de la Receta</h5>
-              <button type="button" className="btn-close btn-close-white" onClick={() => cerrarModalVer()} aria-label="Close"></button>
-            </div>
-            <div className="modal-body">
-              {recetaSeleccionada && (
-                <>
-                  <p><strong>Paciente:</strong> {recetaSeleccionada.paciente}</p>
-                  <p><strong>Medicamento:</strong> {recetaSeleccionada.nombre}</p>
-                  <p><strong>Estado:</strong> {recetaSeleccionada.estado}</p>
-                  <p><strong>Observaciones:</strong> {recetaSeleccionada.observaciones || "Ninguna"}</p>
-                </>
-              )}
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={() => cerrarModalVer()}>Cerrar</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <RenovarReceta
+        receta={recetaRenovar}
+        formData={formData}
+        setFormData={setFormData}
+        setRecetas={setRecetas}
+        recetas={recetas}
+        error={error}
+        setError={setError}
+        success={success}
+        setSuccess={setSuccess}
+        hoverGuardar={hoverGuardar}
+        setHoverGuardar={setHoverGuardar}
+      />
 
     </div>
   );
