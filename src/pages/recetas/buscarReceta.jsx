@@ -9,7 +9,7 @@ export default function buscarReceta({ searchTerm, setSearchTerm, hoverBuscar, s
       <input
         className="form-control"
         type="search"
-        placeholder="Buscar..."
+        placeholder="Buscar por nombre de medicamento..."
         aria-label="Buscar"
         value={searchTerm}                
         onChange={(e) => setSearchTerm(e.target.value)} 

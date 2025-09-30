@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function NuevaAutorizacion({
-  integrantesCuenta,
+  integrantesCuenta = [],
   formData,
   setFormData,
   setAutorizaciones,
@@ -25,7 +25,6 @@ export default function NuevaAutorizacion({
 
   // Guardar nueva autorización
   const handleGuardar = () => {
-
     // Validación: todos los campos obligatorios
     if (!formData.fecha || !formData.paciente || !formData.medico || !formData.especialidad || !formData.lugar || !formData.internacion) {
       setError("Todos los campos son obligatorios");
