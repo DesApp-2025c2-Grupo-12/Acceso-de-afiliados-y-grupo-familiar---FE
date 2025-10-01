@@ -4,6 +4,7 @@ import "./reintegros.css";
 
 export default function Reintegros() {
     const [modalAbierto, setModalAbierto] = useState(false);
+    const [busqueda, setBusqueda] = useState("");
     const [reintegros, setReintegros] = useState([
         {
             id: 1,
@@ -24,6 +25,22 @@ export default function Reintegros() {
             estado: "Pago",
         },
     ]);
+
+    const normalizar = (txt) =>
+        txt.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+
+    const term = normalizar(busqueda.trim());
+    const reintegrosFiltrados = reintegros.filter((r) => {
+        return (
+            !term ||
+            normalizar(r.paciente).includes(term) ||
+            normalizar(r.medico).includes(term) ||
+            normalizar(r.especialidad).includes(term) ||
+            normalizar(r.fecha).includes(term) ||
+            normalizar(r.estado).includes(term) ||
+            normalizar(r.monto).includes(term)
+        );
+    });
 
     const grupoFamiliar = [
         { nombre: "Bianca Margarita", relacion: "Afiliado", DNI: "40260243" },
@@ -217,38 +234,50 @@ export default function Reintegros() {
                 </div>
 
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                    <input className="form-control" type="search" placeholder="Search" aria-label="Search" />
-                    <button className="botonBusqueda ms-2" type="submit">
-                        Buscar
-                    </button>
+                    <input
+                        className="form-control"
+                        type="search"
+                        placeholder="Buscar por paciente, médico, especialidad..."
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
+                    />
                 </div>
 
-                {reintegros.map((r) => (
-                    <Card key={r.id} className="mb-3 card-reintegro">
-                        <Card.Body>
-                            <Row className="align-items-center">
-                                <Col md={3}>
-                                    <div className="monto">{r.monto}</div>
-                                    <div className="fecha">{r.fecha}</div>
-                                </Col>
+                {reintegrosFiltrados.length === 0 ? (
+                    <h5>No se encontraron reintegros</h5>
+                ) : (
+                    reintegrosFiltrados.map((r) => (
+                        <Card key={r.id} className="mb-3 card-reintegro">
+                            <Card.Body>
+                                <Row className="align-items-center">
+                                    <Col md={3}>
+                                        <div className="monto">{r.monto}</div>
+                                        <div className="fecha">{r.fecha}</div>
+                                    </Col>
 
-                                <Col md={5}>
-                                    <div className="paciente">{r.paciente}</div>
-                                    <div className="datos-medico">
-                                        <span>Médico: {r.medico}</span> | <span>Especialidad: {r.especialidad}</span>
-                                    </div>
-                                </Col>
+                                    <Col md={5}>
+                                        <div className="paciente">{r.paciente}</div>
+                                        <div className="datos-medico">
+                                            <span>Médico: {r.medico}</span> |{" "}
+                                            <span>Especialidad: {r.especialidad}</span>
+                                        </div>
+                                    </Col>
 
-                                <Col md={4} className="text-end">
-                                    <div className={`estado ${r.estado === "Pendiente" ? "pendiente" : "pago"}`}>{r.estado}</div>
-                                    <div className="acciones">
-                                        <a href="#" onClick={() => handleVerDetalle(r)}>Ver detalle</a>
-                                    </div>
-                                </Col>
-                            </Row>
-                        </Card.Body>
-                    </Card>
-                ))}
+                                    <Col md={4} className="text-end">
+                                        <div className={`estado ${r.estado === "Pendiente" ? "pendiente" : "pago"}`}>
+                                            {r.estado}
+                                        </div>
+                                        <div className="acciones">
+                                            <a href="#" onClick={() => handleVerDetalle(r)}>
+                                                Ver detalle
+                                            </a>
+                                        </div>
+                                    </Col>
+                                </Row>
+                            </Card.Body>
+                        </Card>
+                    ))
+                )}
             </div>
 
             <ModalNuevoReintegro
