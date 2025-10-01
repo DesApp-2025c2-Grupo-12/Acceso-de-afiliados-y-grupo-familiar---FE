@@ -15,15 +15,7 @@ export default function buscarReceta({ searchTerm, setSearchTerm, hoverBuscar, s
         onChange={(e) => setSearchTerm(e.target.value)} 
       />
 
-      {/* Botón de búsqueda */}
-      <button
-        className="btn text-white"
-        style={{ backgroundColor: hoverBuscar ? "#b0b0b0" : "#132074" }}
-        onMouseEnter={() => setHoverBuscar(true)}
-        onMouseLeave={() => setHoverBuscar(false)}
-      >
-        Buscar
-      </button>
+      
     </div>
   );
 }
