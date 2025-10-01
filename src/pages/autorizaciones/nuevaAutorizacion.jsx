@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function NuevaAutorizacion({
-  integrantesCuenta = [],
+  integrantesCuenta,
   formData,
   setFormData,
   setAutorizaciones,
@@ -11,9 +11,8 @@ export default function NuevaAutorizacion({
   success,
   setSuccess,
   hoverGuardar,
-  setHoverGuardar
+  setHoverGuardar,
 }) {
-
   // Maneja cambios en inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,7 +25,14 @@ export default function NuevaAutorizacion({
   // Guardar nueva autorización
   const handleGuardar = () => {
     // Validación: todos los campos obligatorios
-    if (!formData.fecha || !formData.paciente || !formData.medico || !formData.especialidad || !formData.lugar || !formData.internacion) {
+    if (
+      !formData.fecha ||
+      !formData.paciente ||
+      !formData.medico ||
+      !formData.especialidad ||
+      !formData.lugar ||
+      !formData.internacion
+    ) {
       setError("Todos los campos son obligatorios");
       return;
     }
@@ -75,25 +81,43 @@ export default function NuevaAutorizacion({
   };
 
   return (
-    <div className="modal fade" id="nuevaAutorizacionModal" tabIndex="-1" aria-labelledby="nuevaAutorizacionModalLabel" aria-hidden="true">
+    <div
+      className="modal fade"
+      id="nuevaAutorizacionModal"
+      tabIndex="-1"
+      aria-labelledby="nuevaAutorizacionModalLabel"
+      aria-hidden="true"
+    >
       <div className="modal-dialog">
         <div className="modal-content">
-
           {/* Header */}
-          <div className="modal-header" style={{ backgroundColor: "#132074", color: "white" }}>
-            <h5 className="modal-title" id="nuevaAutorizacionModalLabel">Nueva Autorización</h5>
-            <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div
+            className="modal-header"
+            style={{ backgroundColor: "#132074", color: "white" }}
+          >
+            <h5 className="modal-title" id="nuevaAutorizacionModalLabel">
+              Nueva Autorización
+            </h5>
+            <button
+              type="button"
+              className="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
 
           {/* Body */}
           <div className="modal-body">
-
             {error && (
-              <div className="alert alert-danger" role="alert">{error}</div>
+              <div className="alert alert-danger" role="alert">
+                {error}
+              </div>
             )}
 
             <div className="mb-3">
-              <label className="form-label">Fecha prevista para la prestación</label>
+              <label className="form-label">
+                Fecha prevista para la prestación
+              </label>
               <input
                 type="date"
                 className="form-control"
@@ -113,7 +137,9 @@ export default function NuevaAutorizacion({
               >
                 <option value="">Seleccionar...</option>
                 {integrantesCuenta.map((i, idx) => (
-                  <option key={idx} value={i}>{i}</option>
+                  <option key={idx} value={i}>
+                    {i}
+                  </option>
                 ))}
               </select>
             </div>
@@ -141,7 +167,9 @@ export default function NuevaAutorizacion({
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Lugar donde se realizará la prestación</label>
+              <label className="form-label">
+                Lugar donde se realizará la prestación
+              </label>
               <input
                 type="text"
                 className="form-control"
@@ -172,12 +200,17 @@ export default function NuevaAutorizacion({
                 onChange={handleChange}
               />
             </div>
-
           </div>
 
           {/* Footer */}
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
             <button
               type="button"
               className="btn text-white"
@@ -189,7 +222,6 @@ export default function NuevaAutorizacion({
               Guardar
             </button>
           </div>
-
         </div>
       </div>
     </div>

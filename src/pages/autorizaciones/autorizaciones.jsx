@@ -11,8 +11,8 @@ const autorizacionesData = [
     fecha: "Lunes 21 de Septiembre",
     medico: "Kenzo Tenma",
     lugar: "Hospital municipal de Hurlingham",
-    especialidad: "Cardiologia",
-    internacion: "8 dias",
+    especialidad: "Cardiología",
+    internacion: "8 días",
     paciente: "Franco Cantero",
     tipodeAF: "Hijo, Menor de edad",
     observaciones: "Observaciones ejemplo",
@@ -20,11 +20,11 @@ const autorizacionesData = [
   },
   {
     id: 2,
-    fecha: "Miercoles 12 de Agosto",
-    medico: "Fiodor Poe",
+    fecha: "Miércoles 12 de Agosto",
+    medico: "Kenzo Tenma",
     lugar: "Hospital municipal de Hurlingham",
-    especialidad: "Dermatologia",
-    internacion: "Sin internacion",
+    especialidad: "Dermatología",
+    internacion: "Sin internación",
     paciente: "Franco Cantero",
     tipodeAF: "Hijo, Menor de edad",
     observaciones: "",
@@ -35,8 +35,8 @@ const autorizacionesData = [
     fecha: "Martes 13 de Junio",
     medico: "Kenzo Tenma",
     lugar: "Sanatorio Trinidad",
-    especialidad: "Pediatria",
-    internacion: "14 dias",
+    especialidad: "Pediatría",
+    internacion: "14 días",
     paciente: "Bianca Margarita",
     tipodeAF: "Titular",
     observaciones: "Observaciones ejemplo",
@@ -51,7 +51,7 @@ export default function Autorizaciones() {
   const [hoverBuscar, setHoverBuscar] = useState(false);
   const [formData, setFormData] = useState({
     fecha: "",
-    integrante: "",
+    paciente: "",
     medico: "",
     especialidad: "",
     lugar: "",
@@ -64,7 +64,10 @@ export default function Autorizaciones() {
   const [success, setSuccess] = useState("");
   const [autorizacionSeleccionada, setAutorizacionSeleccionada] = useState(null);
 
-  // Filtrado por paciente o médico
+  // Array de integrantes de la cuenta (ejemplo)
+  const integrantesCuenta = ["Juan Salvo", "Ana Salvo", "María Salvo"];
+
+  // Filtro por paciente o médico
   const autorizacionesFiltradas = autorizaciones.filter(
     (a) =>
       a.paciente.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -93,6 +96,7 @@ export default function Autorizaciones() {
         </div>
       )}
 
+      {/* Barra de búsqueda */}
       <BuscarAutorizacion
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
@@ -111,6 +115,7 @@ export default function Autorizaciones() {
       </div>
 
       <NuevaAutorizacion
+        integrantesCuenta={integrantesCuenta}
         formData={formData}
         setFormData={setFormData}
         autorizaciones={autorizaciones}
