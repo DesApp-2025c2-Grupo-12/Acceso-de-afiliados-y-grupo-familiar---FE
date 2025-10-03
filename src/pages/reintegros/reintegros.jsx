@@ -28,7 +28,6 @@ export default function Reintegros() {
 
     const normalizar = (txt) =>
         txt.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
-
     const term = normalizar(busqueda.trim());
     const reintegrosFiltrados = reintegros.filter((r) => {
         return (

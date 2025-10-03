@@ -23,6 +23,10 @@ export default function Navbar() {
     recetas: {
       default: "src/assets/icons/recetas-1.svg",
       active: "src/assets/icons/recetas-2.svg"
+    },
+    prestadores: {
+      default: "src/assets/icons/prestadores-1.svg",
+      active: "src/assets/icons/prestadores-2.svg"
     }
   };
 
@@ -69,6 +73,15 @@ export default function Navbar() {
           <>
             <img src={isActive ? icons.recetas.active : icons.recetas.default} alt="Ir a la sección de recetas" />
             <p>Recetas</p>
+          </>
+        )}
+      </NavLink>
+
+      <NavLink to="/prestadores">
+        {({ isActive }) => (
+          <>
+            <img src={isActive ? icons.prestadores.active : icons.prestadores.default} alt="Ir a la sección de prestadores" />
+            <p>Prestadores</p>
           </>
         )}
       </NavLink>
