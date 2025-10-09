@@ -2,7 +2,7 @@ import React from "react";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "./Form.css";
 
-export default function Form({ title, subtitle, buttonText, onSubmit, extraFields }) {
+export default function Form({ title, subtitle, buttonText, onSubmit, extraFields, documento, setDocumento }) {
   return (
     <>
       {title && <h1>{title}</h1>}
@@ -11,6 +11,7 @@ export default function Form({ title, subtitle, buttonText, onSubmit, extraField
         <div className="card" style={{ width: "18rem" }}>
           <div className="card-body">
             <form onSubmit={onSubmit}>
+              {/* Input documento */}
               <div className="mb-3">
                 <label htmlFor="credential" className="form-label">
                   N° de documento
@@ -21,10 +22,12 @@ export default function Form({ title, subtitle, buttonText, onSubmit, extraField
                   id="credential"
                   placeholder="Ingresa tu documento"
                   required
+                  value={documento}
+                  onChange={(e) => setDocumento(e.target.value)}
                 />
               </div>
 
-              {/* Campos adicionales*/}
+              {/* Campos adicionales */}
               {extraFields}
 
               <button type="submit" className="btn btn-primary w-100 mt-2">

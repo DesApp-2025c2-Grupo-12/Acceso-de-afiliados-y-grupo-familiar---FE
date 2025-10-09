@@ -14,25 +14,37 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Reintegros from './pages/reintegros/reintegros'
+import ProtectedRoute from './components/protectedRoutes/protectedRoutes'
+import { useState , useEffect} from 'react'
+
 
 function App() {
+
+  const [usuarioLogueado, setUsuarioLogueado] = useState(false);
+
+
+  useEffect(() => {
+    const usuario = localStorage.getItem("afiliadoLogueado");
+    if (usuario) setUsuarioLogueado(true);
+  }, []);
+
   return (
     <Router>
       <div className="d-flex flex-column min-vh-100">
         <Header />
         <div className="content">
-          <Navbar />
+          <Navbar usuarioLogueado={usuarioLogueado} />
           <main className="container my-5 flex-grow-1">
             <Routes>
               <Route path="/" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/home" element={<Home />} />
+              <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
               <Route path="/about" element={<p>Contacto...</p>} />
-              <Route path="/recetas" element={<Recetas />} />
-              <Route path="/turnos" element={<Turnos />} />
-              <Route path="/reintegros" element={<Reintegros />} />
-              <Route path="/autorizaciones" element={<Autorizaciones />} />
-              <Route path="/prestadores" element={<Prestadores />} />
+              <Route path="/recetas" element={<ProtectedRoute><Recetas /></ProtectedRoute>} />
+              <Route path="/turnos" element={<ProtectedRoute><Turnos /></ProtectedRoute>} />
+              <Route path="/reintegros" element={<ProtectedRoute><Reintegros /></ProtectedRoute>} />
+              <Route path="/autorizaciones" element={<ProtectedRoute><Autorizaciones /></ProtectedRoute>} />
+              <Route path="/prestadores" element={<ProtectedRoute><Prestadores /></ProtectedRoute>} />
             </Routes>
           </main>
         </div>

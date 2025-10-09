@@ -5,12 +5,63 @@ import Form from "../../components/Form/Form";
 export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [documento, setDocumento] = useState("");
+  const [successMessage, setSuccessMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   // Función para redireccionar al home
-  const handleLogin = (e) => { 
-    e.preventDefault(); // evitar que el formulario recargue la página
-    navigate("/home");
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    if (!documento.trim()) {
+      setErrorMessage("❌ Debés ingresar un documento");
+      return;
+    }
+    if (!password.trim()) {
+      setErrorMessage("❌ Debés ingresar una contraseña");
+      return;
+    }
+
+    try {
+
+      const resDoc = await fetch(`http://localhost:3000/affiliate/verificar-documento/${documento}`);
+      if (!resDoc.ok) throw new Error("Error al verificar el documento");
+      const dataDoc = await resDoc.json();
+      if (!dataDoc.existe) {
+        throw new Error("❌ Este documento no pertenece a un afiliado dado de alta");
+      }
+
+
+      const resPass = await fetch(`http://localhost:3000/affiliate/verificar-password/${documento}`);
+      console.log("resPass:", resPass);
+      console.log("resPass.ok:", resPass.ok);
+      console.log("resPass.status:", resPass.status);
+      if (!resPass.ok) throw new Error("Error al verificar la contraseña");
+      const dataPass = await resPass.json()
+      if (!dataPass.existe) { throw new Error("❌ El Afiliado no esta registrado11") }
+
+      /*encodeURIComponent(password) INVESTIGAR SI CONVIENE USAR,HABRIA QUE CAMBIAR COSAS EN EL BACK CALCULO */
+      const resVerPass = await fetch(`http://localhost:3000/affiliate/es-su-contrasena/${documento}/${password}`);
+      if (!resVerPass.ok) throw new Error("Error al verificar la contraseña")
+      const dataVerPass = await resVerPass.json()
+      if (!dataVerPass.existe) {
+        throw new Error("❌ La Contraseña no es correcta");
+      }
+
+      localStorage.setItem("afiliadoLogueado", documento);
+      
+
+      setErrorMessage("");
+      setSuccessMessage(true);
+      setTimeout(() => navigate("/home"), 3000);
+
+    } catch (err) {
+
+      setErrorMessage(err.message);
+      setSuccessMessage(false);
+
+    }
   };
 
   return (
@@ -20,6 +71,8 @@ export default function Login() {
         subtitle="Iniciar sesión en el Portal Afiliado"
         buttonText="Iniciar sesión"
         onSubmit={handleLogin}
+        documento={documento}
+        setDocumento={setDocumento}
         extraFields={
           <>
             {/* Contraseña */}
@@ -49,6 +102,24 @@ export default function Login() {
           </>
         }
       />
+      {/* Mensaje de error */}
+      {errorMessage && (
+        <div className="d-flex justify-content-center mt-3">
+          <div className="alert alert-danger d-flex align-items-center" role="alert">
+            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+            <div>{errorMessage}</div>
+          </div>
+        </div>
+      )}
+
+      {/* Mensaje de éxito */}
+      {successMessage && (
+        <div className="d-flex justify-content-center mt-3">
+          <div className="alert alert-success d-flex align-items-center" role="alert">
+            <div className="spinner-border spinner-border-sm me-2" role="status"></div>
+            <div>¡Usuario Logeado correctamente!</div>
+          </div>
+        </div>)}
 
       <div className="text-center mt-2">
         <p>

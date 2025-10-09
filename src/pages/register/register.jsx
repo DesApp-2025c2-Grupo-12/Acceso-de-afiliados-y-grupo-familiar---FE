@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Form from "../../components/Form/Form";
 import { useNavigate } from "react-router-dom";
 
@@ -8,31 +8,61 @@ export default function Register() {
   const [errorMessage, setErrorMessage] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [documento, setDocumento] = useState("");
 
-  const handleRegister = (e) => {
-    e.preventDefault();
+  const handleRegister = async (e) => {
+  e.preventDefault();
 
-    // Validación de contraseñas
-    if (password !== confirmPassword) {
-      setErrorMessage("❌ Las contraseñas no coinciden");
-      setSuccessMessage(false);
-      return;
+  // Validaciones locales
+  if (!documento.trim()) {
+    setErrorMessage("❌ Debés ingresar un documento");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    setErrorMessage("❌ Las contraseñas no coinciden");
+    setSuccessMessage(false);
+    return;
+  }
+
+  try {
+    
+    const resDoc = await fetch(`http://localhost:3000/affiliate/verificar-documento/${documento}`);
+    if (!resDoc.ok) throw new Error("Error al verificar el documento");
+    const dataDoc = await resDoc.json();
+    if (!dataDoc.existe) {
+      throw new Error("❌ Este documento no está dado de alta");
     }
 
-    // Si pasa la validación
+    
+    const resPass = await fetch(`http://localhost:3000/affiliate/verificar-password/${documento}`);
+    if (!resPass.ok) throw new Error("Error al verificar la contraseña");
+    const dataPass = await resPass.json();
+
+    if (!dataPass.existe) {
+      
+      const resAgregar = await fetch(`http://localhost:3000/affiliate/agregar-password/${documento}/${password}`, {
+        method: 'PUT'
+      });
+      if (!resAgregar.ok) throw new Error("Error al agregar la contraseña");
+    } else {
+      
+      throw new Error("❌ El afiliado ya está registrado");
+    }
+
+    
     setErrorMessage("");
     setSuccessMessage(true);
-  };
+    setTimeout(() => navigate("/"), 3000);
 
-  // Redirigir después de 3 segundos si se registró bien
-  useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => {
-        navigate("/"); // redirige al inicio
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage, navigate]);
+  } catch (err) {
+    
+    setErrorMessage(err.message);
+    setSuccessMessage(false);
+
+  }
+};
+
 
   return (
     <>
@@ -41,13 +71,13 @@ export default function Register() {
         subtitle="Completa tus datos"
         buttonText="Registrarse"
         onSubmit={handleRegister}
+        documento={documento}
+        setDocumento={setDocumento}
         extraFields={
           <>
-            {/* Campo Contraseña */}
+            {/* Contraseña */}
             <div className="mb-3">
-              <label htmlFor="password" className="form-label">
-                Contraseña
-              </label>
+              <label htmlFor="password" className="form-label">Contraseña</label>
               <input
                 type="password"
                 className="form-control"
@@ -59,11 +89,9 @@ export default function Register() {
               />
             </div>
 
-            {/* Campo Confirmar Contraseña */}
+            {/* Confirmar Contraseña */}
             <div className="mb-3">
-              <label htmlFor="confirmPassword" className="form-label">
-                Confirmar Contraseña
-              </label>
+              <label htmlFor="confirmPassword" className="form-label">Confirmar Contraseña</label>
               <input
                 type="password"
                 className="form-control"

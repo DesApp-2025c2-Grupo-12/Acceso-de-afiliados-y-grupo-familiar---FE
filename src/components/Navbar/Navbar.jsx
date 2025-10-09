@@ -2,32 +2,17 @@ import React from 'react'
 import { NavLink } from 'react-router-dom';
 import './Navbar.css';
 
-export default function Navbar() {
+export default function Navbar({ usuarioLogueado }) {
+  // Si no hay usuario logueado, no renderiza nada
+  if (!usuarioLogueado) return null;
+
   const icons = {
-    home: {
-      default: "src/assets/icons/home-1.svg",
-      active: "src/assets/icons/home-2.svg"
-    },
-    turnos: {
-      default: "src/assets/icons/turnos-1.svg",
-      active: "src/assets/icons/turnos-2.svg"
-    },
-    reintegros: {
-      default: "src/assets/icons/reintegros-1.svg",
-      active: "src/assets/icons/reintegros-2.svg"
-    },
-    autorizaciones: {
-      default: "src/assets/icons/autorizaciones-1.svg",
-      active: "src/assets/icons/autorizaciones-2.svg"
-    },
-    recetas: {
-      default: "src/assets/icons/recetas-1.svg",
-      active: "src/assets/icons/recetas-2.svg"
-    },
-    prestadores: {
-      default: "src/assets/icons/prestadores-1.svg",
-      active: "src/assets/icons/prestadores-2.svg"
-    }
+    home: { default: "src/assets/icons/home-1.svg", active: "src/assets/icons/home-2.svg" },
+    turnos: { default: "src/assets/icons/turnos-1.svg", active: "src/assets/icons/turnos-2.svg" },
+    reintegros: { default: "src/assets/icons/reintegros-1.svg", active: "src/assets/icons/reintegros-2.svg" },
+    autorizaciones: { default: "src/assets/icons/autorizaciones-1.svg", active: "src/assets/icons/autorizaciones-2.svg" },
+    recetas: { default: "src/assets/icons/recetas-1.svg", active: "src/assets/icons/recetas-2.svg" },
+    prestadores: { default: "src/assets/icons/prestadores-1.svg", active: "src/assets/icons/prestadores-2.svg" }
   };
 
   return (
