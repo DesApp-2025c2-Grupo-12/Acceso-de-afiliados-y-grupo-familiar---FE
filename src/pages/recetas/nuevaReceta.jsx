@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-export default function nuevaReceta({
+export default function NuevaReceta({
   integrantesCuenta,
   formData,
   setFormData,
@@ -21,11 +21,13 @@ export default function nuevaReceta({
 
     const handleShow = () => {
       setFormData({
-        integrante: "",
-        nombre: "",
+        paciente: "",
+        nombreDelMedicamento: "",
         cantidad: 1,
         presentacion: "",
-        observaciones: "",
+        fechaDeEmision: "",
+        numeroDeDocumento: "",
+        observaciones: ""
       });
       setError("");
     };
@@ -40,39 +42,43 @@ export default function nuevaReceta({
   };
 
   const handleGuardar = () => {
-    const cantidadNum = parseInt(formData.cantidad);
+  const cantidadNum = parseInt(formData.cantidad, 10);
 
-    if (!formData.integrante || !formData.nombre || !formData.presentacion) {
-      setError("Todos los campos son obligatorios");
-      return;
-    }
+  if (!formData.paciente || !formData.nombreDelMedicamento || !formData.presentacion) {
+    setError("Todos los campos obligatorios deben completarse");
+    return;
+  }
 
-    if (cantidadNum < 1 || cantidadNum > 2) {
-      setError("La cantidad debe ser 1 o 2");
-      return;
-    }
+  if (cantidadNum < 1 || cantidadNum > 2) {
+    setError("La cantidad debe ser 1 o 2");
+    return;
+  }
 
     const nuevaReceta = {
       id: recetas.length + 1,
-      nombre: `${formData.nombre}, ${formData.presentacion} × ${formData.cantidad}`,
-      paciente: formData.integrante,
+      nombre: `${formData.nombreDelMedicamento}, ${formData.presentacion} × ${formData.cantidad}`,
+      paciente: formData.paciente,
       estado: "Pendiente",
       observaciones: formData.observaciones || "",
     };
 
     setRecetas([...recetas, nuevaReceta]);
+
+    // Reiniciar formulario
     setFormData({
-      integrante: "",
-      nombre: "",
+      paciente: "",
+      nombreDelMedicamento: "",
       cantidad: 1,
       presentacion: "",
-      observaciones: "",
+      fechaDeEmision: "",
+      numeroDeDocumento: "",
+      observaciones: ""
     });
     setError("");
     setSuccess("Su receta se guardó correctamente!");
     setTimeout(() => setSuccess(""), 3000);
 
-    // cierra modal
+    // Cerrar modal
     const modalEl = document.getElementById("nuevaRecetaModal");
     if (modalEl) {
       modalEl.classList.remove("show");
@@ -98,7 +104,7 @@ export default function nuevaReceta({
 
             <div className="mb-3">
               <label className="form-label">Seleccionar integrante</label>
-              <select className="form-select" name="integrante" value={formData.integrante} onChange={handleChange}>
+              <select className="form-select" name="paciente" value={formData.paciente} onChange={handleChange}>
                 <option value="">Seleccionar...</option>
                 {integrantesCuenta.map((i, idx) => <option key={idx} value={i}>{i}</option>)}
               </select>
@@ -106,12 +112,15 @@ export default function nuevaReceta({
 
             <div className="mb-3">
               <label className="form-label">Nombre de medicamento</label>
-              <input type="text" className="form-control" name="nombre" value={formData.nombre} onChange={handleChange}/>
+              <input type="text" className="form-control" name="nombreDelMedicamento" value={formData.nombreDelMedicamento} onChange={handleChange}/>
             </div>
 
             <div className="mb-3">
               <label className="form-label">Cantidad</label>
-              <input type="number" className="form-control" name="cantidad" value={formData.cantidad} onChange={handleChange} min={1} max={2}/>
+              <input type="number" className="form-control" name="cantidad" value={formData.cantidad}  onChange={handleChange}
+              min={1}
+               max={2}   // maximo dos 
+               />
             </div>
 
             <div className="mb-3">
@@ -123,6 +132,16 @@ export default function nuevaReceta({
                 <option value="Gotas">Gotas</option>
                 <option value="Otros">Otro</option>
               </select>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Fecha de emisión</label>
+              <input type="date" className="form-control" name="fechaDeEmision" value={formData.fechaDeEmision} onChange={handleChange}/>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Número de Documento</label>
+              <input type="text" className="form-control" name="numeroDeDocumento" value={formData.numeroDeDocumento} onChange={handleChange}/>
             </div>
 
             <div className="mb-3">
