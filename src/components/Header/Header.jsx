@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Dropdown, Container, Button, Modal } from "react-bootstrap";
 import logo from "../../assets/logo.png";
+import { useLocation, Link } from "react-router-dom";
 
 export default function Header() {
   const [showProfile, setShowProfile] = useState(false);
@@ -10,28 +11,39 @@ export default function Header() {
 
   // Datos de prueba
   const grupoFamiliar = [
-    { nombre: "Bianca Margarita", relacion: "Afiliado", edad: 40, DNI: "40260243",mail: "biancamargarita@gmail.com" ,  credencial: "27/40260243/00" },
-    { nombre: "Juan Pérez", relacion: "Cónyuge", edad: 38, DNI: "38265895",mail: "juanperez@gmail.com" ,  credencial: "27/38265895/00" },
-    { nombre: "Lucas Pérez", relacion: "Hijo", edad: 17, DNI: "48658945",mail: "lucasperez@gmail.com" ,  credencial: "27/48658945/00" },
-    { nombre: "Sofía Pérez", relacion: "Hija", edad: 12, DNI: "50654965",mail: "sofiaperez@gmail.com" ,  credencial: "27/50654965/00" },
+    { nombre: "Bianca Margarita", relacion: "Afiliado", edad: 40, DNI: "40260243", mail: "biancamargarita@gmail.com", credencial: "27/40260243/00" },
+    { nombre: "Juan Pérez", relacion: "Cónyuge", edad: 38, DNI: "38265895", mail: "juanperez@gmail.com", credencial: "27/38265895/00" },
+    { nombre: "Lucas Pérez", relacion: "Hijo", edad: 17, DNI: "48658945", mail: "lucasperez@gmail.com", credencial: "27/48658945/00" },
+    { nombre: "Sofía Pérez", relacion: "Hija", edad: 12, DNI: "50654965", mail: "sofiaperez@gmail.com", credencial: "27/50654965/00" },
   ];
-  
+
   const handleVerPerfilFamiliar = (persona) => {
     setPerfilSeleccionado(persona);
     setShowModalPerfilFamiliar(true);
   };
+
+
+  const location = useLocation();
+  const disabledPaths = ["/", "/register"];
+  const isDisabled = disabledPaths.includes(location.pathname);
 
   return (
     <>
       <header style={{ backgroundColor: "#132074" }} className="text-white py-2">
         <Container fluid className="d-flex justify-content-between align-items-center">
           {/* Logo */}
-          <a href="/Home" className="d-flex align-items-center text-white text-decoration-none">
+
+          <Link
+            to={isDisabled ? "#" : "/Home"}
+            className={`d-flex align-items-center text-white text-decoration-none ${isDisabled ? "disabled" : ""}`}
+            onClick={e => isDisabled && e.preventDefault()}
+          >
             <img src={logo} alt="Logo" height="50" className="me-2" />
             <span>
               MEDICINA <br /> INTEGRAL
             </span>
-          </a>
+          </Link>
+  
 
           {/* Título */}
           <div className="text-center fw-bold">MEDICINA INTEGRAL</div>
@@ -87,7 +99,7 @@ export default function Header() {
           <div className="d-flex flex-wrap gap-3">
             {grupoFamiliar.map((persona, index) => (
               <div
-                key={index} 
+                key={index}
                 className="border rounded p-3 flex-grow-1"
                 style={{ minWidth: "200px", maxWidth: "220px" }}
               >

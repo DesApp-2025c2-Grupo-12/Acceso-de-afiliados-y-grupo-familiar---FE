@@ -3,8 +3,8 @@ import { NavLink } from 'react-router-dom';
 import './Navbar.css';
 
 export default function Navbar({ usuarioLogueado }) {
-  // Si no hay usuario logueado, no renderiza nada
-  if (!usuarioLogueado) return null;
+ 
+  
 
   const icons = {
     home: { default: "src/assets/icons/home-1.svg", active: "src/assets/icons/home-2.svg" },

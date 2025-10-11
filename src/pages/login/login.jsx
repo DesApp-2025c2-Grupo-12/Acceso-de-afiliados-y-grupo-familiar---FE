@@ -49,7 +49,7 @@ export default function Login() {
         throw new Error("❌ La Contraseña no es correcta");
       }
 
-      localStorage.setItem("afiliadoLogueado", documento);
+     
       
 
       setErrorMessage("");
