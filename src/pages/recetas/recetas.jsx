@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CardReceta from "./cardReceta";
 import NuevaReceta from "./nuevaReceta";
 import VerReceta from "./verReceta";
@@ -7,11 +7,10 @@ import BuscarReceta from "./buscarReceta";
 import { handleDescargar } from "./descargarReceta";
 
 export default function Recetas() {
-
   const integrantesCuenta = ["Juan Salvo", "Ana Salvo", "María Salvo"];
 
   const [recetas, setRecetas] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); 
+  const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
     paciente: "",
     nombreDelMedicamento: "",
@@ -24,13 +23,29 @@ export default function Recetas() {
   const [hoverGuardar, setHoverGuardar] = useState(false);
   const [hoverNueva, setHoverNueva] = useState(false);
   const [hoverBuscar, setHoverBuscar] = useState(false);
-  const [error, setError] = useState(""); 
-  const [success, setSuccess] = useState(""); 
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
   const [recetaRenovar, setRecetaRenovar] = useState(null);
 
+  useEffect(() => {
+    const fetchRecetas = async () => {
+      try {
+        const response = await fetch("http://localhost:3001/recipes");
+        if (!response.ok) throw new Error("Error al cargar recetas");
+        const data = await response.json();
+        setRecetas(data); // 🔹 guardamos tal cual, usar nombreDelMedicamento en la UI
+      } catch (err) {
+        console.error(err);
+        setError("No se pudieron cargar las recetas");
+      }
+    };
+
+    fetchRecetas();
+  }, []);
+
   const recetasFiltradas = recetas.filter((receta) =>
-    receta.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+    receta.nombreDelMedicamento?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const abrirModalVer = (receta) => {
@@ -77,11 +92,8 @@ export default function Recetas() {
         </button>
       </div>
 
-      {success && (
-        <div className="alert alert-success text-center mb-4" role="alert">
-          {success}
-        </div>
-      )}
+      {error && <div className="alert alert-danger text-center">{error}</div>}
+      {success && <div className="alert alert-success text-center">{success}</div>}
 
       <BuscarReceta
         searchTerm={searchTerm}
@@ -134,7 +146,6 @@ export default function Recetas() {
         hoverGuardar={hoverGuardar}
         setHoverGuardar={setHoverGuardar}
       />
-
     </div>
   );
 }
