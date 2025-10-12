@@ -31,10 +31,10 @@ export default function Recetas() {
   useEffect(() => {
     const fetchRecetas = async () => {
       try {
-        const response = await fetch("http://localhost:3001/recipes");
+        const response = await fetch("http://localhost:3001/recipes"); //VER PUERTO
         if (!response.ok) throw new Error("Error al cargar recetas");
         const data = await response.json();
-        setRecetas(data); // 🔹 guardamos tal cual, usar nombreDelMedicamento en la UI
+        setRecetas(data); 
       } catch (err) {
         console.error(err);
         setError("No se pudieron cargar las recetas");
@@ -149,3 +149,4 @@ export default function Recetas() {
     </div>
   );
 }
+
