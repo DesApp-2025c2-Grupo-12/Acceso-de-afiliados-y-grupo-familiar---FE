@@ -13,7 +13,7 @@ export default function NuevaReceta({
   hoverGuardar,
   setHoverGuardar,
 }) {
-  // 🔹 Reinicia el formulario cada vez que se abre el modal
+  // reiniicia el formulario cada vez que se abre el modal
   useEffect(() => {
     const modalEl = document.getElementById("nuevaRecetaModal");
     if (!modalEl) return;
@@ -35,7 +35,7 @@ export default function NuevaReceta({
     return () => modalEl.removeEventListener("show.bs.modal", handleShow);
   }, [setFormData, setError]);
 
-  // 🔹 Manejo de cambios en el formulario
+  //manejo de cambios en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -52,12 +52,12 @@ export default function NuevaReceta({
     setFormData({ ...formData, [name]: value });
   };
 
-  // 🔹 Guardar receta
+  // guarda receta
   const handleGuardar = async () => {
     try {
       const recetaParaEnviar = { ...formData, estado: "Pendiente" };
 
-      const response = await fetch("http://localhost:3001/recipes", {
+      const response = await fetch("http://localhost:3001/recipes", { //REVISAR PUERTO
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(recetaParaEnviar),
@@ -71,14 +71,14 @@ export default function NuevaReceta({
         return;
       }
 
-      // 🔹 Agregamos receta al listado
+      //agrega receta al listado
       if (handleAgregarReceta) handleAgregarReceta(data);
       else setRecetas(prev => [...prev, data]);
 
       setSuccess("Receta creada con éxito");
       setError("");
 
-      // 🔹 Reiniciamos el formulario
+      // reinicia el formulario
       setFormData({
         paciente: "",
         nombreDelMedicamento: "",
@@ -89,7 +89,7 @@ export default function NuevaReceta({
         observaciones: "",
       });
 
-      // 🔹 Cerramos modal
+      //cierra modal
       const modalEl = document.getElementById("nuevaRecetaModal");
       if (modalEl) {
         modalEl.classList.remove("show");
@@ -105,7 +105,7 @@ export default function NuevaReceta({
     }
   };
 
-  // 🔹 Límites de fecha
+  // Limites de fecha
   const hoy = new Date();
   const mesAnterior = new Date();
   mesAnterior.setMonth(hoy.getMonth() - 1);
@@ -258,3 +258,4 @@ export default function NuevaReceta({
     </div>
   );
 }
+
