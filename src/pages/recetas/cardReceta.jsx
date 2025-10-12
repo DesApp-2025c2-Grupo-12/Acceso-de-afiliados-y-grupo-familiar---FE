@@ -11,7 +11,7 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
         <div className="card-body">
 
           {/* Nombre del medicmento */}
-          <h5 className="card-title">{receta.nombre}</h5>
+         <h5 className="card-title">{receta.nombreDelMedicamento}</h5>
 
           {/* Paciente */}
           <p className="text-muted mb-2">{receta.paciente}</p>
@@ -56,3 +56,4 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
     </div>
   );
 }
+
