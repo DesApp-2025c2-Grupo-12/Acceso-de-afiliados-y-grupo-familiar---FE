@@ -9,13 +9,14 @@ import Recetas from './pages/recetas/recetas'
 import Turnos from './pages/turnos/turnos'
 import Prestadores from './pages/prestadores/prestadores'
 import Autorizaciones from './pages/autorizaciones/autorizaciones'
+import NuevoTurno from './pages/turnos/nuevoTurno'
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Reintegros from './pages/reintegros/reintegros'
 import ProtectedRoute from './components/protectedRoutes/protectedRoutes'
-import { useState, useEffect } from 'react'
+//import { useState, useEffect } from 'react'
 
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
             <Route path="/reintegros" element={<ProtectedRoute><Reintegros /></ProtectedRoute>} />
             <Route path="/autorizaciones" element={<ProtectedRoute><Autorizaciones /></ProtectedRoute>} />
             <Route path="/prestadores" element={<ProtectedRoute><Prestadores /></ProtectedRoute>} />
+            <Route path="/nuevo-turno" element={<NuevoTurno />} />
           </Routes>
         </main>
       </div>
