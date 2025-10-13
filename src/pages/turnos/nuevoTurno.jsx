@@ -20,17 +20,62 @@ export default function NuevoTurno({ turnos, setTurnos, setPantallaNuevoTurno, s
 
   const [especialidad, setEspecialidad] = useState("");
   const [tipoConsulta, setTipoConsulta] = useState("");
+  const [diaSeleccionado, setDiaSeleccionado] = useState("");
+
+  // Función para generar los próximos 7 días desde "mañana"
+  const generarProximosDias = () => {
+    const dias = [];
+    const hoy = new Date();
+    
+    for (let i = 1; i <= 7; i++) {
+      const fecha = new Date(hoy);
+      fecha.setDate(hoy.getDate() + i);
+      
+      const opcion = {
+        fecha: fecha,
+        fechaISO: fecha.toISOString().split('T')[0],
+        label: fecha.toLocaleDateString('es-ES', { 
+          weekday: 'short', 
+          day: 'numeric', 
+          month: 'short' 
+        })
+      };
+      
+      dias.push(opcion);
+    }
+    return dias;
+  };
+
+  const proximosDias = generarProximosDias();
+
+  const generarFechaTurnoConDia = (hora, fechaSeleccionada) => {
+    if (!fechaSeleccionada) return generarFechaTurno(hora);
+    
+    const fechaTurno = new Date(fechaSeleccionada);
+    fechaTurno.setHours(parseInt(hora.split(":")[0]));
+    fechaTurno.setMinutes(parseInt(hora.split(":")[1]));
+    
+    const diaSemana = fechaTurno.toLocaleDateString("es-AR", { weekday: "long" });
+    const dia = fechaTurno.getDate();
+    const mes = fechaTurno.toLocaleDateString("es-AR", { month: "long" });
+    const horaStr = `${fechaTurno.getHours().toString().padStart(2, "0")}:${fechaTurno.getMinutes().toString().padStart(2, "0")}`;
+    
+    return `${diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1)} ${dia} de ${mes}, ${horaStr}`;
+  };
 
   const reservarTurno = (medico, hora) => {
-    if (!especialidad || !tipoConsulta) {
-      setAlerta({ msg: "Por favor completa todos los campos.", tipo: "danger" });
+    if (!especialidad || !tipoConsulta || !diaSeleccionado) {
+      setAlerta({ msg: "Por favor completa todos los campos y selecciona un día.", tipo: "danger" });
       setTimeout(() => setAlerta({ msg: "", tipo: "success" }), 3000);
       return;
     }
 
+    const fechaSeleccionadaObj = proximosDias.find(d => d.fechaISO === diaSeleccionado)?.fecha;
+    const fechaTurnoFormateada = generarFechaTurnoConDia(hora, fechaSeleccionadaObj);
+
     const newTurno = {
       id: Date.now(),
-      fechaYHora: generarFechaTurno(hora),
+      fechaYHora: fechaTurnoFormateada,
       especialidad,
       tipo: tipoConsulta,
       medico,
@@ -43,6 +88,7 @@ export default function NuevoTurno({ turnos, setTurnos, setPantallaNuevoTurno, s
     setPantallaNuevoTurno(false);
     setEspecialidad("");
     setTipoConsulta("");
+    setDiaSeleccionado("");
   };
 
   return (
@@ -51,36 +97,86 @@ export default function NuevoTurno({ turnos, setTurnos, setPantallaNuevoTurno, s
 
       <Row className="mb-4">
         <Col md={6}>
-          <Form.Select value={especialidad} onChange={(e) => { setEspecialidad(e.target.value); setTipoConsulta(""); }}>
+          <Form.Select value={especialidad} onChange={(e) => { 
+            setEspecialidad(e.target.value); 
+            setTipoConsulta(""); 
+            setDiaSeleccionado(""); 
+          }}>
             <option value="">Selecciona una especialidad</option>
             {Object.keys(especialidades).map(esp => <option key={esp} value={esp}>{esp}</option>)}
           </Form.Select>
         </Col>
         <Col md={6}>
-          <Form.Select value={tipoConsulta} onChange={(e) => setTipoConsulta(e.target.value)}>
+          <Form.Select value={tipoConsulta} onChange={(e) => { 
+            setTipoConsulta(e.target.value); 
+            setDiaSeleccionado(""); 
+          }}>
             <option value="">Selecciona un tipo de consulta o estudio</option>
             {especialidad && especialidades[especialidad].map(tipo => <option key={tipo} value={tipo}>{tipo}</option>)}
           </Form.Select>
         </Col>
       </Row>
 
+      {/* Barra de selección de días */}
       {especialidad && tipoConsulta && (
+        <Row className="mb-4">
+          <Col>
+            <h5 className="mb-3 text-center">Selecciona un día:</h5>
+            
+            {/* Contenedor con borde y centrado */}
+            <div className="border rounded p-3 bg-light">
+              <div className="d-flex justify-content-center gap-2 overflow-auto">
+                {proximosDias.map((dia) => (
+                  <Button
+                    key={dia.fechaISO}
+                    variant={diaSeleccionado === dia.fechaISO ? "primary" : "outline-primary"}
+                    onClick={() => setDiaSeleccionado(dia.fechaISO)}
+                    className="flex-shrink-0"
+                    style={{ 
+                      minWidth: "100px",
+                      fontWeight: "500"
+                    }}
+                  >
+                    {dia.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </Col>
+        </Row>
+      )}
+
+      {/* Turnos disponibles */}
+      {especialidad && tipoConsulta && diaSeleccionado && (
         <>
-          <h5>Opciones disponibles:</h5>
+          <h5 className="text-center mb-4">
+            Turnos disponibles para el {proximosDias.find(d => d.fechaISO === diaSeleccionado)?.label}:
+          </h5>
           <Row>
             {medicos[especialidad].map(medico => (
               horarios.map(hora => {
-                const fechaTurno = generarFechaTurno(hora);
-                const turnoExiste = turnos.some(t => t.medico === medico && t.fechaYHora === fechaTurno);
+                const fechaSeleccionadaObj = proximosDias.find(d => d.fechaISO === diaSeleccionado)?.fecha;
+                const fechaTurnoFormateada = generarFechaTurnoConDia(hora, fechaSeleccionadaObj);
+                
+                const turnoExiste = turnos.some(t => t.medico === medico && t.fechaYHora === fechaTurnoFormateada);
                 if (turnoExiste) return null;
+                
                 return (
-                  <Col md={4} key={`${medico}-${hora}`} className="mb-3">
-                    <Card className="shadow-sm">
-                      <Card.Body>
-                        <Card.Title>{medico}</Card.Title>
+                  <Col md={4} key={`${medico}-${hora}-${diaSeleccionado}`} className="mb-3">
+                    <Card className="shadow-sm h-100">
+                      <Card.Body className="d-flex flex-column">
+                        <Card.Title className="h6">{medico}</Card.Title>
                         <Card.Text><strong>Horario:</strong> {hora}</Card.Text>
+                        <Card.Text><strong>Fecha:</strong> {fechaTurnoFormateada}</Card.Text>
                         <Card.Text><strong>Lugar:</strong> Hospital Municipal de Hurlingham</Card.Text>
-                        <Button variant="success" size="sm" onClick={() => reservarTurno(medico, hora)}>Reservar</Button>
+                        <Button 
+                          variant="success" 
+                          size="sm" 
+                          onClick={() => reservarTurno(medico, hora)}
+                          className="mt-auto"
+                        >
+                          Reservar
+                        </Button>
                       </Card.Body>
                     </Card>
                   </Col>
