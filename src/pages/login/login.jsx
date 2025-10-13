@@ -49,9 +49,28 @@ export default function Login() {
         throw new Error("❌ La Contraseña no es correcta");
       }
 
-     
+
+      const resAfil = await fetch(`http://localhost:3000/affiliate/afiliado-por-documento/${documento}`)
+      if (!resAfil.ok) throw new Error("Error en el login,Vuelve a intentarlo")
+
+      const dataAfil = await resAfil.json()
+
       
 
+      localStorage.setItem("usuarioLogueado", JSON.stringify(dataAfil))
+      const usuario = JSON.parse(localStorage.getItem("usuarioLogueado"))
+    
+
+
+      const resGrupoFam = await fetch(`http://localhost:3000/affiliate/grupo-familiar/${documento}`)
+      if(!resGrupoFam.ok) throw  new Error("error GF")
+      const dataGrupFam = await resGrupoFam.json()
+      
+      localStorage.setItem("grupoFamiliar", JSON.stringify(dataGrupFam))
+      const grupoFami = JSON.parse(localStorage.getItem("grupoFamiliar"))
+      console.log(grupoFami)
+
+      
       setErrorMessage("");
       setSuccessMessage(true);
       setTimeout(() => navigate("/home"), 3000);

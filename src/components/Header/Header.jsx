@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Dropdown, Container, Button, Modal } from "react-bootstrap";
 import { useLocation, Link } from "react-router-dom";
 import logo from "../../assets/logo.png";
+import { calcularEdad } from "../../utils/utils";
 
 export default function Header() {
   const [showProfile, setShowProfile] = useState(false);
@@ -67,13 +68,14 @@ export default function Header() {
               {/* Lista desplegable dentro del menú */}
               {mostrarListaFamiliar && (
                 <div className="ps-3 border-start ms-2">
-                  {grupoFamiliar.map((persona, index) => (
+                  {JSON.parse(localStorage.getItem("grupoFamiliar")).map((persona, index) => (
                     <Dropdown.Item
+                      
                       key={index}
                       onClick={() => handleVerPerfilFamiliar(persona)}
                       className="text-primary"
                     >
-                      - {persona.nombre}
+                       {persona.nombre}
                     </Dropdown.Item>
                   ))}
                 </div>
@@ -92,10 +94,10 @@ export default function Header() {
           <Modal.Title>Mi perfil</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p><strong>Nombre:</strong> Bianca Margarita</p>
-          <p><strong>Email:</strong> biancamargarita@gmail.com</p>
-          <p><strong>DNI:</strong> 40260243</p>
-          <p><strong>Credencial:</strong> 27/40260243/00</p>
+          <p><strong>Nombre:</strong> {JSON.parse(localStorage.getItem("usuarioLogueado")).nombre}</p>
+          <p><strong>Email:</strong> {JSON.parse(localStorage.getItem("usuarioLogueado")).correoElectronico}</p>
+          <p><strong>DNI:</strong> {JSON.parse(localStorage.getItem("usuarioLogueado")).numeroDeDocumento}</p>
+          <p><strong>Credencial:</strong> {JSON.parse(localStorage.getItem("usuarioLogueado")).numeroDeAfiliado}</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowProfile(false)}>
@@ -116,11 +118,11 @@ export default function Header() {
           </Modal.Header>
           <Modal.Body>
             <p><strong>Nombre:</strong> {perfilSeleccionado.nombre}</p>
-            <p><strong>Rol:</strong> {perfilSeleccionado.relacion}</p>
-            <p><strong>Edad:</strong> {perfilSeleccionado.edad}</p>
-            <p><strong>DNI:</strong> {perfilSeleccionado.DNI}</p>
-            <p><strong>Mail:</strong> {perfilSeleccionado.mail}</p>
-            <p><strong>Credencial:</strong> {perfilSeleccionado.credencial}</p>
+            <p><strong>Relacion:</strong> {perfilSeleccionado.parentesco}</p>
+            <p><strong>Edad:</strong> {calcularEdad(perfilSeleccionado.fechaDeNacimiento)} Años</p>
+            <p><strong>DNI:</strong> {perfilSeleccionado.numeroDeDocumento}</p>
+            <p><strong>Mail:</strong> {perfilSeleccionado.correoElectronico}</p>
+            <p><strong>Credencial:</strong> {perfilSeleccionado.numeroDeAfiliado}</p>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowModalPerfilFamiliar(false)}>

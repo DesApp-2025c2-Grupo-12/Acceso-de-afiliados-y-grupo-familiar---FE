@@ -52,12 +52,23 @@ export default function NuevaReceta({
     setFormData({ ...formData, [name]: value });
   };
 
+  /*const documentoValido = () => {
+    const dni = formData.numeroDeDocumento
+    const nombre = formData.nombre.split(' ')[0]
+    const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar"))
+    if (grupoFamiliar.some(persona => persona.numeroDeDocumento == dni && nombre.toLowerCase() == persona.nombre.toLowerCase())) {
+      return true
+    } else {
+      return false
+    }
+  }*/
+
   // guarda receta
   const handleGuardar = async () => {
     try {
       const recetaParaEnviar = { ...formData, estado: "Pendiente" };
 
-      const response = await fetch("http://localhost:3001/recipes", { //REVISAR PUERTO
+      const response = await fetch("http://localhost:3000/recipes", { //REVISAR PUERTO
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(recetaParaEnviar),
@@ -69,6 +80,10 @@ export default function NuevaReceta({
         setError(data.error || "Error al crear receta");
         setSuccess("");
         return;
+      }
+
+      if(!documentoValido()){
+        throw new Error("El documento ingresado no pertenece al afiliado seleccionado")
       }
 
       //agrega receta al listado
@@ -100,7 +115,7 @@ export default function NuevaReceta({
 
     } catch (error) {
       console.error(error);
-      setError("Error de conexión con el servidor");
+      setError(error.message);
       setSuccess("");
     }
   };
@@ -114,6 +129,8 @@ export default function NuevaReceta({
 
   const minDate = mesAnterior.toISOString().split("T")[0];
   const maxDate = mesSiguiente.toISOString().split("T")[0];
+
+
 
   return (
     <div

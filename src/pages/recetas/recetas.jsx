@@ -7,7 +7,7 @@ import BuscarReceta from "./buscarReceta";
 import { handleDescargar } from "./descargarReceta";
 
 export default function Recetas() {
-  const integrantesCuenta = ["Juan Salvo", "Ana Salvo", "María Salvo"];
+ const integrantesCuenta = JSON.parse(localStorage.getItem("grupoFamiliar")).map(persona => persona.nombre.charAt(0).toUpperCase() + persona.nombre.slice(1).toLowerCase() +" "+persona.apellido.charAt(0).toUpperCase()+persona.apellido.slice(1).toLowerCase());
 
   const [recetas, setRecetas] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,7 +31,7 @@ export default function Recetas() {
   useEffect(() => {
     const fetchRecetas = async () => {
       try {
-        const response = await fetch("http://localhost:3001/recipes"); //VER PUERTO
+        const response = await fetch("http://localhost:3000/recipes"); //VER PUERTO
         if (!response.ok) throw new Error("Error al cargar recetas");
         const data = await response.json();
         setRecetas(data); 
