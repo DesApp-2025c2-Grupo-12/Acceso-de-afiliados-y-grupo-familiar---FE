@@ -7,7 +7,11 @@ import BuscarReceta from "./buscarReceta";
 import { handleDescargar } from "./descargarReceta";
 
 export default function Recetas() {
- const integrantesCuenta = JSON.parse(localStorage.getItem("grupoFamiliar")).map(persona => persona.nombre.charAt(0).toUpperCase() + persona.nombre.slice(1).toLowerCase() +" "+persona.apellido.charAt(0).toUpperCase()+persona.apellido.slice(1).toLowerCase());
+  // CAMBIO AQUI: carga dinámica de integrantesCuenta desde localStorage
+  const integrantesCuenta = JSON.parse(localStorage.getItem("grupoFamiliar"))?.map(persona => 
+    persona.nombre.charAt(0).toUpperCase() + persona.nombre.slice(1).toLowerCase() + " " +
+    persona.apellido.charAt(0).toUpperCase() + persona.apellido.slice(1).toLowerCase()
+  ) || [];
 
   const [recetas, setRecetas] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -115,11 +119,10 @@ export default function Recetas() {
       </div>
 
       <NuevaReceta
-        integrantesCuenta={integrantesCuenta}
+        integrantesCuenta={integrantesCuenta} // CAMBIO AQUI: dinámico
         formData={formData}
         setFormData={setFormData}
-        setRecetas={setRecetas}
-        recetas={recetas}
+        setRecetas={setRecetas} // ya no pasamos recetas
         error={error}
         setError={setError}
         success={success}
@@ -137,8 +140,7 @@ export default function Recetas() {
         receta={recetaRenovar}
         formData={formData}
         setFormData={setFormData}
-        setRecetas={setRecetas}
-        recetas={recetas}
+        setRecetas={setRecetas} // ya no pasamos recetas
         error={error}
         setError={setError}
         success={success}
@@ -149,4 +151,3 @@ export default function Recetas() {
     </div>
   );
 }
-
