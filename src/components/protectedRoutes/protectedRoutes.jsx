@@ -3,10 +3,10 @@ import { Navigate } from "react-router-dom";
 
 export default function ProtectedRoute({ children }) {
 
-  const usuarioLogueado = localStorage.getItem("afiliadoLogueado");
+  const usuarioLogueado = localStorage.getItem("usuarioLogueado");
 
   if (!usuarioLogueado) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   

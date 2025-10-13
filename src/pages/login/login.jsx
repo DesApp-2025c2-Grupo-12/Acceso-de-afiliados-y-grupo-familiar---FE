@@ -55,8 +55,7 @@ export default function Login() {
 
       const dataAfil = await resAfil.json()
 
-      
-
+  
       localStorage.setItem("usuarioLogueado", JSON.stringify(dataAfil))
       const usuario = JSON.parse(localStorage.getItem("usuarioLogueado"))
     
@@ -68,7 +67,7 @@ export default function Login() {
       
       localStorage.setItem("grupoFamiliar", JSON.stringify(dataGrupFam))
       const grupoFami = JSON.parse(localStorage.getItem("grupoFamiliar"))
-      console.log(grupoFami)
+      
 
       
       setErrorMessage("");

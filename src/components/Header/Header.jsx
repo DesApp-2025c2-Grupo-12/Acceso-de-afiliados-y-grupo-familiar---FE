@@ -14,13 +14,9 @@ export default function Header() {
   const disabledPaths = ["/", "/register"];
   const isDisabled = disabledPaths.includes(location.pathname);
 
-  // Datos de prueba
-  const grupoFamiliar = [
-    { nombre: "Bianca Margarita", relacion: "Afiliado", edad: 40, DNI: "40260243", mail: "biancamargarita@gmail.com", credencial: "27/40260243/00" },
-    { nombre: "Juan Pérez", relacion: "Cónyuge", edad: 38, DNI: "38265895", mail: "juanperez@gmail.com", credencial: "27/38265895/00" },
-    { nombre: "Lucas Pérez", relacion: "Hijo", edad: 17, DNI: "48658945", mail: "lucasperez@gmail.com", credencial: "27/48658945/00" },
-    { nombre: "Sofía Pérez", relacion: "Hija", edad: 12, DNI: "50654965", mail: "sofiaperez@gmail.com", credencial: "27/50654965/00" },
-  ];
+  
+  const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
+  const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar") || "[]");
 
   const handleVerPerfilFamiliar = (persona) => {
     setPerfilSeleccionado(persona);
@@ -58,7 +54,7 @@ export default function Header() {
               {/* Botón que despliega el grupo familiar dentro del menú */}
               <Dropdown.Item
                 onClick={(e) => {
-                  e.stopPropagation(); // evita que se cierre el menú
+                  e.stopPropagation();
                   setMostrarListaFamiliar(!mostrarListaFamiliar);
                 }}
               >
@@ -66,23 +62,31 @@ export default function Header() {
               </Dropdown.Item>
 
               {/* Lista desplegable dentro del menú */}
-              {mostrarListaFamiliar && (
+              {mostrarListaFamiliar && grupoFamiliar.length > 0 && (
                 <div className="ps-3 border-start ms-2">
-                  {JSON.parse(localStorage.getItem("grupoFamiliar")).map((persona, index) => (
+                  {grupoFamiliar.map((persona, index) => (
                     <Dropdown.Item
-                      
                       key={index}
                       onClick={() => handleVerPerfilFamiliar(persona)}
                       className="text-primary"
                     >
-                       {persona.nombre}
+                      {persona.nombre}
                     </Dropdown.Item>
                   ))}
                 </div>
               )}
 
               <Dropdown.Divider />
-              <Dropdown.Item href="/">Cerrar sesión</Dropdown.Item>
+              <Dropdown.Item
+                onClick={() => {
+                  localStorage.removeItem('usuarioLogueado');
+                  localStorage.removeItem('grupoFamiliar');
+                  window.location.href = "/";
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                Cerrar sesión
+              </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Container>
@@ -94,10 +98,16 @@ export default function Header() {
           <Modal.Title>Mi perfil</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p><strong>Nombre:</strong> {JSON.parse(localStorage.getItem("usuarioLogueado")).nombre}</p>
-          <p><strong>Email:</strong> {JSON.parse(localStorage.getItem("usuarioLogueado")).correoElectronico}</p>
-          <p><strong>DNI:</strong> {JSON.parse(localStorage.getItem("usuarioLogueado")).numeroDeDocumento}</p>
-          <p><strong>Credencial:</strong> {JSON.parse(localStorage.getItem("usuarioLogueado")).numeroDeAfiliado}</p>
+          {usuarioLogueado ? ( 
+            <>
+              <p><strong>Nombre:</strong> {usuarioLogueado.nombre}</p>
+              <p><strong>Email:</strong> {usuarioLogueado.correoElectronico}</p>
+              <p><strong>DNI:</strong> {usuarioLogueado.numeroDeDocumento}</p>
+              <p><strong>Credencial:</strong> {usuarioLogueado.numeroDeAfiliado}</p>
+            </>
+          ) : (
+            <p>No hay información del usuario</p>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowProfile(false)}>
