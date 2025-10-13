@@ -31,7 +31,7 @@ export default function Recetas() {
   useEffect(() => {
     const fetchRecetas = async () => {
       try {
-        const response = await fetch("http://localhost:3001/recipes"); //VER PUERTO
+        const response = await fetch("http://localhost:3000/recipes"); //VER PUERTO
         if (!response.ok) throw new Error("Error al cargar recetas");
         const data = await response.json();
         setRecetas(data); 
