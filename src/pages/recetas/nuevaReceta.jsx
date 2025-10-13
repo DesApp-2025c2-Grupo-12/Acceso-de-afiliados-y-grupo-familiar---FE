@@ -13,7 +13,7 @@ export default function NuevaReceta({
   hoverGuardar,
   setHoverGuardar,
 }) {
-  // reiniicia el formulario cada vez que se abre el modal
+  // reinicia el formulario cada vez que se abre el modal
   useEffect(() => {
     const modalEl = document.getElementById("nuevaRecetaModal");
     if (!modalEl) return;
@@ -35,10 +35,10 @@ export default function NuevaReceta({
     return () => modalEl.removeEventListener("show.bs.modal", handleShow);
   }, [setFormData, setError]);
 
-  //manejo de cambios en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    // Validación en tiempo real
     if (name === "nombreDelMedicamento") {
       const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]{0,60}$/;
       if (!regex.test(value)) return;
@@ -52,23 +52,40 @@ export default function NuevaReceta({
     setFormData({ ...formData, [name]: value });
   };
 
-  /*const documentoValido = () => {
-    const dni = formData.numeroDeDocumento
-    const nombre = formData.nombre.split(' ')[0]
-    const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar"))
-    if (grupoFamiliar.some(persona => persona.numeroDeDocumento == dni && nombre.toLowerCase() == persona.nombre.toLowerCase())) {
-      return true
-    } else {
-      return false
-    }
-  }*/
+  // Validar si el DNI coincide con el paciente seleccionado
+  const documentoValido = () => {
+    const dni = formData.numeroDeDocumento;
+    const nombre = formData.paciente?.split(" ")[0];
+    const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
+    return grupoFamiliar.some(
+      (persona) =>
+        persona.numeroDeDocumento == dni &&
+        persona.nombre.toLowerCase() === nombre?.toLowerCase()
+    );
+  };
 
-  // guarda receta
   const handleGuardar = async () => {
     try {
+      // Validaciones finales antes de enviar
+      if (!formData.paciente || !formData.nombreDelMedicamento || !formData.numeroDeDocumento) {
+        throw new Error("Paciente, nombre del medicamento y documento son obligatorios");
+      }
+
+      if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]{1,60}$/.test(formData.nombreDelMedicamento)) {
+        throw new Error("Nombre del medicamento inválido");
+      }
+
+      if (!/^[0-9]{7,9}$/.test(formData.numeroDeDocumento)) {
+        throw new Error("Número de documento inválido (7 a 9 dígitos)");
+      }
+
+      if (!documentoValido()) {
+        throw new Error("El documento ingresado no pertenece al afiliado seleccionado");
+      }
+
       const recetaParaEnviar = { ...formData, estado: "Pendiente" };
 
-      const response = await fetch("http://localhost:3000/recipes", { //REVISAR PUERTO
+      const response = await fetch("http://localhost:3000/recipes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(recetaParaEnviar),
@@ -76,17 +93,8 @@ export default function NuevaReceta({
 
       const data = await response.json();
 
-      if (!response.ok) {
-        setError(data.error || "Error al crear receta");
-        setSuccess("");
-        return;
-      }
+      if (!response.ok) throw new Error(data.error || "Error al crear receta");
 
-      if(!documentoValido()){
-        throw new Error("El documento ingresado no pertenece al afiliado seleccionado")
-      }
-
-      //agrega receta al listado
       if (handleAgregarReceta) handleAgregarReceta(data);
       else setRecetas(prev => [...prev, data]);
 
@@ -104,7 +112,7 @@ export default function NuevaReceta({
         observaciones: "",
       });
 
-      //cierra modal
+      // cerrar modal
       const modalEl = document.getElementById("nuevaRecetaModal");
       if (modalEl) {
         modalEl.classList.remove("show");
@@ -121,39 +129,19 @@ export default function NuevaReceta({
   };
 
   // Limites de fecha
-const hoy = new Date();
-const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-const finMesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0);
-
-const minDate = inicioMesActual.toISOString().split("T")[0];
-const maxDate = finMesSiguiente.toISOString().split("T")[0];
-
-
-
+  const hoy = new Date();
+  const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const finMesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0);
+  const minDate = inicioMesActual.toISOString().split("T")[0];
+  const maxDate = finMesSiguiente.toISOString().split("T")[0];
 
   return (
-    <div
-      className="modal fade"
-      id="nuevaRecetaModal"
-      tabIndex="-1"
-      aria-labelledby="nuevaRecetaModalLabel"
-      aria-hidden="true"
-    >
+    <div className="modal fade" id="nuevaRecetaModal" tabIndex="-1" aria-labelledby="nuevaRecetaModalLabel" aria-hidden="true">
       <div className="modal-dialog">
         <div className="modal-content">
-          <div
-            className="modal-header"
-            style={{ backgroundColor: "#132074", color: "white" }}
-          >
-            <h5 className="modal-title" id="nuevaRecetaModalLabel">
-              Nueva Receta
-            </h5>
-            <button
-              type="button"
-              className="btn-close btn-close-white"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            />
+          <div className="modal-header" style={{ backgroundColor: "#132074", color: "white" }}>
+            <h5 className="modal-title" id="nuevaRecetaModalLabel">Nueva Receta</h5>
+            <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" />
           </div>
 
           <div className="modal-body">
@@ -175,9 +163,7 @@ const maxDate = finMesSiguiente.toISOString().split("T")[0];
             </div>
 
             <div className="mb-3">
-              <label className="form-label">
-                Nombre de medicamento <small className="text-muted">(Ej: Ibuprofeno 600 mg x 30)</small>
-              </label>
+              <label className="form-label">Nombre de medicamento <small className="text-muted">(Ej: Ibuprofeno 600 mg x 30)</small></label>
               <input
                 type="text"
                 className="form-control"
@@ -255,9 +241,7 @@ const maxDate = finMesSiguiente.toISOString().split("T")[0];
           </div>
 
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
-              Cancelar
-            </button>
+            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
             <button
               type="button"
               className="btn text-white"
@@ -274,4 +258,3 @@ const maxDate = finMesSiguiente.toISOString().split("T")[0];
     </div>
   );
 }
-
