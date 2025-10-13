@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-export default function renovarReceta({
+export default function RenovarReceta({
   receta,
   formData,
   setFormData,
@@ -18,10 +18,11 @@ export default function renovarReceta({
   useEffect(() => {
     if (receta) {
       setFormData({
-        integrante: receta.paciente,
-        nombre: receta.nombre.split(",")[0], // solo nombre sin presentación y cantidad
-        cantidad: parseInt(receta.nombre.split("×")[1]?.trim()) || 1,
-        presentacion: receta.nombre.split(",")[1]?.split("×")[0]?.trim() || "",
+        paciente: receta.paciente,
+        nombreDelMedicamento: receta.nombreDelMedicamento,
+        presentacion: receta.presentacion,
+        cantidad: receta.cantidad,
+        fechaDeEmision: receta.fechaDeEmision,
         observaciones: receta.observaciones || "",
       });
     }
@@ -45,42 +46,89 @@ export default function renovarReceta({
       modalEl.style.display = "none";
       document.body.classList.remove("modal-open");
 
-      // eliminar backdrop
       const backdrop = document.querySelector(".modal-backdrop");
       if (backdrop) backdrop.remove();
     }
   };
 
-  // Guardar receta renovada
-  const guardarRenovacion = () => {
-    const cantidadNum = parseInt(formData.cantidad);
+  // Guardar receta renovada en DB
+  const guardarRenovacion = async () => {
+    try {
+      const cantidadNum = parseInt(formData.cantidad);
 
-    // Validaciones
-    if (!formData.integrante || !formData.nombre || !formData.presentacion) {
-      setError("Todos los campos son obligatorios");
-      return; // detiene la función si falta algún campo
+      // Validaciones
+      if (!formData.cantidad || !formData.fechaDeEmision) {
+        setError("Cantidad y fecha de emisión son obligatorias");
+        return;
+      }
+
+      if (cantidadNum < 1 || cantidadNum > 2) {
+        setError("La cantidad debe ser 1 o 2");
+        return;
+      }
+
+      // restriccion para no exceder mas de ds recetas al mes
+      const fecha = new Date(formData.fechaDeEmision);
+      const mes = fecha.getMonth();
+      const año = fecha.getFullYear();
+
+      const contador = recetas.filter(r =>
+        r.nombreDelMedicamento === receta.nombreDelMedicamento &&
+        new Date(r.fechaDeEmision).getMonth() === mes &&
+        new Date(r.fechaDeEmision).getFullYear() === año
+      ).reduce((acc, r) => acc + r.cantidad, 0);
+
+      if (contador + cantidadNum > 2) {
+        setError("No puede superar 2 recetas del mismo medicamento en el mismo mes");
+        return;
+      }
+
+      const recetaRenovada = {
+        nombreDelMedicamento: receta.nombreDelMedicamento,
+        presentacion: receta.presentacion,
+        paciente: receta.paciente,
+        numeroDeDocumento: receta.numeroDeDocumento,
+        fechaDeEmision: formData.fechaDeEmision,
+        cantidad: cantidadNum,
+        estado: "Pendiente",
+        observaciones: receta.observaciones || "",
+      };
+
+      const response = await fetch("http://localhost:3000/recipes", { //REVISAR PUERTO
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(recetaRenovada),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Error al renovar receta");
+        setSuccess("");
+        return;
+      }
+
+      setRecetas([...recetas, data]);
+      setError("");
+      setSuccess("Su receta se renovó correctamente!");
+      setTimeout(() => setSuccess(""), 3000);
+
+      cerrarModalRenovar();
+
+    } catch (err) {
+      console.error(err);
+      setError("Error de conexión con el servidor");
+      setSuccess("");
     }
-
-    if (cantidadNum < 1 || cantidadNum > 2) {
-      setError("La cantidad debe ser 1 o 2");
-      return;
-    }
-
-    const nuevaReceta = {
-      id: recetas.length + 1,
-      nombre: `${formData.nombre}, ${formData.presentacion} × ${formData.cantidad}`,
-      paciente: formData.integrante,
-      estado: "Pendiente",
-      observaciones: formData.observaciones || "",
-    };
-
-    setRecetas([...recetas, nuevaReceta]);
-    setError(""); // limpia errores
-    setSuccess("Su receta se renovó correctamente!");
-    setTimeout(() => setSuccess(""), 3000);
-
-    cerrarModalRenovar(); // cierra modal
   };
+
+  // Limites de fecha (mes actual o siguiente)
+  const hoy = new Date();
+  const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const finMesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0);
+
+  const minDate = inicioMesActual.toISOString().split("T")[0];
+  const maxDate = finMesSiguiente.toISOString().split("T")[0];
 
   return (
     <div className="modal fade" id="renovarRecetaModal" tabIndex="-1" aria-labelledby="renovarRecetaModalLabel" aria-hidden="true">
@@ -95,39 +143,7 @@ export default function renovarReceta({
 
           {/* Body del modal */}
           <div className="modal-body">
-            {/* Mensaje de error */}
-            {error && (
-              <div className="alert alert-danger" role="alert">
-                {error}
-              </div>
-            )}
-
-            {/* Formulario de renovación */}
-            <div className="mb-3">
-              <label className="form-label">Seleccionar integrante</label>
-              <select
-                className="form-select"
-                name="integrante"
-                value={formData.integrante}
-                onChange={handleChange}
-              >
-                <option value="">Seleccionar...</option>
-                {["Juan Salvo", "Ana Salvo", "María Salvo"].map((integrante, index) => (
-                  <option key={index} value={integrante}>{integrante}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Nombre de medicamento</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                name="nombre" 
-                value={formData.nombre} 
-                onChange={handleChange} 
-              />
-            </div>
+            {error && <div className="alert alert-danger">{error}</div>}
 
             <div className="mb-3">
               <label className="form-label">Cantidad</label>
@@ -143,28 +159,15 @@ export default function renovarReceta({
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Presentación</label>
-              <select
-                className="form-select"
-                name="presentacion"
-                value={formData.presentacion}
+              <label className="form-label">Fecha de emisión</label>
+              <input
+                type="date"
+                className="form-control"
+                name="fechaDeEmision"
+                value={formData.fechaDeEmision}
                 onChange={handleChange}
-              >
-                <option value="">Seleccionar...</option>
-                <option value="Comprimidos">Comprimidos</option>
-                <option value="Jarabe">Jarabe</option>
-                <option value="Gotas">Gotas</option>
-                <option value="Otros">Otro</option>
-              </select>
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Observaciones</label>
-              <textarea 
-                className="form-control" 
-                name="observaciones" 
-                value={formData.observaciones} 
-                onChange={handleChange} 
+                min={minDate}
+                max={maxDate}
               />
             </div>
           </div>
@@ -189,3 +192,4 @@ export default function renovarReceta({
     </div>
   );
 }
+
