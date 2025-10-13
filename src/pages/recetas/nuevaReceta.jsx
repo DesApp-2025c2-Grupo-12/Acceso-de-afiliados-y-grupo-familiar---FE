@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
 
 export default function NuevaReceta({
-  integrantesCuenta,
+  integrantesCuenta, // viene del grupo familiar
   formData,
   setFormData,
   setRecetas,
-  handleAgregarReceta,
   error,
   setError,
   success,
@@ -52,17 +51,22 @@ export default function NuevaReceta({
     setFormData({ ...formData, [name]: value });
   };
 
-  // Validar si el DNI coincide con el paciente seleccionado
+  /* Validación: verificar que el DNI ingresado esté en el grupo familiar
   const documentoValido = () => {
     const dni = formData.numeroDeDocumento;
-    const nombre = formData.paciente?.split(" ")[0];
-    const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
-    return grupoFamiliar.some(
-      (persona) =>
-        persona.numeroDeDocumento == dni &&
-        persona.nombre.toLowerCase() === nombre?.toLowerCase()
-    );
-  };
+    return integrantesCuenta.some(persona => persona.numeroDeDocumento == dni);
+  }; ESTO ES LO QUE DEJAMOS ANOCHE*/
+
+  //ESTO ES LO NUEVO
+const documentoValido = () => {
+  const dniIngresado = formData.numeroDeDocumento;
+  const pacienteSeleccionado = formData.paciente; // Este es el documento del paciente seleccionado
+  
+  // Verificar que el documento ingresado coincida EXACTAMENTE con el paciente seleccionado
+  return dniIngresado === pacienteSeleccionado;
+
+};
+
 
   const handleGuardar = async () => {
     try {
@@ -79,9 +83,17 @@ export default function NuevaReceta({
         throw new Error("Número de documento inválido (7 a 9 dígitos)");
       }
 
-      if (!documentoValido()) {
-        throw new Error("El documento ingresado no pertenece al afiliado seleccionado");
-      }
+
+if (!documentoValido()) {
+  throw new Error("El número de documento debe coincidir con el integrante seleccionado");
+}
+
+//agrego aca 
+      if (!integrantesCuenta || integrantesCuenta.length === 0) {
+  throw new Error("No se pudo cargar la información del grupo familiar");
+
+  
+}
 
       const recetaParaEnviar = { ...formData, estado: "Pendiente" };
 
@@ -92,12 +104,9 @@ export default function NuevaReceta({
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.error || "Error al crear receta");
 
-      if (handleAgregarReceta) handleAgregarReceta(data);
-      else setRecetas(prev => [...prev, data]);
-
+      setRecetas(prev => [...prev, data]); // 🔹 Agrega la receta nueva a la lista
       setSuccess("Receta creada con éxito");
       setError("");
 
@@ -147,6 +156,7 @@ export default function NuevaReceta({
           <div className="modal-body">
             {error && <div className="alert alert-danger">{error}</div>}
 
+            {/* 🔹 Selección de paciente */}
             <div className="mb-3">
               <label className="form-label">Seleccionar integrante</label>
               <select
@@ -156,12 +166,15 @@ export default function NuevaReceta({
                 onChange={handleChange}
               >
                 <option value="">Seleccionar...</option>
-                {integrantesCuenta.map((i, idx) => (
-                  <option key={idx} value={i}>{i}</option>
+                {integrantesCuenta.map((persona, idx) => (
+                  <option key={idx} value={persona.numeroDeDocumento}>
+                    {persona.nombre} {persona.apellido}
+                  </option>
                 ))}
               </select>
             </div>
 
+            {/* 🔹 Otros campos */}
             <div className="mb-3">
               <label className="form-label">Nombre de medicamento <small className="text-muted">(Ej: Ibuprofeno 600 mg x 30)</small></label>
               <input

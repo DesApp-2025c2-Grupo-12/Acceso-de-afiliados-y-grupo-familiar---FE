@@ -1,109 +1,121 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function RenovarReceta({
   receta,
   formData,
   setFormData,
   setRecetas,
-  recetas,
   error,
   setError,
   success,
   setSuccess,
   hoverGuardar,
-  setHoverGuardar
+  setHoverGuardar,
 }) {
+  const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
+
+  // Cargar grupo familiar al montar
+  useEffect(() => {
+    const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
+    setIntegrantesCuenta(grupoFamiliar);
+    console.log("Grupo Familiar en Renovar:", grupoFamiliar);
+  }, []);
+
+  // Cuando se selecciona una receta para renovar, llenar el formulario
   useEffect(() => {
     if (receta) {
       setFormData({
-        paciente: receta.paciente,
-        nombreDelMedicamento: receta.nombreDelMedicamento,
-        presentacion: receta.presentacion,
-        cantidad: receta.cantidad,
-        fechaDeEmision: receta.fechaDeEmision,
+        paciente: receta.paciente || "",
+        nombreDelMedicamento: receta.nombreDelMedicamento || "",
+        cantidad: receta.cantidad || 1,
+        presentacion: receta.presentacion || "",
+        fechaDeEmision: receta.fechaDeEmision || "",
+        numeroDeDocumento: receta.numeroDeDocumento || "",
         observaciones: receta.observaciones || "",
-        numeroDeDocumento: receta.numeroDeDocumento
       });
+      setError("");
+      setSuccess("");
     }
-  }, [receta, setFormData]);
+  }, [receta, setFormData, setError, setSuccess]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Validación en tiempo real
+    if (name === "nombreDelMedicamento") {
+      const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]{0,60}$/;
+      if (!regex.test(value)) return;
+    }
+
+    if (name === "numeroDeDocumento") {
+      const regex = /^[0-9]{0,9}$/;
+      if (!regex.test(value)) return;
+    }
+
     setFormData({ ...formData, [name]: value });
   };
 
-  const cerrarModalRenovar = () => {
-    const modalEl = document.getElementById("renovarRecetaModal");
-    if (modalEl) {
-      modalEl.classList.remove("show");
-      modalEl.setAttribute("aria-hidden", "true");
-      modalEl.style.display = "none";
-      document.body.classList.remove("modal-open");
-      document.querySelector(".modal-backdrop")?.remove();
-    }
+  // 🔹 Validación: verificar que el DNI ingresado esté en el grupo familiar
+  const documentoValido = () => {
+    const dni = formData.numeroDeDocumento;
+    return integrantesCuenta.some(persona => persona.numeroDeDocumento == dni);
   };
 
-  const guardarRenovacion = async () => {
+  const handleGuardar = async () => {
     try {
-      // Validaciones
-      const cantidadNum = parseInt(formData.cantidad);
-      if (!formData.cantidad || !formData.fechaDeEmision)
-        throw new Error("Cantidad y fecha de emisión son obligatorias");
-      if (cantidadNum < 1 || cantidadNum > 2)
-        throw new Error("La cantidad debe ser 1 o 2");
-      if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]{1,60}$/.test(formData.nombreDelMedicamento))
+      if (!formData.paciente || !formData.nombreDelMedicamento || !formData.numeroDeDocumento) {
+        throw new Error("Paciente, nombre del medicamento y documento son obligatorios");
+      }
+
+      if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]{1,60}$/.test(formData.nombreDelMedicamento)) {
         throw new Error("Nombre del medicamento inválido");
-      if (!/^[0-9]{7,9}$/.test(formData.numeroDeDocumento))
-        throw new Error("Número de documento inválido");
+      }
 
-      // restricción para no exceder más de dos recetas al mes
-      const fecha = new Date(formData.fechaDeEmision);
-      const mes = fecha.getMonth();
-      const año = fecha.getFullYear();
+      if (!/^[0-9]{7,9}$/.test(formData.numeroDeDocumento)) {
+        throw new Error("Número de documento inválido (7 a 9 dígitos)");
+      }
 
-      const contador = recetas.filter(r =>
-        r.nombreDelMedicamento === receta.nombreDelMedicamento &&
-        new Date(r.fechaDeEmision).getMonth() === mes &&
-        new Date(r.fechaDeEmision).getFullYear() === año
-      ).reduce((acc, r) => acc + r.cantidad, 0);
+      if (!documentoValido()) {
+        throw new Error("El documento ingresado no pertenece al afiliado seleccionado");
+      }
 
-      if (contador + cantidadNum > 2)
-        throw new Error("No puede superar 2 recetas del mismo medicamento en el mismo mes");
+      // Crear objeto actualizado de receta
+      const recetaActualizada = { ...formData, estado: "Pendiente" };
 
-      const recetaRenovada = {
-        nombreDelMedicamento: receta.nombreDelMedicamento,
-        presentacion: receta.presentacion,
-        paciente: receta.paciente,
-        numeroDeDocumento: receta.numeroDeDocumento,
-        fechaDeEmision: formData.fechaDeEmision,
-        cantidad: cantidadNum,
-        estado: "Pendiente",
-        observaciones: receta.observaciones || "",
-      };
-
-      const response = await fetch("http://localhost:3000/recipes", {
-        method: "POST",
+      const response = await fetch(`http://localhost:3000/recipes/${receta.id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(recetaRenovada),
+        body: JSON.stringify(recetaActualizada),
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.error || "Error al renovar receta");
 
-      setRecetas([...recetas, data]);
-      setError("");
-      setSuccess("Su receta se renovó correctamente!");
-      setTimeout(() => setSuccess(""), 3000);
+      // Actualizar lista de recetas en Recetas.js
+      setRecetas(prev =>
+        prev.map(r => (r.id === receta.id ? data : r))
+      );
 
-      cerrarModalRenovar();
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
+      setSuccess("Receta renovada con éxito");
+      setError("");
+
+      // cerrar modal
+      const modalEl = document.getElementById("renovarRecetaModal");
+      if (modalEl) {
+        modalEl.classList.remove("show");
+        modalEl.style.display = "none";
+        document.body.classList.remove("modal-open");
+        document.querySelector(".modal-backdrop")?.remove();
+      }
+
+    } catch (error) {
+      console.error(error);
+      setError(error.message);
       setSuccess("");
     }
   };
 
+  // Limites de fecha
   const hoy = new Date();
   const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
   const finMesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0);
@@ -114,26 +126,72 @@ export default function RenovarReceta({
     <div className="modal fade" id="renovarRecetaModal" tabIndex="-1" aria-labelledby="renovarRecetaModalLabel" aria-hidden="true">
       <div className="modal-dialog">
         <div className="modal-content">
-
           <div className="modal-header" style={{ backgroundColor: "#132074", color: "white" }}>
             <h5 className="modal-title" id="renovarRecetaModalLabel">Renovar Receta</h5>
-            <button type="button" className="btn-close btn-close-white" onClick={cerrarModalRenovar} aria-label="Close"></button>
+            <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" />
           </div>
 
           <div className="modal-body">
             {error && <div className="alert alert-danger">{error}</div>}
 
+            {/*Selección de paciente */}
+            <div className="mb-3">
+              <label className="form-label">Seleccionar integrante</label>
+              <select
+                className="form-select"
+                name="paciente"
+                value={formData.paciente}
+                onChange={handleChange}
+              >
+                <option value="">Seleccionar...</option>
+                {integrantesCuenta.map((persona, idx) => (
+                  <option key={idx} value={persona.numeroDeDocumento}>
+                    {persona.nombre} {persona.apellido}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* 🔹 Otros campos */}
+            <div className="mb-3">
+              <label className="form-label">Nombre de medicamento <small className="text-muted">(Ej: Ibuprofeno 600 mg x 30)</small></label>
+              <input
+                type="text"
+                className="form-control"
+                name="nombreDelMedicamento"
+                value={formData.nombreDelMedicamento}
+                onChange={handleChange}
+                maxLength={60}
+              />
+            </div>
+
             <div className="mb-3">
               <label className="form-label">Cantidad</label>
-              <input 
-                type="number" 
-                className="form-control" 
-                name="cantidad" 
-                value={formData.cantidad} 
-                onChange={handleChange} 
-                min={1} 
-                max={2} 
+              <input
+                type="number"
+                className="form-control"
+                name="cantidad"
+                value={formData.cantidad}
+                onChange={handleChange}
+                min={1}
+                max={2}
               />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Presentación</label>
+              <select
+                className="form-select"
+                name="presentacion"
+                value={formData.presentacion}
+                onChange={handleChange}
+              >
+                <option value="">Seleccionar...</option>
+                <option value="Comprimidos">Comprimidos</option>
+                <option value="Jarabe">Jarabe</option>
+                <option value="Gotas">Gotas</option>
+                <option value="Otros">Otro</option>
+              </select>
             </div>
 
             <div className="mb-3">
@@ -148,22 +206,44 @@ export default function RenovarReceta({
                 max={maxDate}
               />
             </div>
+
+            <div className="mb-3">
+              <label className="form-label">Número de Documento</label>
+              <input
+                type="text"
+                className="form-control"
+                name="numeroDeDocumento"
+                value={formData.numeroDeDocumento}
+                onChange={handleChange}
+                placeholder="Solo números (7 a 9 dígitos)"
+                inputMode="numeric"
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Observaciones</label>
+              <textarea
+                className="form-control"
+                name="observaciones"
+                value={formData.observaciones}
+                onChange={handleChange}
+              />
+            </div>
           </div>
 
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={cerrarModalRenovar}>Cancelar</button>
+            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
             <button
               type="button"
               className="btn text-white"
               style={{ backgroundColor: hoverGuardar ? "#b0b0b0" : "#132074" }}
               onMouseEnter={() => setHoverGuardar(true)}
               onMouseLeave={() => setHoverGuardar(false)}
-              onClick={guardarRenovacion}
+              onClick={handleGuardar}
             >
               Guardar
             </button>
           </div>
-
         </div>
       </div>
     </div>

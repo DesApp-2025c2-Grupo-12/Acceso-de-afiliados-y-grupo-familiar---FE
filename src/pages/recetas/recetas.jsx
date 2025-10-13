@@ -8,11 +8,7 @@ import { handleDescargar } from "./descargarReceta";
 
 export default function Recetas() {
   // CAMBIO AQUI: carga dinámica de integrantesCuenta desde localStorage
-  const integrantesCuenta = JSON.parse(localStorage.getItem("grupoFamiliar"))?.map(persona => 
-    persona.nombre.charAt(0).toUpperCase() + persona.nombre.slice(1).toLowerCase() + " " +
-    persona.apellido.charAt(0).toUpperCase() + persona.apellido.slice(1).toLowerCase()
-  ) || [];
-
+  const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
   const [recetas, setRecetas] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
@@ -32,26 +28,40 @@ export default function Recetas() {
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
   const [recetaRenovar, setRecetaRenovar] = useState(null);
 
-  useEffect(() => {
-    const fetchRecetas = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/recipes"); //VER PUERTO
-        if (!response.ok) throw new Error("Error al cargar recetas");
-        const data = await response.json();
-        setRecetas(data); 
-      } catch (err) {
-        console.error(err);
-        setError("No se pudieron cargar las recetas");
-      }
-    };
+  // Cargar recetas y grupo familiar al montar
+  //SE CORRIGIO FETCH
+ useEffect(() => {
+  const fetchRecetas = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/recipes");
+      if (!response.ok) throw new Error("Error al cargar recetas");
+      const data = await response.json();
+      setRecetas(data);
+    } catch (err) {
+      console.error("Error fetching recetas:", err);
+      setError("No se pudieron cargar las recetas");
+    }
+  };
 
-    fetchRecetas();
+  fetchRecetas();
+
+     // Cargar grupo familiar
+     //NUEVO AGREGO USUARIO LOGEADO
+  const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado")) || {};
+  const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
+  
+  // Incluir al usuario logueado en el grupo familiar
+  const todosIntegrantes = [usuarioLogueado, ...grupoFamiliar].filter(Boolean);
+  setIntegrantesCuenta(todosIntegrantes);
+
+    /* console.log("Grupo Familiar cargado:", grupoFamiliar); */
   }, []);
 
   const recetasFiltradas = recetas.filter((receta) =>
     receta.nombreDelMedicamento?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Abrir modal para ver receta
   const abrirModalVer = (receta) => {
     setRecetaSeleccionada(receta);
     const modalEl = document.getElementById("verRecetaModal");
@@ -66,6 +76,7 @@ export default function Recetas() {
     }
   };
 
+  // Abrir modal para renovar receta
   const abrirModalRenovar = (receta) => {
     setRecetaRenovar(receta);
     const modalEl = document.getElementById("renovarRecetaModal");
@@ -119,10 +130,10 @@ export default function Recetas() {
       </div>
 
       <NuevaReceta
-        integrantesCuenta={integrantesCuenta} // CAMBIO AQUI: dinámico
+        integrantesCuenta={integrantesCuenta} // 🔹 Dinámico desde localStorage
         formData={formData}
         setFormData={setFormData}
-        setRecetas={setRecetas} // ya no pasamos recetas
+        setRecetas={setRecetas}
         error={error}
         setError={setError}
         success={success}
@@ -140,7 +151,7 @@ export default function Recetas() {
         receta={recetaRenovar}
         formData={formData}
         setFormData={setFormData}
-        setRecetas={setRecetas} // ya no pasamos recetas
+        setRecetas={setRecetas}
         error={error}
         setError={setError}
         success={success}
