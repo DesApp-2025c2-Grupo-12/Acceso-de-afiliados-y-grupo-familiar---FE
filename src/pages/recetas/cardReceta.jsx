@@ -2,21 +2,34 @@ import React from "react";
 
 export default function CardReceta({ receta, handleVer, handleRenovar, handleDescargar }) {
 
-  // para cambiar el estado de la receta
+  // Clase para el estado
   const estadoClass = receta.estado === "Pendiente" ? "bg-warning text-dark" : "bg-success text-dark";
+
+  // Función para formatear fecha
+  const formatFecha = (fechaStr) => {
+    if (!fechaStr) return "-";
+    const fecha = new Date(fechaStr);
+    const dia = String(fecha.getDate()).padStart(2, "0");
+    const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+    const año = fecha.getFullYear();
+    return `${dia}/${mes}/${año}`;
+  };
 
   return (
     <div className="col-md-6 mb-4">
       <div className="card h-100 shadow-sm">
         <div className="card-body">
 
-          {/* Nombre del medicmento */}
-         <h5 className="card-title">{receta.nombreDelMedicamento}</h5>
+          {/* Nombre del medicamento y fecha de emisión */}
+          <h5 className="card-title">
+            {receta.nombreDelMedicamento} -{" "}
+            <small className="text-muted">{formatFecha(receta.fechaDeEmision)}</small>
+          </h5>
 
           {/* Paciente */}
           <p className="text-muted mb-2">{receta.paciente}</p>
 
-          {/* estado y botones */}
+          {/* Estado y botones */}
           <div className="d-flex justify-content-between align-items-center mt-3 flex-wrap">
 
             {/* Estado */}
@@ -24,9 +37,8 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
               {receta.estado}
             </span>
 
-            {/* botons */}
+            {/* Botones */}
             <div className="mt-2 mt-md-0">
-              {/* botón de ver receta */}
               <button 
                 className="btn btn-outline-dark btn-sm me-2" 
                 onClick={() => handleVer(receta)}
@@ -34,7 +46,6 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
                 Ver
               </button>
 
-              {/* botón de rnovar receta */}
               <button 
                 className="btn btn-outline-dark btn-sm me-2" 
                 onClick={() => handleRenovar(receta)}
@@ -42,7 +53,6 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
                 Renovar
               </button>
 
-              {/* botón de descargar receta */}
               <button 
                 className="btn btn-outline-dark btn-sm" 
                 onClick={() => handleDescargar(receta)}

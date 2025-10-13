@@ -121,14 +121,13 @@ export default function NuevaReceta({
   };
 
   // Limites de fecha
-  const hoy = new Date();
-  const mesAnterior = new Date();
-  mesAnterior.setMonth(hoy.getMonth() - 1);
-  const mesSiguiente = new Date();
-  mesSiguiente.setMonth(hoy.getMonth() + 1);
+const hoy = new Date();
+const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+const finMesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0);
 
-  const minDate = mesAnterior.toISOString().split("T")[0];
-  const maxDate = mesSiguiente.toISOString().split("T")[0];
+const minDate = inicioMesActual.toISOString().split("T")[0];
+const maxDate = finMesSiguiente.toISOString().split("T")[0];
+
 
 
 
