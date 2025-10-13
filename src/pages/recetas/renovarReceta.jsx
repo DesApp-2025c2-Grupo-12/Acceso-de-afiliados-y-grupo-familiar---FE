@@ -13,8 +13,6 @@ export default function RenovarReceta({
   hoverGuardar,
   setHoverGuardar
 }) {
-
-  // Precargar formulario con datos de la receta a renovar
   useEffect(() => {
     if (receta) {
       setFormData({
@@ -24,20 +22,16 @@ export default function RenovarReceta({
         cantidad: receta.cantidad,
         fechaDeEmision: receta.fechaDeEmision,
         observaciones: receta.observaciones || "",
+        numeroDeDocumento: receta.numeroDeDocumento
       });
     }
   }, [receta, setFormData]);
 
-  // Maneja cambios en inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
-  // Cerrar modal de renovar
   const cerrarModalRenovar = () => {
     const modalEl = document.getElementById("renovarRecetaModal");
     if (modalEl) {
@@ -45,29 +39,24 @@ export default function RenovarReceta({
       modalEl.setAttribute("aria-hidden", "true");
       modalEl.style.display = "none";
       document.body.classList.remove("modal-open");
-
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) backdrop.remove();
+      document.querySelector(".modal-backdrop")?.remove();
     }
   };
 
-  // Guardar receta renovada en DB
   const guardarRenovacion = async () => {
     try {
-      const cantidadNum = parseInt(formData.cantidad);
-
       // Validaciones
-      if (!formData.cantidad || !formData.fechaDeEmision) {
-        setError("Cantidad y fecha de emisión son obligatorias");
-        return;
-      }
+      const cantidadNum = parseInt(formData.cantidad);
+      if (!formData.cantidad || !formData.fechaDeEmision)
+        throw new Error("Cantidad y fecha de emisión son obligatorias");
+      if (cantidadNum < 1 || cantidadNum > 2)
+        throw new Error("La cantidad debe ser 1 o 2");
+      if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]{1,60}$/.test(formData.nombreDelMedicamento))
+        throw new Error("Nombre del medicamento inválido");
+      if (!/^[0-9]{7,9}$/.test(formData.numeroDeDocumento))
+        throw new Error("Número de documento inválido");
 
-      if (cantidadNum < 1 || cantidadNum > 2) {
-        setError("La cantidad debe ser 1 o 2");
-        return;
-      }
-
-      // restriccion para no exceder mas de ds recetas al mes
+      // restricción para no exceder más de dos recetas al mes
       const fecha = new Date(formData.fechaDeEmision);
       const mes = fecha.getMonth();
       const año = fecha.getFullYear();
@@ -78,10 +67,8 @@ export default function RenovarReceta({
         new Date(r.fechaDeEmision).getFullYear() === año
       ).reduce((acc, r) => acc + r.cantidad, 0);
 
-      if (contador + cantidadNum > 2) {
-        setError("No puede superar 2 recetas del mismo medicamento en el mismo mes");
-        return;
-      }
+      if (contador + cantidadNum > 2)
+        throw new Error("No puede superar 2 recetas del mismo medicamento en el mismo mes");
 
       const recetaRenovada = {
         nombreDelMedicamento: receta.nombreDelMedicamento,
@@ -94,7 +81,7 @@ export default function RenovarReceta({
         observaciones: receta.observaciones || "",
       };
 
-      const response = await fetch("http://localhost:3000/recipes", { //REVISAR PUERTO
+      const response = await fetch("http://localhost:3000/recipes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(recetaRenovada),
@@ -102,11 +89,7 @@ export default function RenovarReceta({
 
       const data = await response.json();
 
-      if (!response.ok) {
-        setError(data.error || "Error al renovar receta");
-        setSuccess("");
-        return;
-      }
+      if (!response.ok) throw new Error(data.error || "Error al renovar receta");
 
       setRecetas([...recetas, data]);
       setError("");
@@ -114,19 +97,16 @@ export default function RenovarReceta({
       setTimeout(() => setSuccess(""), 3000);
 
       cerrarModalRenovar();
-
     } catch (err) {
       console.error(err);
-      setError("Error de conexión con el servidor");
+      setError(err.message);
       setSuccess("");
     }
   };
 
-  // Limites de fecha (mes actual o siguiente)
   const hoy = new Date();
   const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
   const finMesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0);
-
   const minDate = inicioMesActual.toISOString().split("T")[0];
   const maxDate = finMesSiguiente.toISOString().split("T")[0];
 
@@ -135,13 +115,11 @@ export default function RenovarReceta({
       <div className="modal-dialog">
         <div className="modal-content">
 
-          {/* Header del modal */}
           <div className="modal-header" style={{ backgroundColor: "#132074", color: "white" }}>
             <h5 className="modal-title" id="renovarRecetaModalLabel">Renovar Receta</h5>
             <button type="button" className="btn-close btn-close-white" onClick={cerrarModalRenovar} aria-label="Close"></button>
           </div>
 
-          {/* Body del modal */}
           <div className="modal-body">
             {error && <div className="alert alert-danger">{error}</div>}
 
@@ -172,7 +150,6 @@ export default function RenovarReceta({
             </div>
           </div>
 
-          {/* Footer del modal */}
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={cerrarModalRenovar}>Cancelar</button>
             <button
@@ -192,4 +169,3 @@ export default function RenovarReceta({
     </div>
   );
 }
-
