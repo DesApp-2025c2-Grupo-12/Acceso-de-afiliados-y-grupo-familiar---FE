@@ -18,16 +18,16 @@ export default function NuevaReceta({
     if (!modalEl) return;
 
     const handleShow = () => {
-      setFormData({
-        paciente: "",
-        nombreDelMedicamento: "",
-        cantidad: 1,
-        presentacion: "",
-        fechaDeEmision: "",
-        numeroDeDocumento: "",
-        observaciones: "",
-      });
-      setError("");
+    const hoy = new Date().toISOString().split("T")[0];
+setFormData({
+  paciente: "",
+  nombreDelMedicamento: "",
+  cantidad: 1,
+  presentacion: "",
+  fechaDeEmision: hoy, // por defecto hoy
+  numeroDeDocumento: "",
+  observaciones: "",
+});
     };
 
     modalEl.addEventListener("show.bs.modal", handleShow);
@@ -138,11 +138,9 @@ if (!documentoValido()) {
   };
 
   // Limites de fecha
-  const hoy = new Date();
-  const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-  const finMesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0);
-  const minDate = inicioMesActual.toISOString().split("T")[0];
-  const maxDate = finMesSiguiente.toISOString().split("T")[0];
+const hoy = new Date().toISOString().split("T")[0];
+const minDate = hoy;
+const maxDate = hoy; // solo permite hoy
 
   return (
     <div className="modal fade" id="nuevaRecetaModal" tabIndex="-1" aria-labelledby="nuevaRecetaModalLabel" aria-hidden="true">
