@@ -14,7 +14,6 @@ export default function Header() {
   const disabledPaths = ["/", "/register"];
   const isDisabled = disabledPaths.includes(location.pathname);
 
-  
   const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
   const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar") || "[]");
 
@@ -43,51 +42,72 @@ export default function Header() {
           <div className="text-center fw-bold">MEDICINA INTEGRAL</div>
 
           {/* Dropdown de usuario */}
-          <Dropdown align="end" autoClose="outside">
-            <Dropdown.Toggle as="div" id="dropdown-user" style={{ cursor: "pointer" }}>
+          <Dropdown
+            align="end"
+            autoClose="outside"
+            onToggle={(nextShow, event, metadata) => {
+              if (isDisabled && metadata.source === "click") {
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
+              }
+            }}
+          >
+            <Dropdown.Toggle
+              as="div"
+              id="dropdown-user"
+              style={{
+                opacity: isDisabled ? 0.5 : 1,
+                display: "inline-flex",
+                alignItems: "center",
+              }}
+            >
               <i className="bi bi-person-circle fs-4 text-white"></i>
             </Dropdown.Toggle>
 
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={() => setShowProfile(true)}>Mis datos</Dropdown.Item>
+            {/* Sólo renderizo el menú si NO está deshabilitado */}
+            {!isDisabled && (
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => setShowProfile(true)}>Mis datos</Dropdown.Item>
 
-              {/* Botón que despliega el grupo familiar dentro del menú */}
-              <Dropdown.Item
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setMostrarListaFamiliar(!mostrarListaFamiliar);
-                }}
-              >
-                Ver grupo familiar
-              </Dropdown.Item>
+                {/* Botón que despliega el grupo familiar dentro del menú */}
+                <Dropdown.Item
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMostrarListaFamiliar(!mostrarListaFamiliar);
+                  }}
+                >
+                  Ver grupo familiar
+                </Dropdown.Item>
 
-              {/* Lista desplegable dentro del menú */}
-              {mostrarListaFamiliar && grupoFamiliar.length > 0 && (
-                <div className="ps-3 border-start ms-2">
-                  {grupoFamiliar.map((persona, index) => (
-                    <Dropdown.Item
-                      key={index}
-                      onClick={() => handleVerPerfilFamiliar(persona)}
-                      className="text-primary"
-                    >
-                      {persona.nombre}
-                    </Dropdown.Item>
-                  ))}
-                </div>
-              )}
+                {/* Lista desplegable dentro del menú */}
+                {mostrarListaFamiliar && grupoFamiliar.length > 0 && (
+                  <div className="ps-3 border-start ms-2">
+                    {grupoFamiliar.map((persona, index) => (
+                      <Dropdown.Item
+                        key={index}
+                        onClick={() => handleVerPerfilFamiliar(persona)}
+                        className="text-primary"
+                      >
+                        {persona.nombre}
+                      </Dropdown.Item>
+                    ))}
+                  </div>
+                )}
 
-              <Dropdown.Divider />
-              <Dropdown.Item
-                onClick={() => {
-                  localStorage.removeItem('usuarioLogueado');
-                  localStorage.removeItem('grupoFamiliar');
-                  window.location.href = "/";
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                Cerrar sesión
-              </Dropdown.Item>
-            </Dropdown.Menu>
+                <Dropdown.Divider />
+                <Dropdown.Item
+                  onClick={() => {
+                    localStorage.removeItem("usuarioLogueado");
+                    localStorage.removeItem("grupoFamiliar");
+                    window.location.href = "/";
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  Cerrar sesión
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            )}
           </Dropdown>
         </Container>
       </header>
@@ -98,7 +118,7 @@ export default function Header() {
           <Modal.Title>Mi perfil</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {usuarioLogueado ? ( 
+          {usuarioLogueado ? (
             <>
               <p><strong>Nombre:</strong> {usuarioLogueado.nombre}</p>
               <p><strong>Email:</strong> {usuarioLogueado.correoElectronico}</p>

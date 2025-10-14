@@ -11,59 +11,59 @@ export default function Register() {
   const [documento, setDocumento] = useState("");
 
   const handleRegister = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // Validaciones locales
-  if (!documento.trim()) {
-    setErrorMessage("❌ Debés ingresar un documento");
-    return;
-  }
-
-  if (password !== confirmPassword) {
-    setErrorMessage("❌ Las contraseñas no coinciden");
-    setSuccessMessage(false);
-    return;
-  }
-
-  try {
-    
-    const resDoc = await fetch(`http://localhost:3000/affiliate/verificar-documento/${documento}`);
-    if (!resDoc.ok) throw new Error("Error al verificar el documento");
-    const dataDoc = await resDoc.json();
-    if (!dataDoc.existe) {
-      throw new Error("❌ Este documento no está dado de alta");
+    // Validaciones locales
+    if (!documento.trim()) {
+      setErrorMessage("❌ Debés ingresar un documento");
+      return;
     }
 
-    
-    const resPass = await fetch(`http://localhost:3000/affiliate/verificar-password/${documento}`);
-    if (!resPass.ok) throw new Error("Error al verificar la contraseña");
-    const dataPass = await resPass.json();
-
-    if (!dataPass.existe) {
-      
-      const resAgregar = await fetch(`http://localhost:3000/affiliate/agregar-password/${documento}/${password}`, {
-        method: 'PUT'
-      });
-      if (!resAgregar.ok) throw new Error("Error al agregar la contraseña");
-    } else {
-      
-      throw new Error("❌ El afiliado ya está registrado");
+    if (password !== confirmPassword) {
+      setErrorMessage("❌ Las contraseñas no coinciden");
+      setSuccessMessage(false);
+      return;
     }
 
-    
-    setErrorMessage("");
-    setSuccessMessage(true);
-    setTimeout(() => navigate("/"), 3000);
+    try {
 
-  } catch (err) {
-    
-    setErrorMessage(err.message);
-    setSuccessMessage(false);
-
-  }
-};
+      const resDoc = await fetch(`http://localhost:3000/affiliate/verificar-documento/${documento}`);
+      if (!resDoc.ok) throw new Error("Error al verificar el documento");
+      const dataDoc = await resDoc.json();
+      if (!dataDoc.existe) {
+        throw new Error("❌ Este documento no está dado de alta");
+      }
 
 
+      const resPass = await fetch(`http://localhost:3000/affiliate/verificar-password/${documento}`);
+      if (!resPass.ok) throw new Error("Error al verificar la contraseña");
+      const dataPass = await resPass.json();
+
+      if (!dataPass.existe) {
+
+        const resAgregar = await fetch(`http://localhost:3000/affiliate/agregar-password/${documento}/${password}`, {
+          method: 'PUT'
+        });
+        if (!resAgregar.ok) throw new Error("Error al agregar la contraseña");
+      } else {
+
+        throw new Error("❌ El afiliado ya está registrado");
+      }
+
+
+      setErrorMessage("");
+      setSuccessMessage(true);
+      setTimeout(() => navigate("/"), 3000);
+
+    } catch (err) {
+
+      setErrorMessage(err.message);
+      setSuccessMessage(false);
+
+    }
+  };
+
+  
   return (
     <>
       <Form
@@ -105,7 +105,13 @@ export default function Register() {
           </>
         }
       />
-
+      <button
+        type="button"
+        className="btn btn-primary mt-2"
+        style={{ color: "white", textDecoration: "none", cursor: "pointer" }}
+        onClick={() =>{ navigate("/"); }}
+      >Volver al Login
+      </button>
       {/* Mensaje de error */}
       {errorMessage && (
         <div className="d-flex justify-content-center mt-3">
