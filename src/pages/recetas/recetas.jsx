@@ -46,13 +46,12 @@ export default function Recetas() {
   fetchRecetas();
 
      // Cargar grupo familiar
-     //NUEVO AGREGO USUARIO LOGEADO
+     //NUEVO AGREGO USUARIO LOGEADO(no es necesario ya era parte del grupo familiar segun armado de bd)
   const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado")) || {};
   const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
   
-  // Incluir al usuario logueado en el grupo familiar
-  const todosIntegrantes = [usuarioLogueado, ...grupoFamiliar].filter(Boolean);
-  setIntegrantesCuenta(todosIntegrantes);
+  
+  setIntegrantesCuenta(grupoFamiliar);
 
     /* console.log("Grupo Familiar cargado:", grupoFamiliar); */
   }, []);

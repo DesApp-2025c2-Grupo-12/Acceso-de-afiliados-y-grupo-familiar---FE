@@ -7,8 +7,8 @@ nav {
   align-items: center;
   justify-content: space-around;
   margin: 55px 0 30px 15px;
-  height: 100%;
-  padding: 15px 0 0 0;
+  height: 95vh;
+  padding: 10px 0 0 0;
   position: sticky;
   top: 15px;
 }
@@ -23,12 +23,12 @@ nav a {
 }
 
 nav a img {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
 }
 
 nav a p {
-  padding: 7px;
-  font-size: 14px;
+  padding: 5px;
+  font-size: 12px;
   color: #132074;
 }

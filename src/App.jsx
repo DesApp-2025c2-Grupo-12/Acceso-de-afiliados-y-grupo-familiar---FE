@@ -40,7 +40,7 @@ function App() {
             <Route path="/recetas" element={<ProtectedRoute><Recetas /></ProtectedRoute>} />
             <Route path="/turnos" element={<ProtectedRoute><Turnos /></ProtectedRoute>} />
             <Route path="/reintegros" element={<ProtectedRoute><Reintegros /></ProtectedRoute>} />
-            <Route path="/autorizaciones" element={<ProtectedRoute></ProtectedRoute>} />
+            <Route path="/autorizaciones" element={<ProtectedRoute><Autorizaciones></Autorizaciones></ProtectedRoute>} />
             <Route path="/prestadores" element={<ProtectedRoute><Prestadores /></ProtectedRoute>} />
             <Route path="/nuevo-turno" element={<ProtectedRoute><NuevoTurno /></ProtectedRoute>} />
           </Routes>
