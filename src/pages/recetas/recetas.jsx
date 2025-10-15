@@ -7,7 +7,6 @@ import BuscarReceta from "./buscarReceta";
 import { handleDescargar } from "./descargarReceta";
 
 export default function Recetas() {
-  // CAMBIO AQUI: carga dinámica de integrantesCuenta desde localStorage
   const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
   const [recetas, setRecetas] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,67 +27,30 @@ export default function Recetas() {
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
   const [recetaRenovar, setRecetaRenovar] = useState(null);
 
-  // Cargar recetas y grupo familiar al montar
-  //SE CORRIGIO FETCH
- useEffect(() => {
-  const fetchRecetas = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/recipes");
-      if (!response.ok) throw new Error("Error al cargar recetas");
-      const data = await response.json();
-      setRecetas(data);
-    } catch (err) {
-      console.error("Error fetching recetas:", err);
-      setError("No se pudieron cargar las recetas");
-    }
-  };
+  useEffect(() => {
+    const fetchRecetas = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/recipes");
+        if (!response.ok) throw new Error("Error al cargar recetas");
+        const data = await response.json();
+        setRecetas(data);
+      } catch (err) {
+        console.error("Error fetching recetas:", err);
+        setError("No se pudieron cargar las recetas");
+      }
+    };
+    fetchRecetas();
 
-  fetchRecetas();
-
-     // Cargar grupo familiar
-     //NUEVO AGREGO USUARIO LOGEADO(no es necesario ya era parte del grupo familiar segun armado de bd)
-  const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado")) || {};
-  const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
-  
-  
-  setIntegrantesCuenta(grupoFamiliar);
-
-    /* console.log("Grupo Familiar cargado:", grupoFamiliar); */
+    const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
+    setIntegrantesCuenta(grupoFamiliar);
   }, []);
 
   const recetasFiltradas = recetas.filter((receta) =>
     receta.nombreDelMedicamento?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Abrir modal para ver receta
-  const abrirModalVer = (receta) => {
-    setRecetaSeleccionada(receta);
-    const modalEl = document.getElementById("verRecetaModal");
-    if (modalEl) {
-      modalEl.classList.add("show");
-      modalEl.setAttribute("aria-hidden", "false");
-      modalEl.style.display = "block";
-      document.body.classList.add("modal-open");
-      const backdrop = document.createElement("div");
-      backdrop.className = "modal-backdrop fade show";
-      document.body.appendChild(backdrop);
-    }
-  };
-
-  // Abrir modal para renovar receta
-  const abrirModalRenovar = (receta) => {
-    setRecetaRenovar(receta);
-    const modalEl = document.getElementById("renovarRecetaModal");
-    if (modalEl) {
-      modalEl.classList.add("show");
-      modalEl.setAttribute("aria-hidden", "false");
-      modalEl.style.display = "block";
-      document.body.classList.add("modal-open");
-      const backdrop = document.createElement("div");
-      backdrop.className = "modal-backdrop fade show";
-      document.body.appendChild(backdrop);
-    }
-  };
+  const abrirModalVer = (receta) => setRecetaSeleccionada(receta);
+  const abrirModalRenovar = (receta) => setRecetaRenovar(receta);
 
   return (
     <div className="container">
@@ -129,7 +91,7 @@ export default function Recetas() {
       </div>
 
       <NuevaReceta
-        integrantesCuenta={integrantesCuenta} // 🔹 Dinámico desde localStorage
+        integrantesCuenta={integrantesCuenta}
         formData={formData}
         setFormData={setFormData}
         setRecetas={setRecetas}
