@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Card, Form, Button, Modal } from "react-bootstrap";
+import { Container, Row, Col, Form, Button, Modal } from "react-bootstrap";
+import CardPersonalizada from "../../components/Cards/CardPersonalizada";
 
 export default function Prestadores() {
   const [search, setSearch] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [location, setLocation] = useState("");
   const [zona, setZona] = useState("");
-  const [selectedPrestador, setSelectedPrestador] = useState(null); // estado para modal
+  const [selectedPrestador, setSelectedPrestador] = useState(null);
 
   const prestadores = [
     { id: 1, nombre: "Dr. Juan Pérez", especialidad: "Cardiología", ubicacion: "Buenos Aires", zona: "Oeste", telefono: "11-4567-8901", lugar: "Hospital Municipal de Hurlingham" },
@@ -32,7 +33,7 @@ export default function Prestadores() {
     <Container className="my-5">
       <h2 className="text-center mb-4">Prestadores</h2>
 
-      {/* Buscador y Filtros */}
+      {/* Buscador y filtros */}
       <Row className="mb-4">
         <Col md={4}>
           <Form.Control
@@ -60,10 +61,7 @@ export default function Prestadores() {
         <Col md={4}>
           <Form.Select
             value={location}
-            onChange={(e) => {
-              setLocation(e.target.value);
-              setZona(""); // reset zona
-            }}
+            onChange={(e) => { setLocation(e.target.value); setZona(""); }}
           >
             <option value="">Todas las ubicaciones</option>
             <option value="CABA">CABA</option>
@@ -75,7 +73,7 @@ export default function Prestadores() {
         </Col>
       </Row>
 
-      {/* Desplegable de zonas si es Buenos Aires */}
+      {/* Zonas para Buenos Aires */}
       {location === "Buenos Aires" && (
         <Row className="mb-4">
           <Col md={4}>
@@ -91,32 +89,26 @@ export default function Prestadores() {
       )}
 
       {/* Listado de prestadores */}
-      <Row>
+      <Row className="g-3">
         {filteredPrestadores.length > 0 ? (
           filteredPrestadores.map((p) => (
-            <Col md={4} key={p.id} className="mb-3 d-flex">
-              <Card className="h-100 d-flex flex-column w-100">
-                <Card.Body className="d-flex flex-column">
-                  <Card.Title>{p.nombre}</Card.Title>
-                  <Card.Text>
-                    <strong>Especialidad:</strong> {p.especialidad} <br />
-                    <strong>Ubicación:</strong> {p.ubicacion} <br />
-                    {p.ubicacion === "Buenos Aires" && (
-                      <span>
-                        <strong>Zona:</strong> {p.zona} <br />
-                      </span>
-                    )}
-                    <strong>Lugar:</strong> {p.lugar}
-                  </Card.Text>
-                  <Button
-                    variant="primary"
-                    className="btn btn-blue mt-auto align-self-center"
-                    onClick={() => setSelectedPrestador(p)}
-                  >
-                    Ver perfil
-                  </Button>
-                </Card.Body>
-              </Card>
+            <Col md={4} key={p.id} className="d-flex">
+              <div className="d-flex flex-column h-100 w-100">
+                <CardPersonalizada
+                  title={p.nombre}
+                  subtitle={p.especialidad}
+                  tipo={p.ubicacion === "Buenos Aires" && p.zona ? `Zona ${p.zona}` : p.ubicacion}
+                  detalles={[
+                    { label: "Especialidad", value: p.especialidad },
+                    { label: "Ubicación", value: p.ubicacion },
+                    { label: "Lugar", value: p.lugar },
+                    { label: "Teléfono", value: p.telefono },
+                  ]}
+                  botonTexto="Ver perfil"
+                  onClick={() => setSelectedPrestador(p)}
+                  className="h-100"
+                />
+              </div>
             </Col>
           ))
         ) : (

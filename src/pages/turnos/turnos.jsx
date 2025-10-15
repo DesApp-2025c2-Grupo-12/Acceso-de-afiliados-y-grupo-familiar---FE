@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Card, Row, Col, Container, Alert } from "react-bootstrap";
 import NuevoTurno from "./nuevoTurno";
+import CardPersonalizada from "../../components/Cards/CardPersonalizada";
 
 export default function Turnos() {
   const [pantallaNuevoTurno, setPantallaNuevoTurno] = useState(false);
@@ -77,20 +78,17 @@ export default function Turnos() {
           <Row>
             {turnosOrdenados.map(turno => (
               <Col md={6} lg={4} key={turno.id} className="mb-3">
-                <Card className="h-100 shadow-sm">
-                  <Card.Header className="d-flex justify-content-between align-items-center">
-                    <strong>{turno.especialidad}</strong>
-                    <span>{turno.tipo}</span>
-                  </Card.Header>
-                  <Card.Body>
-                    <Card.Title>{turno.medico}</Card.Title>
-                    <Card.Text><strong>Fecha y Hora:</strong> {turno.fechaYHora}</Card.Text>
-                    <Card.Text><strong>Lugar:</strong> {turno.lugar}</Card.Text>
-                  </Card.Body>
-                  <Card.Footer className="text-center">
-                    <Button variant="outline-danger" size="sm" onClick={() => cancelarTurno(turno)}>Dar de baja</Button>
-                  </Card.Footer>
-                </Card>
+                <CardPersonalizada
+                  title={turno.medico}
+                  subtitle={turno.especialidad}
+                  tipo={turno.tipo}
+                  detalles={[
+                    { label: "Fecha y Hora", value: turno.fechaYHora },
+                    { label: "Lugar", value: turno.lugar },
+                  ]}
+                  botonTexto="Dar de baja"
+                  onClick={() => cancelarTurno(turno)}
+               />
               </Col>
             ))}
           </Row>

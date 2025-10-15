@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Form, Card, Button, Alert } from "react-bootstrap";
+import CardPersonalizada from "../../components/Cards/CardPersonalizada";
 
 export default function NuevoTurno({ turnos, setTurnos, setPantallaNuevoTurno, setAlerta, generarFechaTurno }) {
   const especialidades = {
@@ -163,23 +164,20 @@ export default function NuevoTurno({ turnos, setTurnos, setPantallaNuevoTurno, s
                 
                 return (
                   <Col md={4} key={`${medico}-${hora}-${diaSeleccionado}`} className="mb-3">
-                    <Card className="shadow-sm h-100">
-                      <Card.Body className="d-flex flex-column">
-                        <Card.Title className="h6">{medico}</Card.Title>
-                        <Card.Text><strong>Horario:</strong> {hora}</Card.Text>
-                        <Card.Text><strong>Fecha:</strong> {fechaTurnoFormateada}</Card.Text>
-                        <Card.Text><strong>Lugar:</strong> Hospital Municipal de Hurlingham</Card.Text>
-                        <Button 
-                          variant="success" 
-                          size="sm" 
-                          onClick={() => reservarTurno(medico, hora)}
-                          className="mt-auto"
-                        >
-                          Reservar
-                        </Button>
-                      </Card.Body>
-                    </Card>
+                    <CardPersonalizada
+                      title={medico}
+                      subtitle={especialidad}
+                      tipo={tipoConsulta}
+                     detalles={[
+                        { label: "Fecha", value: fechaTurnoFormateada },
+                        { label: "Hora", value: hora },
+                        { label: "Lugar", value: "Hospital Municipal de Hurlingham" },
+                      ]}
+                      botonTexto="Reservar"
+                      onClick={() => reservarTurno(medico, hora)}
+                    />
                   </Col>
+
                 );
               })
             ))}
