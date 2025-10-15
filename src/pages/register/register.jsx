@@ -31,7 +31,7 @@ export default function Register() {
       if (!resDoc.ok) throw new Error("Error al verificar el documento");
       const dataDoc = await resDoc.json();
       if (!dataDoc.existe) {
-        throw new Error("❌ Este documento no está dado de alta");
+        throw new Error("❌ Este documento no pertenece a un afiliado dado de alta");
       }
 
 

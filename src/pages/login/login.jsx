@@ -39,7 +39,7 @@ export default function Login() {
       console.log("resPass.status:", resPass.status);
       if (!resPass.ok) throw new Error("Error al verificar la contraseña");
       const dataPass = await resPass.json()
-      if (!dataPass.existe) { throw new Error("❌ El Afiliado no esta registrado11") }
+      if (!dataPass.existe) { throw new Error("❌ El Afiliado no esta registrado") }
 
       /*encodeURIComponent(password) INVESTIGAR SI CONVIENE USAR,HABRIA QUE CAMBIAR COSAS EN EL BACK CALCULO */
       const resVerPass = await fetch(`http://localhost:3000/affiliate/es-su-contrasena/${documento}/${password}`);
