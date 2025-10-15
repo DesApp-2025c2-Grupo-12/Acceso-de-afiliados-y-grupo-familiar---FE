@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import CardReceta from "./cardReceta";
 import NuevaReceta from "./nuevaReceta";
 import VerReceta from "./verReceta";
@@ -27,6 +27,8 @@ export default function Recetas() {
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
   const [recetaRenovar, setRecetaRenovar] = useState(null);
 
+  const nuevaRecetaRef = useRef(null); // Ref para modal nueva receta
+
   useEffect(() => {
     const fetchRecetas = async () => {
       try {
@@ -49,6 +51,10 @@ export default function Recetas() {
     receta.nombreDelMedicamento?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const abrirModalNuevaReceta = () => {
+    nuevaRecetaRef.current?.show();
+  };
+
   const abrirModalVer = (receta) => setRecetaSeleccionada(receta);
   const abrirModalRenovar = (receta) => setRecetaRenovar(receta);
 
@@ -61,8 +67,7 @@ export default function Recetas() {
           style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
           onMouseEnter={() => setHoverNueva(true)}
           onMouseLeave={() => setHoverNueva(false)}
-          data-bs-toggle="modal"
-          data-bs-target="#nuevaRecetaModal"
+          onClick={abrirModalNuevaReceta}
         >
           + Nueva Receta
         </button>
@@ -91,6 +96,7 @@ export default function Recetas() {
       </div>
 
       <NuevaReceta
+        refModal={nuevaRecetaRef}          // 🔹 Pasamos el ref
         integrantesCuenta={integrantesCuenta}
         formData={formData}
         setFormData={setFormData}
