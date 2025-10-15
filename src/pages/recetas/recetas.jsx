@@ -30,7 +30,7 @@ export default function Recetas() {
 
   const nuevaRecetaRef = useRef(null); // Ref para modal nueva receta
 
-  // ⚡ Fetch inicial de recetas y grupo familiar
+  // Fetch inicial de recetas y grupo familiar
   useEffect(() => {
     const fetchRecetas = async () => {
       try {
@@ -49,7 +49,7 @@ export default function Recetas() {
     setIntegrantesCuenta(grupoFamiliar);
   }, []);
 
-  // ⚡ Alertas temporales
+  // Alertas temporales
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => setError(""), 3000);
@@ -97,7 +97,7 @@ export default function Recetas() {
         </button>
       </div>
 
-      {/* ⚡ Mensajes temporales */}
+      {/* Mensajes temporales */}
       {error && <div className="alert alert-danger text-center">{error}</div>}
       {success && <div className="alert alert-success text-center">{success}</div>}
       {alertaDescarga && <div className="alert alert-warning text-center">{alertaDescarga}</div>}

@@ -64,7 +64,7 @@ export default function RenovarReceta({
     setError("");
     setSuccess("");
 
-    bsModal.current.show(); // ⬅️ Solo aquí se abre el modal
+    bsModal.current.show(); 
   }, [receta]);
 
   const handleChange = (e) => {

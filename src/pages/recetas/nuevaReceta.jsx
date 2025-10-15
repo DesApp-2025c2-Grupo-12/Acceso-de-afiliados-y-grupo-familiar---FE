@@ -14,8 +14,8 @@ export default function NuevaReceta({
   hoverGuardar,
   setHoverGuardar,
 }) {
-  const modalRef = useRef(null);   // 🔹 Ref interno
-  const bsModal = useRef(null);    // 🔹 Instancia bootstrap
+  const modalRef = useRef(null);   
+  const bsModal = useRef(null);   
 
   useEffect(() => {
     if (modalRef.current) {

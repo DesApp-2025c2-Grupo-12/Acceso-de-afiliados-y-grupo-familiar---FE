@@ -1,6 +1,6 @@
 export const handleDescargar = (receta, setAlertaDescarga) => {
   if (receta.estado !== "Aprobada") {
-    // ⚡ Mensaje estilizado en pantalla
+    // Mensaje estilizado en pantalla
     setAlertaDescarga("Solo se pueden descargar recetas aprobadas.");
     setTimeout(() => setAlertaDescarga(""), 3000); // desaparece después de 3s
     return;
