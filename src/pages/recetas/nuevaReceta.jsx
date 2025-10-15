@@ -132,7 +132,7 @@ const recetaParaEnviar = {
 
             <div className="mb-3">
               <label className="form-label">Nombre de medicamento</label>
-              <input type="text" className="form-control" name="nombreDelMedicamento" value={formData.nombreDelMedicamento} onChange={handleChange} maxLength={60} />
+              <input type="text" className="form-control" name="nombreDelMedicamento" value={formData.nombreDelMedicamento} placeholder="Ej: Ibuprofeno 600 mg x 30"  onChange={handleChange} maxLength={60} />
             </div>
 
             <div className="mb-3">
