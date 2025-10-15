@@ -62,8 +62,17 @@ export default function NuevaReceta({
       if (!integrantesCuenta || integrantesCuenta.length === 0)
         throw new Error("No se pudo cargar la información del grupo familiar");
 
-      const recetaParaEnviar = { ...formData, estado: "Pendiente" };
+// Buscar el paciente seleccionado por DNI
+const pacienteSeleccionado = integrantesCuenta.find(
+  (p) => p.numeroDeDocumento === formData.paciente
+);
 
+const recetaParaEnviar = {
+  ...formData,
+  paciente: pacienteSeleccionado ? `${pacienteSeleccionado.nombre} ${pacienteSeleccionado.apellido}` : "",
+  numeroDeDocumento: formData.paciente, // mantiene el DNI
+  estado: "Pendiente"
+};
       const response = await fetch("http://localhost:3000/recipes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

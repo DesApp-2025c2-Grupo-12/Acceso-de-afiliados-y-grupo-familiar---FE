@@ -24,11 +24,13 @@ export default function Recetas() {
   const [hoverBuscar, setHoverBuscar] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [alertaDescarga, setAlertaDescarga] = useState(""); // alerta de descarga
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
   const [recetaRenovar, setRecetaRenovar] = useState(null);
 
   const nuevaRecetaRef = useRef(null); // Ref para modal nueva receta
 
+  // ⚡ Fetch inicial de recetas y grupo familiar
   useEffect(() => {
     const fetchRecetas = async () => {
       try {
@@ -46,6 +48,28 @@ export default function Recetas() {
     const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
     setIntegrantesCuenta(grupoFamiliar);
   }, []);
+
+  // ⚡ Alertas temporales
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => setSuccess(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
+  useEffect(() => {
+    if (alertaDescarga) {
+      const timer = setTimeout(() => setAlertaDescarga(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [alertaDescarga]);
 
   const recetasFiltradas = recetas.filter((receta) =>
     receta.nombreDelMedicamento?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -73,8 +97,10 @@ export default function Recetas() {
         </button>
       </div>
 
+      {/* ⚡ Mensajes temporales */}
       {error && <div className="alert alert-danger text-center">{error}</div>}
       {success && <div className="alert alert-success text-center">{success}</div>}
+      {alertaDescarga && <div className="alert alert-warning text-center">{alertaDescarga}</div>}
 
       <BuscarReceta
         searchTerm={searchTerm}
@@ -90,13 +116,13 @@ export default function Recetas() {
             receta={receta}
             handleVer={abrirModalVer}
             handleRenovar={abrirModalRenovar}
-            handleDescargar={handleDescargar}
+            handleDescargar={(r) => handleDescargar(r, setAlertaDescarga)}
           />
         ))}
       </div>
 
       <NuevaReceta
-        refModal={nuevaRecetaRef}          // 🔹 Pasamos el ref
+        refModal={nuevaRecetaRef}
         integrantesCuenta={integrantesCuenta}
         formData={formData}
         setFormData={setFormData}

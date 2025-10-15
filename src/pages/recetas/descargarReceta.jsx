@@ -1,10 +1,17 @@
-export const handleDescargar = (receta) => {
+export const handleDescargar = (receta, setAlertaDescarga) => {
+  if (receta.estado !== "Aprobada") {
+    // ⚡ Mensaje estilizado en pantalla
+    setAlertaDescarga("Solo se pueden descargar recetas aprobadas.");
+    setTimeout(() => setAlertaDescarga(""), 3000); // desaparece después de 3s
+    return;
+  }
+
   const contenido = `
 Receta Médica
 -----------------------
 ID: ${receta.id}
 Paciente: ${receta.paciente}
-Medicamento: ${receta.nombreDelMedicamento}  // 🔹 CAMBIAR: receta.nombre → receta.nombreDelMedicamento
+Medicamento: ${receta.nombreDelMedicamento}
 Presentación: ${receta.presentacion}
 Cantidad: ${receta.cantidad}
 Fecha de Emisión: ${receta.fechaDeEmision}
