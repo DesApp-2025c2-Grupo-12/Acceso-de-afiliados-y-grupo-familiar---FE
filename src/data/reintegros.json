@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "fecha": "Jueves 11 de Diciembre 2025",
+    "paciente": "Juan Salvo",
+    "medico": "Dr. Julio Cortés",
+    "especialidad": "Neurocirugía",
+    "monto": "$260.000",
+    "estado": "Pendiente"
+  },
+  {
+    "id": 2,
+    "fecha": "Miércoles 15 de Noviembre 2025",
+    "paciente": "Juan Salvo",
+    "medico": "Dr. Alejandra Pizarn",
+    "especialidad": "Psicóloga clínica",
+    "monto": "$32.000",
+    "estado": "Pago"
+  }
+]

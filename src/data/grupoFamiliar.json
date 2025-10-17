@@ -1,0 +1,22 @@
+[
+  {
+    "nombre": "Bianca Margarita",
+    "relacion": "Afiliado",
+    "DNI": "40260243"
+  },
+  {
+    "nombre": "Juan Pérez",
+    "relacion": "Cónyuge",
+    "DNI": "38265895"
+  },
+  {
+    "nombre": "Lucas Pérez",
+    "relacion": "Hijo",
+    "DNI": "48658945"
+  },
+  {
+    "nombre": "Sofía Pérez",
+    "relacion": "Hija",
+    "DNI": "50654965"
+  }
+]
