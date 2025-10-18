@@ -61,7 +61,7 @@ export default function Login() {
     
 
 
-      const resGrupoFam = await fetch(`http://localhost:3000/affiliate/grupo-familiar/${documento}`)
+      const resGrupoFam = await fetch(`http://localhost:3000/affiliate/grupo-familiar/${usuario.perteneceA}`)
       if(!resGrupoFam.ok) throw  new Error("error GF")
       const dataGrupFam = await resGrupoFam.json()
       
