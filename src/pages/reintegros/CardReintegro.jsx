@@ -17,21 +17,21 @@ export default function CardReintegro({ reintegroFiltrado, seleccionarReintegro,
         <Card.Body>
           <Row className="align-items-center">
             <Col md={3}>
-              <div className="monto">{reintegroFiltrado.monto}</div>
-              <div className="fecha">{reintegroFiltrado.fecha}</div>
+              <div className="monto">{reintegroFiltrado.facturacion_ValorTotal}</div>
+              <div className="fecha">{reintegroFiltrado.facturacion_Fecha}</div>
             </Col>
 
             <Col md={5}>
-              <div className="paciente">{reintegroFiltrado.paciente}</div>
+              <div className="paciente">{reintegroFiltrado.nombreDelAfiliado}</div>
               <div className="datos-medico">
-                <span>Médico: {reintegroFiltrado.medico}</span> |{" "}
+                <span>Médico: {reintegroFiltrado.nombreDelMedico}</span> |{" "}
                 <span>Especialidad: {reintegroFiltrado.especialidad}</span>
               </div>
             </Col>
 
             <Col md={4} className="text-end">
-              <div className={`estado ${reintegroFiltrado.estado === "Pendiente" ? "pendiente" : "pago"}`}>
-                {reintegroFiltrado.estado}
+              <div className={`estado pendiente`}>
+                Pendiente
               </div>
               <div className="acciones">
                 <a href="#" onClick={() => handleVerDetalle(reintegroFiltrado) }>
