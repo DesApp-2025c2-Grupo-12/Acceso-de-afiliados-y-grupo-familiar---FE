@@ -5,6 +5,8 @@ import grupoFamiliarInicial from "../../data/grupoFamiliar.json";
 import reintegrosIniciales from "../../data/reintegros.json";
 import { normalizar, coincide } from "../../utils/filtros";
 import ModalNuevoReintegro from "./ModalNuevoReintegro";
+import ModalDetalleReintegro from "./ModalDetalleReintegro";
+import CardReintegro from "./CardReintegro";
 
 export default function Reintegros() {
     const [modalAbierto, setModalAbierto] = useState(false);
@@ -25,36 +27,8 @@ export default function Reintegros() {
         alert("Reintegro guardado con éxito ✅");
     };
     
-    const [modalDetalleAbierto, setModalDetalleAbierto] = useState(false);
     const [reintegroSeleccionado, setReintegroSeleccionado] = useState(null);
-
-    const handleVerDetalle = (reintegro) => {
-        setReintegroSeleccionado(reintegro);
-        setModalDetalleAbierto(true);
-    };
-
-    const ModalDetalleReintegro = ({ show, onHide, reintegro }) => {
-        if (!reintegro) return null;
-
-        return (
-            <Modal show={show} onHide={onHide} size="md" centered>
-                <Modal.Header closeButton style={{ backgroundColor: "#132074", color: "white" }}>
-                    <Modal.Title>Detalle del Reintegro</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p><b>Paciente:</b> {reintegro.paciente}</p>
-                    <p><b>Fecha:</b> {reintegro.fecha}</p>
-                    <p><b>Médico:</b> {reintegro.medico}</p>
-                    <p><b>Especialidad:</b> {reintegro.especialidad}</p>
-                    <p><b>Monto:</b> {reintegro.monto}</p>
-                    <p><b>Lugar de atención:</b> {reintegro.lugarAtencion}</p>
-                    <p><b>Forma de pago:</b> {reintegro.formaPago}</p>
-                    <p><b>CBU/Alias:</b> {reintegro.cbuAlias}</p>
-                    {reintegro.descripcion && <p><b>Descripción:</b> {reintegro.descripcion}</p>}
-                </Modal.Body>
-            </Modal>
-        );
-    };
+    const [modalDetalleAbierto, setModalDetalleAbierto] = useState(false);
 
     return (
         <Container>
@@ -79,36 +53,14 @@ export default function Reintegros() {
                 {reintegrosFiltrados.length === 0 ? (
                     <h5>No se encontraron reintegros</h5>
                 ) : (
-                    reintegrosFiltrados.map((r) => (
-                        <Card key={r.id} className="mb-3 card-reintegro">
-                            <Card.Body>
-                                <Row className="align-items-center">
-                                    <Col md={3}>
-                                        <div className="monto">{r.monto}</div>
-                                        <div className="fecha">{r.fecha}</div>
-                                    </Col>
-
-                                    <Col md={5}>
-                                        <div className="paciente">{r.paciente}</div>
-                                        <div className="datos-medico">
-                                            <span>Médico: {r.medico}</span> |{" "}
-                                            <span>Especialidad: {r.especialidad}</span>
-                                        </div>
-                                    </Col>
-
-                                    <Col md={4} className="text-end">
-                                        <div className={`estado ${r.estado === "Pendiente" ? "pendiente" : "pago"}`}>
-                                            {r.estado}
-                                        </div>
-                                        <div className="acciones">
-                                            <a href="#" onClick={() => handleVerDetalle(r)}>
-                                                Ver detalle
-                                            </a>
-                                        </div>
-                                    </Col>
-                                </Row>
-                            </Card.Body>
-                        </Card>
+                    reintegrosFiltrados.map(reintegro => (
+                        <>
+                        <CardReintegro
+                        reintegroFiltrado={reintegro}
+                        seleccionarReintegro={setReintegroSeleccionado}
+                        abrirModalDetalle={setModalDetalleAbierto}
+                        ></CardReintegro>
+                    </>
                     ))
                 )}
             </div>
