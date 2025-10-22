@@ -46,9 +46,10 @@ export default function Reintegros() {
         console.error("Error fetching reintegros:", err);
         setError("No se pudieron cargar las reintegros");
       }
+      
     };
     fetchReintegros();
-    })
+    },[])
 
     return (
         <Container>

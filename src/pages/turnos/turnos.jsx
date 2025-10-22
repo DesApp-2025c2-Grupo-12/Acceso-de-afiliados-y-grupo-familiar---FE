@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Card, Row, Col, Container, Alert } from "react-bootstrap";
 import NuevoTurno from "./nuevoTurno";
 import CardPersonalizada from "../../components/Cards/CardPersonalizada";
@@ -6,15 +6,28 @@ import CardPersonalizada from "../../components/Cards/CardPersonalizada";
 export default function Turnos() {
   const [pantallaNuevoTurno, setPantallaNuevoTurno] = useState(false);
   const [alerta, setAlerta] = useState({ msg: "", tipo: "success" });
+  const [turnos, setTurnos] = useState([]);
 
-  // Mis turnos actuales
-  const initialTurnos = [
-    { id: 1, fechaYHora: "Lunes 21 de Octubre, 10:00", especialidad: "Pediatría", tipo: "Consulta", medico: "Dra. Calderon", lugar: "Hospital Municipal de Hurlingham" },
-    { id: 2, fechaYHora: "Jueves 24 de Octubre, 07:30", especialidad: "Cardiología", tipo: "Estudio", medico: "Dr. Gutierrez", lugar: "Clínica Modelo de Moron" },
-    { id: 3, fechaYHora: "Lunes 18 de Octubre, 17:00", especialidad: "Dermatología", tipo: "Consulta", medico: "Dr. Escobar", lugar: "Sanatorio Trinidad" },
-    { id: 4, fechaYHora: "Miércoles 10 de Septiembre, 20:00", especialidad: "Odontología", tipo: "Consulta", medico: "Dr. Primera", lugar: "Hospital Municipal de Hurlingham" },
-  ];
-  const [turnos, setTurnos] = useState(initialTurnos);
+
+
+const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
+
+  const obtenerTurnosDeAPI = async () => {
+    try {
+       const resTurnos = await fetch(`http://localhost:3000/appointment/affiliated-appointments/${usuarioLogueado.id}`)
+       if(!resTurnos.ok) throw new error("Error al cargar los turnos")
+       const dataTurnos = await resTurnos.json();
+       setTurnos(dataTurnos)
+    } catch (error) {
+       setErrorMessage(err.message);
+       setSuccessMessage(false);
+    }
+  }
+
+  
+  useEffect(()=> {
+    obtenerTurnosDeAPI()
+  },[])
 
   const meses = {
     "enero": 0, "febrero": 1, "marzo": 2, "abril": 3, "mayo": 4,
@@ -79,12 +92,13 @@ export default function Turnos() {
             {turnosOrdenados.map(turno => (
               <Col md={6} lg={4} key={turno.id} className="mb-3">
                 <CardPersonalizada
-                  title={turno.medico}
+                  title={turno.nombreDelPrestador}
                   subtitle={turno.especialidad}
                   tipo={turno.tipo}
                   detalles={[
-                    { label: "Fecha y Hora", value: turno.fechaYHora },
-                    { label: "Lugar", value: turno.lugar },
+                    { label: "Fecha", value: turno.fecha},
+                    { label: "horario", value: turno.horario},
+                    { label: "Lugar", value: turno.lugarDeAtencion },
                   ]}
                   botonTexto="Dar de baja"
                   onClick={() => cancelarTurno(turno)}

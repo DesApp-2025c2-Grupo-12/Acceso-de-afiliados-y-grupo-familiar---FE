@@ -1,37 +1,21 @@
-import React, { useState } from "react";
-import { Container, Row, Col, Form, Card, Button, Alert } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import CardPersonalizada from "../../components/Cards/CardPersonalizada";
 
-export default function NuevoTurno({ turnos, setTurnos, setPantallaNuevoTurno, setAlerta, generarFechaTurno }) {
-  const especialidades = {
-    "Pediatría": ["Consulta general", "Vacunación"],
-    "Cardiología": ["Consulta", "Estudio de estrés"],
-    "Dermatología": ["Consulta", "Biopsia"],
-    "Odontología": ["Consulta", "Limpieza"]
-  };
-
-  const medicos = {
-    "Pediatría": ["Dra. Calderon", "Dr. Perez"],
-    "Cardiología": ["Dr. Gutierrez", "Dra. Ramirez"],
-    "Dermatología": ["Dr. Escobar"],
-    "Odontología": ["Dr. Primera"]
-  };
-
-  const horarios = ["07:30", "09:00", "10:30", "14:00", "15:30", "17:00"];
-
+export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta }) {
+  const [especialidades, setEspecialidades] = useState([])
+  const [turnosSinRerva, setTurnosSinReserva] = useState([])
   const [especialidad, setEspecialidad] = useState("");
-  const [tipoConsulta, setTipoConsulta] = useState("");
   const [diaSeleccionado, setDiaSeleccionado] = useState("");
   const [fechaInicioSemana, setFechaInicioSemana] = useState(() => {
-    // Iniciar desde el lunes de la semana actual
     return getLunesSemanaActual();
   });
 
   // Función para obtener el lunes de la semana actual
   function getLunesSemanaActual() {
     const hoy = new Date();
-    const dia = hoy.getDay(); // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
-    const diff = hoy.getDate() - dia + (dia === 0 ? -6 : 1); // Ajustar para que lunes sea el primer día
+    const dia = hoy.getDay();
+    const diff = hoy.getDate() - dia + (dia === 0 ? -6 : 1);
     const lunes = new Date(hoy.setDate(diff));
     lunes.setHours(0, 0, 0, 0);
     return lunes;
@@ -93,7 +77,6 @@ export default function NuevoTurno({ turnos, setTurnos, setPantallaNuevoTurno, s
     setDiaSeleccionado("");
   };
 
-  // Generar opciones de meses para el selector (próximos 6 meses)
   // Generar opciones de semanas agrupadas por mes
   const generarOpcionesMeses = () => {
     const opciones = [];
@@ -156,83 +139,57 @@ export default function NuevoTurno({ turnos, setTurnos, setPantallaNuevoTurno, s
     return fechaInicioSemana.toDateString() === lunesActual.toDateString();
   };
 
-  const generarFechaTurnoConDia = (hora, fechaSeleccionada) => {
-    if (!fechaSeleccionada) return generarFechaTurno(hora);
-
-    const fechaTurno = new Date(fechaSeleccionada);
-    fechaTurno.setHours(parseInt(hora.split(":")[0]));
-    fechaTurno.setMinutes(parseInt(hora.split(":")[1]));
-
-    const diaSemana = fechaTurno.toLocaleDateString("es-AR", { weekday: "long" });
-    const dia = fechaTurno.getDate();
-    const mes = fechaTurno.toLocaleDateString("es-AR", { month: "long" });
-    const horaStr = `${fechaTurno.getHours().toString().padStart(2, "0")}:${fechaTurno.getMinutes().toString().padStart(2, "0")}`;
-
-    return `${diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1)} ${dia} de ${mes}, ${horaStr}`;
-  };
-
-  const reservarTurno = (medico, hora) => {
-    if (!especialidad || !tipoConsulta || !diaSeleccionado) {
-      setAlerta({ msg: "Por favor completa todos los campos y selecciona un día.", tipo: "danger" });
-      setTimeout(() => setAlerta({ msg: "", tipo: "success" }), 3000);
-      return;
+  useEffect(() => {
+    const cargarEspecialidades = async () => {
+      try {
+        const especialidadesRes = await fetch(`http://localhost:3000/appointment/especialidades/`)
+        if (!especialidadesRes.ok) throw new Error("Error al cargar las especialidades")
+        const dataEsp = await especialidadesRes.json()
+        setEspecialidades(dataEsp)
+      } catch (error) {
+        console.error("Error:", error);
+      }
     }
 
-    const fechaSeleccionadaObj = proximosDias.find(d => d.fechaISO === diaSeleccionado)?.fecha;
-    const fechaTurnoFormateada = generarFechaTurnoConDia(hora, fechaSeleccionadaObj);
+    const obtenerTurnosNoReservados = async () => {
+      try {
+        const resTurnos = await fetch(`http://localhost:3000/appointment/unreserved-appointments/`)
+        if (!resTurnos.ok) throw new Error("Error al cargar los turnos")
+        const dataTurnos = await resTurnos.json();
+        setTurnosSinReserva(dataTurnos)
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+    
+    cargarEspecialidades()
+    obtenerTurnosNoReservados()
+  }, [])
 
-    const newTurno = {
-      id: Date.now(),
-      fechaYHora: fechaTurnoFormateada,
-      especialidad,
-      tipo: tipoConsulta,
-      medico,
-      lugar: "Hospital Municipal de Hurlingham"
-    };
-
-    setTurnos(prev => [...prev, newTurno]);
-    setAlerta({ msg: "Turno reservado correctamente", tipo: "success" });
-    setTimeout(() => setAlerta({ msg: "", tipo: "success" }), 3000);
-    setPantallaNuevoTurno(false);
-    setEspecialidad("");
-    setTipoConsulta("");
-    setDiaSeleccionado("");
-    // Resetear a la semana actual
-    setFechaInicioSemana(getLunesSemanaActual());
-  };
+  const turnosFiltrados = turnosSinRerva.filter(turno =>
+    turno.especialidad === especialidad &&
+    turno.fecha === diaSeleccionado
+  )
 
   return (
     <Container className="my-4 border border-dark">
       <h2 className="mb-4">Nuevo Turno</h2>
 
       <Row className="mb-4">
-        <Col md={6}>
+        <Col md={12}>
           <Form.Select value={especialidad} onChange={(e) => {
             setEspecialidad(e.target.value);
-            setTipoConsulta("");
             setDiaSeleccionado("");
-            // Resetear a la semana actual
             setFechaInicioSemana(getLunesSemanaActual());
           }}>
             <option value="">Selecciona una especialidad</option>
-            {Object.keys(especialidades).map(esp => <option key={esp} value={esp}>{esp}</option>)}
-          </Form.Select>
-        </Col>
-        <Col md={6}>
-          <Form.Select value={tipoConsulta} onChange={(e) => {
-            setTipoConsulta(e.target.value);
-            setDiaSeleccionado("");
-            // Resetear a la semana actual
-            setFechaInicioSemana(getLunesSemanaActual());
-          }}>
-            <option value="">Selecciona un tipo de consulta o estudio</option>
-            {especialidad && especialidades[especialidad].map(tipo => <option key={tipo} value={tipo}>{tipo}</option>)}
+            {especialidades.map(esp => <option key={esp} value={esp}>{esp}</option>)}
           </Form.Select>
         </Col>
       </Row>
 
       {/* Barra de selección de días con navegación y selector de mes */}
-      {especialidad && tipoConsulta && (
+      {especialidad && (
         <Row className="mb-4">
           <Col>
             <h5 className="mb-3 text-center">Selecciona un día:</h5>
@@ -316,12 +273,8 @@ export default function NuevoTurno({ turnos, setTurnos, setPantallaNuevoTurno, s
                     }}
                   >
                     {dia.label}
-
                   </Button>
                 ))}
-              </div>
-              <div className="text-center mt-2">
-
               </div>
             </div>
           </Col>
@@ -329,37 +282,26 @@ export default function NuevoTurno({ turnos, setTurnos, setPantallaNuevoTurno, s
       )}
 
       {/* Turnos disponibles */}
-      {especialidad && tipoConsulta && diaSeleccionado && (
+      {especialidad && diaSeleccionado && turnosFiltrados.length > 0 && (
         <>
           <h5 className="text-center mb-4">
             Turnos disponibles para el {proximosDias.find(d => d.fechaISO === diaSeleccionado)?.label}:
           </h5>
           <Row>
-            {medicos[especialidad].map(medico => (
-              horarios.map(hora => {
-                const fechaSeleccionadaObj = proximosDias.find(d => d.fechaISO === diaSeleccionado)?.fecha;
-                const fechaTurnoFormateada = generarFechaTurnoConDia(hora, fechaSeleccionadaObj);
-
-                const turnoExiste = turnos.some(t => t.medico === medico && t.fechaYHora === fechaTurnoFormateada);
-                if (turnoExiste) return null;
-
-                return (
-                  <Col md={4} key={`${medico}-${hora}-${diaSeleccionado}`} className="mb-3">
-                    <CardPersonalizada
-                      title={medico}
-                      subtitle={especialidad}
-                      tipo={tipoConsulta}
-                      detalles={[
-                        { label: "Fecha", value: fechaTurnoFormateada },
-                        { label: "Hora", value: hora },
-                        { label: "Lugar", value: "Hospital Municipal de Hurlingham" },
-                      ]}
-                      botonTexto="Reservar"
-                      onClick={() => reservarTurno(medico, hora)}
-                    />
-                  </Col>
-                );
-              })
+            {turnosFiltrados.map(turno => (
+              <Col md={4} key={turno.id} className="mb-3">
+                <CardPersonalizada
+                  title={turno.nombreDelPrestador}
+                  subtitle={turno.especialidad}
+                  detalles={[
+                    { label: "Fecha", value: turno.fecha },
+                    { label: "Hora", value: turno.horario },
+                    { label: "Lugar", value: turno.lugarDeAtencion },
+                  ]}
+                  botonTexto="Reservar"
+                  onClick={() => console.log("Reservar turno:", turno.id)}
+                />
+              </Col>
             ))}
           </Row>
         </>
