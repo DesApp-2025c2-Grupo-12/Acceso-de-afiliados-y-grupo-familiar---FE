@@ -22,9 +22,9 @@ export default function NuevaAutorizacion({
     });
   };
 
-  // Guardar nueva autorización
-  const handleGuardar = () => {
-    // Validación: todos los campos obligatorios
+  // Guardar nueva autorización (POST al backend)
+  const handleGuardar = async () => {
+    // Validación básica
     if (
       !formData.fecha ||
       !formData.paciente ||
@@ -37,46 +37,68 @@ export default function NuevaAutorizacion({
       return;
     }
 
-    const nuevaAutorizacion = {
-      id: autorizaciones.length + 1,
-      fecha: formData.fecha,
-      paciente: formData.paciente,
-      medico: formData.medico,
-      especialidad: formData.especialidad,
-      lugar: formData.lugar,
-      internacion: formData.internacion,
-      observaciones: formData.observaciones || "",
-      estado: "Pendiente",
-    };
+    try {
+      const response = await fetch("http://localhost:3000/authorization", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fechaDePrestacion: formData.fecha,
+          nombreDelAfiliado: formData.paciente,
+          nombreDelMedico: formData.medico,
+          especialidad: formData.especialidad,
+          lugarDePrestacion: formData.lugar,
+          diasDeInternacion: formData.internacion,
+          observaciones: formData.observaciones || "",
+          estado: "Pendiente",
+        }),
+      });
 
-    setAutorizaciones([...autorizaciones, nuevaAutorizacion]);
+      if (!response.ok) {
+        throw new Error("Error al crear la autorización");
+      }
 
-    // limpiar formulario
-    setFormData({
-      fecha: "",
-      paciente: "",
-      medico: "",
-      especialidad: "",
-      lugar: "",
-      internacion: 1,
-      observaciones: "",
-    });
+      const nuevaAutorizacion = await response.json();
 
-    setError(""); // limpia errores
-    setSuccess("Su autorización se guardó correctamente!");
-    setTimeout(() => setSuccess(""), 3000);
+      // Agregar al estado local sin recargar la página
+      setAutorizaciones((prev) => [
+        ...prev,
+        {
+          id: nuevaAutorizacion.id,
+          fecha: nuevaAutorizacion.fechaDePrestacion,
+          paciente: nuevaAutorizacion.nombreDelAfiliado,
+          medico: nuevaAutorizacion.nombreDelMedico,
+          especialidad: nuevaAutorizacion.especialidad,
+          estado: nuevaAutorizacion.estado || "Pendiente",
+        },
+      ]);
 
-    // cerrar modal
-    const modalEl = document.getElementById("nuevaAutorizacionModal");
-    if (modalEl) {
-      modalEl.classList.remove("show");
-      modalEl.setAttribute("aria-hidden", "true");
-      modalEl.style.display = "none";
-      document.body.classList.remove("modal-open");
+      setSuccess("Autorización creada correctamente");
+      setError("");
 
-      // eliminar backdrop
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) backdrop.remove();
+      // Limpiar formulario
+      setFormData({
+        fecha: "",
+        paciente: "",
+        medico: "",
+        especialidad: "",
+        lugar: "",
+        internacion: 1,
+        observaciones: "",
+      });
+
+      // Cerrar modal automáticamente
+      setTimeout(() => {
+        const modalEl = document.getElementById("nuevaAutorizacionModal");
+        if (modalEl) {
+          const modal = window.bootstrap.Modal.getInstance(modalEl);
+          modal?.hide();
+        }
+      }, 800);
+    } catch (error) {
+      console.error("Error al crear autorización:", error);
+      setError("No se pudo crear la autorización. Intente nuevamente.");
     }
   };
 

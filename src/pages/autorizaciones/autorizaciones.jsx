@@ -1,51 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CardAutorizacion from "./cardAutorizacion";
 import NuevaAutorizacion from "./nuevaAutorizacion";
 import VerAutorizacion from "./verAutorizacion";
 import BuscarAutorizacion from "./buscarAutorizacion";
 
-// Datos de prueba
-const autorizacionesData = [
-  {
-    id: 1,
-    fecha: "Lunes 21 de Septiembre",
-    medico: "Kenzo Tenma",
-    lugar: "Hospital municipal de Hurlingham",
-    especialidad: "Cardiología",
-    internacion: "8 días",
-    paciente: "Franco Cantero",
-    tipodeAF: "Hijo, Menor de edad",
-    observaciones: "Observaciones ejemplo",
-    estado: "Pendiente",
-  },
-  {
-    id: 2,
-    fecha: "Miércoles 12 de Agosto",
-    medico: "Kenzo Tenma",
-    lugar: "Hospital municipal de Hurlingham",
-    especialidad: "Dermatología",
-    internacion: "Sin internación",
-    paciente: "Franco Cantero",
-    tipodeAF: "Hijo, Menor de edad",
-    observaciones: "",
-    estado: "Pendiente",
-  },
-  {
-    id: 3,
-    fecha: "Martes 13 de Junio",
-    medico: "Kenzo Tenma",
-    lugar: "Sanatorio Trinidad",
-    especialidad: "Pediatría",
-    internacion: "14 días",
-    paciente: "Bianca Margarita",
-    tipodeAF: "Titular",
-    observaciones: "Observaciones ejemplo",
-    estado: "Aprobado",
-  },
-];
-
 export default function Autorizaciones() {
-  const [autorizaciones, setAutorizaciones] = useState(autorizacionesData);
+  const [autorizaciones, setAutorizaciones] = useState([]);
   const [hoverNueva, setHoverNueva] = useState(false);
   const [hoverGuardar, setHoverGuardar] = useState(false);
   const [hoverBuscar, setHoverBuscar] = useState(false);
@@ -64,14 +24,42 @@ export default function Autorizaciones() {
   const [success, setSuccess] = useState("");
   const [autorizacionSeleccionada, setAutorizacionSeleccionada] = useState(null);
 
-  // Array de integrantes de la cuenta (ejemplo)
   const integrantesCuenta = ["Juan Salvo", "Ana Salvo", "María Salvo"];
 
-  // Filtro por paciente o médico
+  useEffect(() => {
+    const fetchAutorizaciones = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/authorization");
+        if (!response.ok) {
+          throw new Error("Error al obtener las autorizaciones");
+        }
+
+        const data = await response.json();
+        console.log("Datos recibidos del backend:", data);
+
+        const listaAdaptada = data.map((item) => ({
+          id: item.id,
+          fecha: item.fechaDePrestacion,
+          paciente: item.nombreDelAfiliado,
+          medico: item.nombreDelMedico,
+          especialidad: item.especialidad,
+          estado: item.estado || "Pendiente",
+        }));
+
+        setAutorizaciones(listaAdaptada);
+      } catch (error) {
+        console.error("Error:", error);
+        setError("No se pudieron cargar las autorizaciones");
+      }
+    };
+    fetchAutorizaciones();
+  }, []);
+
+  // 🔍 Filtro por paciente o médico
   const autorizacionesFiltradas = autorizaciones.filter(
     (a) =>
-      a.paciente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.medico.toLowerCase().includes(searchTerm.toLowerCase())
+      a.paciente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.medico?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -90,6 +78,12 @@ export default function Autorizaciones() {
         </button>
       </div>
 
+      {error && (
+        <div className="alert alert-danger text-center mb-4" role="alert">
+          {error}
+        </div>
+      )}
+
       {success && (
         <div className="alert alert-success text-center mb-4" role="alert">
           {success}
@@ -104,16 +98,24 @@ export default function Autorizaciones() {
         setHoverBuscar={setHoverBuscar}
       />
 
+      {/* Cards de autorizaciones */}
       <div className="row">
-        {autorizacionesFiltradas.map((auto) => (
-          <CardAutorizacion
-            key={auto.id}
-            autorizacion={auto}
-            setAutorizacionSeleccionada={setAutorizacionSeleccionada}
-          />
-        ))}
+        {autorizacionesFiltradas.length > 0 ? (
+          autorizacionesFiltradas.map((auto) => (
+            <CardAutorizacion
+              key={auto.id}
+              autorizacion={auto}
+              setAutorizacionSeleccionada={setAutorizacionSeleccionada}
+            />
+          ))
+        ) : (
+          <p className="text-center text-muted mt-4">
+            No se encontraron autorizaciones.
+          </p>
+        )}
       </div>
 
+      {/* Modal Nueva Autorización */}
       <NuevaAutorizacion
         integrantesCuenta={integrantesCuenta}
         formData={formData}
@@ -128,6 +130,7 @@ export default function Autorizaciones() {
         setSuccess={setSuccess}
       />
 
+      {/* Modal Ver Autorización */}
       {autorizacionSeleccionada && (
         <VerAutorizacion
           autorizacion={autorizacionSeleccionada}

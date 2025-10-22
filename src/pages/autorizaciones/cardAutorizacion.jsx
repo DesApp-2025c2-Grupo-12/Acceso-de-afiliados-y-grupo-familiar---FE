@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function cardAutorizacion({ autorizacion, setAutorizacionSeleccionada }) {
+export default function CardAutorizacion({ autorizacion, setAutorizacionSeleccionada }) {
   const estadoClass =
     autorizacion.estado === "Pendiente"
       ? "bg-warning text-dark"
@@ -12,11 +12,11 @@ export default function cardAutorizacion({ autorizacion, setAutorizacionSeleccio
     <div className="col-md-6 mb-4">
       <div className="card shadow-sm h-100">
         <div className="card-body d-flex flex-column justify-content-between">
-          {/* Info principal */}
           <div>
             <p><strong>Fecha:</strong> {autorizacion.fecha}</p>
             <p><strong>Paciente:</strong> {autorizacion.paciente}</p>
             <p><strong>Médico:</strong> {autorizacion.medico}</p>
+            <p><strong>Especialidad:</strong> {autorizacion.especialidad}</p>
           </div>
 
           {/* Estado + botón Ver */}
