@@ -20,6 +20,72 @@ El proyecto de afiliados es una aplicación web desarrollada con el fin de que l
 
 # 🗂️ Estructura del Proyecto
 
+```
+Acceso-de-afiliados-y-grupo-familiar---FE/
+│
+├─ public/
+│   └─ vite.svg
+│
+├─ src/
+│   ├─ assets/
+│   │
+│   ├─ components/
+│   │   ├─ Cards/
+│   │   │   └─ CardsPersonalizadas.jsx
+│   │   ├─ Footer/
+│   │   │   └─ Footer.jsx
+│   │   ├─ Form/
+│   │   │   └─ Form.jsx
+│   │   ├─ Header/
+│   │   │   └─ Header.jsx
+│   │   └─ Navbar/
+│   │       └─ Navbar.jsx
+│   │
+│   └─ protectedRoutes/
+│       └─ protectedRoutes.jsx
+│
+├─ data/
+│   └─ prestadores.json
+│
+├─ pages/
+│   ├─ autorizaciones/
+│   │   └─ Autorizaciones.jsx
+│   ├─ home/
+│   │   └─ Home.jsx
+│   ├─ login/
+│   │   └─ Login.jsx
+│   ├─ prestadores/
+│   │   ├─ Prestadores.jsx
+│   │   ├─ PrestadorFilters.jsx
+│   │   ├─ PrestadorList.jsx
+│   │   └─ PrestadorModal.jsx
+│   └─ recetas/
+│       ├─ BuscarReceta.jsx
+│       ├─ CardReceta.jsx
+│       ├─ Receta.jsx
+│       ├─ DescargarReceta.jsx
+│       ├─ NuevaReceta.jsx
+│       └─ RenovarReceta.jsx
+│
+├─ utils/
+│   ├─ filtro.jsx
+│   ├─ form.jsx
+│   └─ utils.jsx
+│
+├─ App.jsx
+├─ app.css
+├─ main.js
+├─ index.html
+├─ package.json
+├─ package-lock.json
+├─ vite.config.js
+├─ eslint.config.js
+├─ .gitignore
+└─ README.md
+
+
+```
+
 # 🚀 Uso
 1. Clonar el repositorio.
 2. Instalar las dependencias con npm install.
