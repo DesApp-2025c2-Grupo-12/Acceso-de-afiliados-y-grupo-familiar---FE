@@ -9,9 +9,11 @@ export default function Autorizaciones() {
   const [hoverNueva, setHoverNueva] = useState(false);
   const [hoverGuardar, setHoverGuardar] = useState(false);
   const [hoverBuscar, setHoverBuscar] = useState(false);
+  const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
   const [formData, setFormData] = useState({
     fecha: "",
     paciente: "",
+    pacienteId: "",
     medico: "",
     especialidad: "",
     lugar: "",
@@ -24,18 +26,14 @@ export default function Autorizaciones() {
   const [success, setSuccess] = useState("");
   const [autorizacionSeleccionada, setAutorizacionSeleccionada] = useState(null);
 
-  const integrantesCuenta = ["Juan Salvo", "Ana Salvo", "María Salvo"];
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchAutorizaciones = async () => {
       try {
         const response = await fetch("http://localhost:3000/authorization");
-        if (!response.ok) {
-          throw new Error("Error al obtener las autorizaciones");
-        }
-
+        if (!response.ok) throw new Error("Error al obtener las autorizaciones");
         const data = await response.json();
-        console.log("Datos recibidos del backend:", data);
 
         const listaAdaptada = data.map((item) => ({
           id: item.id,
@@ -48,14 +46,35 @@ export default function Autorizaciones() {
 
         setAutorizaciones(listaAdaptada);
       } catch (error) {
-        console.error("Error:", error);
+        console.error(error);
         setError("No se pudieron cargar las autorizaciones");
       }
     };
     fetchAutorizaciones();
   }, []);
 
-  // 🔍 Filtro por paciente o médico
+  useEffect(() => {
+    const fetchIntegrantes = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/affiliate");
+        console.log("fetch /api/affiliates status:", res.status);
+        if (!res.ok) throw new Error("Error al obtener los afiliados");
+        const data = await res.json();
+        console.log("Integrantes cargados (raw):", data);
+        setIntegrantesCuenta(
+          data.map(i => ({
+            id: i.id,
+            nombreCompleto: `${i.nombre} ${i.apellido}`,
+          }))
+        );
+      } catch (err) {
+        console.error("Error cargando integrantes:", err);
+      }
+    };
+    fetchIntegrantes();
+  }, []);
+
+  // filtro
   const autorizacionesFiltradas = autorizaciones.filter(
     (a) =>
       a.paciente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -71,26 +90,15 @@ export default function Autorizaciones() {
           style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
           onMouseEnter={() => setHoverNueva(true)}
           onMouseLeave={() => setHoverNueva(false)}
-          data-bs-toggle="modal"
-          data-bs-target="#nuevaAutorizacionModal"
+          onClick={() => setShowModal(true)} // abre modal
         >
           + Nueva Autorización
         </button>
       </div>
 
-      {error && (
-        <div className="alert alert-danger text-center mb-4" role="alert">
-          {error}
-        </div>
-      )}
+      {error && <div className="alert alert-danger text-center mb-4">{error}</div>}
+      {success && <div className="alert alert-success text-center mb-4">{success}</div>}
 
-      {success && (
-        <div className="alert alert-success text-center mb-4" role="alert">
-          {success}
-        </div>
-      )}
-
-      {/* Barra de búsqueda */}
       <BuscarAutorizacion
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
@@ -98,7 +106,6 @@ export default function Autorizaciones() {
         setHoverBuscar={setHoverBuscar}
       />
 
-      {/* Cards de autorizaciones */}
       <div className="row">
         {autorizacionesFiltradas.length > 0 ? (
           autorizacionesFiltradas.map((auto) => (
@@ -109,14 +116,14 @@ export default function Autorizaciones() {
             />
           ))
         ) : (
-          <p className="text-center text-muted mt-4">
-            No se encontraron autorizaciones.
-          </p>
+          <p className="text-center text-muted mt-4">No se encontraron autorizaciones.</p>
         )}
       </div>
 
-      {/* Modal Nueva Autorización */}
+      {/* NUEVA AUTORIZACION */}
       <NuevaAutorizacion
+        showModal={showModal}      
+        setShowModal={setShowModal} 
         integrantesCuenta={integrantesCuenta}
         formData={formData}
         setFormData={setFormData}
@@ -128,9 +135,18 @@ export default function Autorizaciones() {
         setError={setError}
         success={success}
         setSuccess={setSuccess}
+        onIntegranteSelect={(id) => {
+          const integrante = integrantesCuenta.find((i) => String(i.id) === String(id));
+          if (integrante) {
+            setFormData((prev) => ({
+              ...prev,
+              paciente: integrante.nombreCompleto,
+              pacienteId: integrante.id,
+            }));
+          }
+        }}
       />
 
-      {/* Modal Ver Autorización */}
       {autorizacionSeleccionada && (
         <VerAutorizacion
           autorizacion={autorizacionSeleccionada}

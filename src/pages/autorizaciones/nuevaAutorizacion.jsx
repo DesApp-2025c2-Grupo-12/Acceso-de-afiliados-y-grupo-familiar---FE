@@ -1,248 +1,130 @@
 import React from "react";
 
 export default function NuevaAutorizacion({
+  showModal,
+  setShowModal,
   integrantesCuenta,
   formData,
   setFormData,
-  setAutorizaciones,
   autorizaciones,
+  setAutorizaciones,
   error,
   setError,
   success,
   setSuccess,
-  hoverGuardar,
-  setHoverGuardar,
 }) {
-  // Maneja cambios en inputs
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
 
-  // Guardar nueva autorización (POST al backend)
-  const handleGuardar = async () => {
-    // Validación básica
-    if (
-      !formData.fecha ||
-      !formData.paciente ||
-      !formData.medico ||
-      !formData.especialidad ||
-      !formData.lugar ||
-      !formData.internacion
-    ) {
-      setError("Todos los campos son obligatorios");
-      return;
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:3000/authorization", {
+      const payload = {
+        fechaDePrestacion: formData.fecha,
+        nombreDelAfiliado: formData.paciente,
+        afiliadoId: formData.pacienteId || null,
+        nombreDelMedico: formData.medico,
+        especialidad: formData.especialidad,
+        lugarDePrestacion: formData.lugar,
+        diasDeInternacion: Number(formData.internacion),
+        observaciones: formData.observaciones,
+        estado: "Pendiente",
+      };
+
+      const res = await fetch("http://localhost:3000/authorization", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fechaDePrestacion: formData.fecha,
-          nombreDelAfiliado: formData.paciente,
-          nombreDelMedico: formData.medico,
-          especialidad: formData.especialidad,
-          lugarDePrestacion: formData.lugar,
-          diasDeInternacion: formData.internacion,
-          observaciones: formData.observaciones || "",
-          estado: "Pendiente",
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        throw new Error("Error al crear la autorización");
-      }
+      const data = await res.json();
 
-      const nuevaAutorizacion = await response.json();
+      if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
 
-      // Agregar al estado local sin recargar la página
-      setAutorizaciones((prev) => [
-        ...prev,
-        {
-          id: nuevaAutorizacion.id,
-          fecha: nuevaAutorizacion.fechaDePrestacion,
-          paciente: nuevaAutorizacion.nombreDelAfiliado,
-          medico: nuevaAutorizacion.nombreDelMedico,
-          especialidad: nuevaAutorizacion.especialidad,
-          estado: nuevaAutorizacion.estado || "Pendiente",
-        },
-      ]);
+      setAutorizaciones([...autorizaciones, {
+        id: data.id || Date.now(),
+        fecha: data.fechaDePrestacion,
+        paciente: data.nombreDelAfiliado,
+        medico: data.nombreDelMedico,
+        especialidad: data.especialidad,
+        estado: data.estado || "Pendiente"
+      }]);
 
-      setSuccess("Autorización creada correctamente");
+      setSuccess("Autorización agregada correctamente");
       setError("");
-
-      // Limpiar formulario
       setFormData({
         fecha: "",
         paciente: "",
+        pacienteId: "",
         medico: "",
         especialidad: "",
         lugar: "",
         internacion: 1,
         observaciones: "",
+        tipodeAF: "",
       });
+      setShowModal(false);
 
-      // Cerrar modal automáticamente
-      setTimeout(() => {
-        const modalEl = document.getElementById("nuevaAutorizacionModal");
-        if (modalEl) {
-          const modal = window.bootstrap.Modal.getInstance(modalEl);
-          modal?.hide();
-        }
-      }, 800);
-    } catch (error) {
-      console.error("Error al crear autorización:", error);
-      setError("No se pudo crear la autorización. Intente nuevamente.");
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+      setSuccess("");
     }
   };
 
+  if (!showModal) return null;
+
   return (
-    <div
-      className="modal fade"
-      id="nuevaAutorizacionModal"
-      tabIndex="-1"
-      aria-labelledby="nuevaAutorizacionModalLabel"
-      aria-hidden="true"
-    >
+    <div className="modal d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
       <div className="modal-dialog">
         <div className="modal-content">
-          {/* Header */}
-          <div
-            className="modal-header"
-            style={{ backgroundColor: "#132074", color: "white" }}
-          >
-            <h5 className="modal-title" id="nuevaAutorizacionModalLabel">
-              Nueva Autorización
-            </h5>
-            <button
-              type="button"
-              className="btn-close btn-close-white"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
+          <div className="modal-header" style={{ backgroundColor: "#132074", color: "white" }}>
+            <h5 className="modal-title">Nueva Autorización</h5>
+            <button type="button" className="btn-close btn-close-white" onClick={() => setShowModal(false)}></button>
           </div>
-
-          {/* Body */}
           <div className="modal-body">
-            {error && (
-              <div className="alert alert-danger" role="alert">
-                {error}
+            {error && <div className="alert alert-danger">{error}</div>}
+            {success && <div className="alert alert-success">{success}</div>}
+
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label>Fecha</label>
+                <input type="date" className="form-control" value={formData.fecha} onChange={e => setFormData({...formData, fecha: e.target.value})} required />
               </div>
-            )}
+              <div className="mb-3">
+                <label>Integrante</label>
+                <select className="form-select" value={formData.pacienteId || ""} onChange={e => {
+                  const i = integrantesCuenta.find(i => String(i.id) === e.target.value);
+                  if(i) setFormData({...formData, pacienteId: i.id, paciente: i.nombreCompleto});
+                }} required>
+                  <option value="">Seleccionar integrante</option>
+                  {integrantesCuenta.map(i => <option key={i.id} value={i.id}>{i.nombreCompleto}</option>)}
+                </select>
+              </div>
+              <div className="mb-3">
+                <label>Médico</label>
+                <input type="text" className="form-control" value={formData.medico} onChange={e => setFormData({...formData, medico: e.target.value})} required />
+              </div>
+              <div className="mb-3">
+                <label>Especialidad</label>
+                <input type="text" className="form-control" value={formData.especialidad} onChange={e => setFormData({...formData, especialidad: e.target.value})} required />
+              </div>
+              <div className="mb-3">
+                <label>Lugar</label>
+                <input type="text" className="form-control" value={formData.lugar} onChange={e => setFormData({...formData, lugar: e.target.value})} required />
+              </div>
+              <div className="mb-3">
+                <label>Días de internación</label>
+                <input type="number" className="form-control" value={formData.internacion} onChange={e => setFormData({...formData, internacion: e.target.value})} min={1} required />
+              </div>
+              <div className="mb-3">
+                <label>Observaciones</label>
+                <textarea className="form-control" value={formData.observaciones} onChange={e => setFormData({...formData, observaciones: e.target.value})}></textarea>
+              </div>
 
-            <div className="mb-3">
-              <label className="form-label">
-                Fecha prevista para la prestación
-              </label>
-              <input
-                type="date"
-                className="form-control"
-                name="fecha"
-                value={formData.fecha}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Integrante</label>
-              <select
-                className="form-select"
-                name="paciente"
-                value={formData.paciente}
-                onChange={handleChange}
-              >
-                <option value="">Seleccionar...</option>
-                {integrantesCuenta.map((i, idx) => (
-                  <option key={idx} value={i}>
-                    {i}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Médico</label>
-              <input
-                type="text"
-                className="form-control"
-                name="medico"
-                value={formData.medico}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Especialidad</label>
-              <input
-                type="text"
-                className="form-control"
-                name="especialidad"
-                value={formData.especialidad}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">
-                Lugar donde se realizará la prestación
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                name="lugar"
-                value={formData.lugar}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Días de internación</label>
-              <input
-                type="number"
-                className="form-control"
-                name="internacion"
-                value={formData.internacion}
-                onChange={handleChange}
-                min={1}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Observaciones</label>
-              <textarea
-                className="form-control"
-                name="observaciones"
-                value={formData.observaciones}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="modal-footer">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              className="btn text-white"
-              style={{ backgroundColor: hoverGuardar ? "#b0b0b0" : "#132074" }}
-              onMouseEnter={() => setHoverGuardar(true)}
-              onMouseLeave={() => setHoverGuardar(false)}
-              onClick={handleGuardar}
-            >
-              Guardar
-            </button>
+              <div className="modal-footer">
+                <button type="submit" className="btn btn-primary">Guardar</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
