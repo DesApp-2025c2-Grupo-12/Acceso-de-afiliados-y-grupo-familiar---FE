@@ -16,6 +16,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Reintegros from './pages/reintegros/reintegros'
 import ProtectedRoute from './components/protectedRoutes/protectedRoutes'
+
 //import { useState, useEffect } from 'react'
 
 
@@ -43,6 +44,7 @@ function App() {
             <Route path="/autorizaciones" element={<ProtectedRoute><Autorizaciones></Autorizaciones></ProtectedRoute>} />
             <Route path="/prestadores" element={<ProtectedRoute><Prestadores /></ProtectedRoute>} />
             <Route path="/nuevo-turno" element={<ProtectedRoute><NuevoTurno /></ProtectedRoute>} />
+            
           </Routes>
         </main>
       </div>
