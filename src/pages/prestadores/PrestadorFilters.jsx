@@ -1,20 +1,37 @@
 import { Row, Col, Form } from "react-bootstrap";
 
-export default function PrestadorFilters({ search, setSearch, specialty, setSpecialty, location, setLocation, zona, setZona }) {
+export default function PrestadorFilters({
+  search,
+  setSearch,
+  specialty,
+  setSpecialty,
+  location,
+  setLocation,
+  zona,
+  setZona,
+  errorNombre // nueva prop para mostrar mensaje
+}) {
   return (
     <>
       <Row className="mb-4">
         <Col md={4}>
           <Form.Control
-  type="text"
-  placeholder="Buscar por nombre..."
-  value={search}
-  onChange={(e) => setSearch(e.target.value)} //  esto actualiza la query del back
-/>
-
+            type="text"
+            placeholder="Buscar prestador por nombre de medico..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            maxLength={50}
+          />
+          {errorNombre && (
+            <small className="text-danger">{errorNombre}</small>
+          )}
         </Col>
+
         <Col md={4}>
-          <Form.Select value={specialty} onChange={(e) => setSpecialty(e.target.value)}>
+          <Form.Select
+            value={specialty}
+            onChange={(e) => setSpecialty(e.target.value)}
+          >
             <option value="">Todas las especialidades</option>
             <option value="Cardiología">Cardiología</option>
             <option value="Pediatría">Pediatría</option>
@@ -25,12 +42,13 @@ export default function PrestadorFilters({ search, setSearch, specialty, setSpec
             <option value="Traumatología">Traumatología</option>
           </Form.Select>
         </Col>
+
         <Col md={4}>
           <Form.Select
             value={location}
             onChange={(e) => {
               setLocation(e.target.value);
-              setZona("");
+              setZona(""); // reset zona al cambiar ubicación
             }}
           >
             <option value="">Todas las ubicaciones</option>
@@ -46,6 +64,7 @@ export default function PrestadorFilters({ search, setSearch, specialty, setSpec
       {location === "Buenos Aires" && (
         <Row className="mb-4">
           <Col md={4}>
+            <Form.Label>Zona:</Form.Label>
             <Form.Select value={zona} onChange={(e) => setZona(e.target.value)}>
               <option value="">Todas las zonas</option>
               <option value="Norte">Zona Norte</option>
