@@ -9,7 +9,7 @@ export default function PrestadorFilters({
   setLocation,
   zona,
   setZona,
-  errorNombre // nueva prop para mostrar mensaje
+  errorNombre
 }) {
   return (
     <>
@@ -17,21 +17,16 @@ export default function PrestadorFilters({
         <Col md={4}>
           <Form.Control
             type="text"
-            placeholder="Buscar prestador por nombre de medico..."
+            placeholder="Buscar prestador por nombre de medico o centro..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             maxLength={50}
           />
-          {errorNombre && (
-            <small className="text-danger">{errorNombre}</small>
-          )}
+          {errorNombre && <small className="text-danger">{errorNombre}</small>}
         </Col>
 
         <Col md={4}>
-          <Form.Select
-            value={specialty}
-            onChange={(e) => setSpecialty(e.target.value)}
-          >
+          <Form.Select value={specialty} onChange={(e) => setSpecialty(e.target.value)}>
             <option value="">Todas las especialidades</option>
             <option value="Cardiología">Cardiología</option>
             <option value="Pediatría">Pediatría</option>
