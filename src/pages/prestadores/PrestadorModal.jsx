@@ -12,8 +12,15 @@ export default function PrestadorModal({ prestador, onClose }) {
         <h5>{prestador.nombreCompleto}</h5>
         <p>
           <strong>Especialidad:</strong> {prestador.especialidad} <br />
-          <strong>Ubicación:</strong> {prestador.direccion} <br />
-          {prestador.esCentro && <><strong>Centro:</strong> Sí <br /></>}
+          {prestador.esCentro ? (
+            <>
+              <strong>Centro Médico:</strong> Sí <br />
+              <strong>Zona:</strong> {prestador.integraCentro} <br />
+              <strong>Dirección:</strong> {prestador.direccion} <br />
+            </>
+          ) : (
+            <><strong>Dirección:</strong> {prestador.direccion} <br /></>
+          )}
           <strong>Teléfono:</strong> {prestador.telefono} <br />
           <strong>Correo:</strong> {prestador.correoElectronico} <br />
           <strong>Horario:</strong> {prestador.horarioInicio} - {prestador.horarioFin} <br />
@@ -26,3 +33,4 @@ export default function PrestadorModal({ prestador, onClose }) {
     </Modal>
   );
 }
+
