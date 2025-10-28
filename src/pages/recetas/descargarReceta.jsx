@@ -1,10 +1,18 @@
 export const handleDescargar = (receta, setAlertaDescarga) => {
   if (receta.estado !== "Aprobada") {
-   
     setAlertaDescarga("Solo se pueden descargar recetas aprobadas.");
     setTimeout(() => setAlertaDescarga(""), 3000); // desaparece después de 3s
     return;
   }
+
+  const formatFecha = (fechaStr) => {
+    if (!fechaStr) return "-";
+    const fecha = new Date(fechaStr);
+    const dia = String(fecha.getDate()).padStart(2, "0");
+    const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+    const año = fecha.getFullYear();
+    return `${dia}/${mes}/${año}`;
+  };
 
   const contenido = `
 Receta Médica
@@ -14,7 +22,7 @@ Paciente: ${receta.paciente}
 Medicamento: ${receta.nombreDelMedicamento}
 Presentación: ${receta.presentacion}
 Cantidad: ${receta.cantidad}
-Fecha de Emisión: ${receta.fechaDeEmision}
+Fecha de Emisión: ${formatFecha(receta.fechaDeEmision)}
 Estado: ${receta.estado}
 Observaciones: ${receta.observaciones || "Ninguna"}
 Documento: ${receta.numeroDeDocumento}
@@ -32,3 +40,4 @@ Documento: ${receta.numeroDeDocumento}
 
   URL.revokeObjectURL(url);
 };
+
