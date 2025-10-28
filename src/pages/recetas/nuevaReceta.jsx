@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, forwardRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Modal } from "bootstrap";
 
 export default function NuevaReceta({
@@ -14,8 +14,8 @@ export default function NuevaReceta({
   hoverGuardar,
   setHoverGuardar,
 }) {
-  const modalRef = useRef(null);   
-  const bsModal = useRef(null);   
+  const modalRef = useRef(null);
+  const bsModal = useRef(null);
 
   useEffect(() => {
     if (modalRef.current) {
@@ -24,20 +24,18 @@ export default function NuevaReceta({
     }
 
     const handleShow = () => {
-      const hoy = new Date().toISOString().split("T")[0];
       setFormData({
         paciente: "",
         nombreDelMedicamento: "",
         cantidad: 1,
         presentacion: "",
-        fechaDeEmision: hoy,
-        numeroDeDocumento: "",
         observaciones: "",
       });
     };
 
     modalRef.current?.addEventListener("show.bs.modal", handleShow);
-    return () => modalRef.current?.removeEventListener("show.bs.modal", handleShow);
+    return () =>
+      modalRef.current?.removeEventListener("show.bs.modal", handleShow);
   }, [setFormData]);
 
   const handleChange = (e) => {
@@ -47,32 +45,38 @@ export default function NuevaReceta({
 
   const handleGuardar = async () => {
     try {
-      if (!formData.paciente || !formData.nombreDelMedicamento || !formData.numeroDeDocumento)
-        throw new Error("Paciente, nombre del medicamento y documento son obligatorios");
+      // Validaciones básicas
+      if (!formData.paciente || !formData.nombreDelMedicamento)
+        throw new Error("Todos los campos son obligatorios");
 
-      if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]{1,60}$/.test(formData.nombreDelMedicamento))
+      if (
+        !/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]{1,60}$/.test(formData.nombreDelMedicamento)
+      )
         throw new Error("Nombre del medicamento inválido");
 
-      if (!/^[0-9]{7,9}$/.test(formData.numeroDeDocumento))
-        throw new Error("Número de documento inválido (7 a 9 dígitos)");
-
-      if (formData.numeroDeDocumento !== formData.paciente)
-        throw new Error("El número de documento debe coincidir con el integrante seleccionado");
-
       if (!integrantesCuenta || integrantesCuenta.length === 0)
-        throw new Error("No se pudo cargar la información del grupo familiar");
+        throw new Error(
+          "No se pudo cargar la información del grupo familiar"
+        );
 
-// Buscar el paciente seleccionado por DNI
-const pacienteSeleccionado = integrantesCuenta.find(
-  (p) => p.numeroDeDocumento === formData.paciente
-);
+      // Buscar el paciente seleccionado por su DNI (guardado como 'paciente')
+      const pacienteSeleccionado = integrantesCuenta.find(
+        (p) => p.numeroDeDocumento === formData.paciente
+      );
 
-const recetaParaEnviar = {
-  ...formData,
-  paciente: pacienteSeleccionado ? `${pacienteSeleccionado.nombre} ${pacienteSeleccionado.apellido}` : "",
-  numeroDeDocumento: formData.paciente, // mantiene el DNI
-  estado: "Pendiente"
-};
+      // Crear objeto receta
+      const recetaParaEnviar = {
+        paciente: pacienteSeleccionado
+          ? `${pacienteSeleccionado.nombre} ${pacienteSeleccionado.apellido}`
+          : "",
+        numeroDeDocumento: formData.paciente, // DNI del select
+        nombreDelMedicamento: formData.nombreDelMedicamento,
+        cantidad: formData.cantidad,
+        presentacion: formData.presentacion,
+        observaciones: formData.observaciones,
+        estado: "Pendiente",
+      };
+
       const response = await fetch("http://localhost:3000/recipes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -82,17 +86,17 @@ const recetaParaEnviar = {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Error al crear receta");
 
-      setRecetas(prev => [...prev, data]);
+      // Actualizar lista de recetas
+      setRecetas((prev) => [...prev, data]);
       setSuccess("Receta creada con éxito");
       setError("");
 
+      // Resetear formulario
       setFormData({
         paciente: "",
         nombreDelMedicamento: "",
         cantidad: 1,
         presentacion: "",
-        fechaDeEmision: "",
-        numeroDeDocumento: "",
         observaciones: "",
       });
 
@@ -104,15 +108,30 @@ const recetaParaEnviar = {
     }
   };
 
-  const hoy = new Date().toISOString().split("T")[0];
-
   return (
-    <div className="modal fade" id="nuevaRecetaModal" ref={modalRef} tabIndex="-1" aria-labelledby="nuevaRecetaModalLabel" aria-hidden="true">
+    <div
+      className="modal fade"
+      id="nuevaRecetaModal"
+      ref={modalRef}
+      tabIndex="-1"
+      aria-labelledby="nuevaRecetaModalLabel"
+      aria-hidden="true"
+    >
       <div className="modal-dialog">
         <div className="modal-content">
-          <div className="modal-header" style={{ backgroundColor: "#132074", color: "white" }}>
-            <h5 className="modal-title" id="nuevaRecetaModalLabel">Nueva Receta</h5>
-            <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" />
+          <div
+            className="modal-header"
+            style={{ backgroundColor: "#132074", color: "white" }}
+          >
+            <h5 className="modal-title" id="nuevaRecetaModalLabel">
+              Nueva Receta
+            </h5>
+            <button
+              type="button"
+              className="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            />
           </div>
 
           <div className="modal-body">
@@ -120,7 +139,12 @@ const recetaParaEnviar = {
 
             <div className="mb-3">
               <label className="form-label">Seleccionar integrante</label>
-              <select className="form-select" name="paciente" value={formData.paciente} onChange={handleChange}>
+              <select
+                className="form-select"
+                name="paciente"
+                value={formData.paciente}
+                onChange={handleChange}
+              >
                 <option value="">Seleccionar...</option>
                 {integrantesCuenta.map((persona, idx) => (
                   <option key={idx} value={persona.numeroDeDocumento}>
@@ -132,17 +156,38 @@ const recetaParaEnviar = {
 
             <div className="mb-3">
               <label className="form-label">Nombre de medicamento</label>
-              <input type="text" className="form-control" name="nombreDelMedicamento" value={formData.nombreDelMedicamento} placeholder="Ej: Ibuprofeno 600 mg x 30"  onChange={handleChange} maxLength={60} />
+              <input
+                type="text"
+                className="form-control"
+                name="nombreDelMedicamento"
+                value={formData.nombreDelMedicamento}
+                placeholder="Ej: Ibuprofeno 600 mg x 30"
+                onChange={handleChange}
+                maxLength={60}
+              />
             </div>
 
             <div className="mb-3">
               <label className="form-label">Cantidad</label>
-              <input type="number" className="form-control" name="cantidad" value={formData.cantidad} onChange={handleChange} min={1} max={2} />
+              <input
+                type="number"
+                className="form-control"
+                name="cantidad"
+                value={formData.cantidad}
+                onChange={handleChange}
+                min={1}
+                max={2}
+              />
             </div>
 
             <div className="mb-3">
               <label className="form-label">Presentación</label>
-              <select className="form-select" name="presentacion" value={formData.presentacion} onChange={handleChange}>
+              <select
+                className="form-select"
+                name="presentacion"
+                value={formData.presentacion}
+                onChange={handleChange}
+              >
                 <option value="">Seleccionar...</option>
                 <option value="Comprimidos">Comprimidos</option>
                 <option value="Jarabe">Jarabe</option>
@@ -152,24 +197,34 @@ const recetaParaEnviar = {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Fecha de emisión</label>
-              <input type="date" className="form-control" name="fechaDeEmision" value={formData.fechaDeEmision} onChange={handleChange} min={hoy} max={hoy} />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Número de Documento</label>
-              <input type="text" className="form-control" name="numeroDeDocumento" value={formData.numeroDeDocumento} onChange={handleChange} placeholder="Solo números (7 a 9 dígitos)" inputMode="numeric" />
-            </div>
-
-            <div className="mb-3">
               <label className="form-label">Observaciones</label>
-              <textarea className="form-control" name="observaciones" value={formData.observaciones} onChange={handleChange} />
+              <textarea
+                className="form-control"
+                name="observaciones"
+                value={formData.observaciones}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" className="btn text-white" style={{ backgroundColor: hoverGuardar ? "#b0b0b0" : "#132074" }} onMouseEnter={() => setHoverGuardar(true)} onMouseLeave={() => setHoverGuardar(false)} onClick={handleGuardar}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              className="btn text-white"
+              style={{
+                backgroundColor: hoverGuardar ? "#b0b0b0" : "#132074",
+              }}
+              onMouseEnter={() => setHoverGuardar(true)}
+              onMouseLeave={() => setHoverGuardar(false)}
+              onClick={handleGuardar}
+            >
               Guardar
             </button>
           </div>
@@ -178,3 +233,4 @@ const recetaParaEnviar = {
     </div>
   );
 }
+
