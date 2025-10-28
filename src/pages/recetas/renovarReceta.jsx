@@ -35,20 +35,9 @@ export default function RenovarReceta({
       return;
     }
 
-    const hoy = new Date();
-    const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-    const finMesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0);
-
-    let fechaOriginal = new Date(receta.fechaDeEmision);
-    let nuevaFecha = new Date(
-      fechaOriginal.getFullYear(),
-      fechaOriginal.getMonth() + 1,
-      fechaOriginal.getDate()
-    );
-
-    if (nuevaFecha < inicioMesActual) nuevaFecha = inicioMesActual;
-    if (nuevaFecha > finMesSiguiente) nuevaFecha = finMesSiguiente;
-
+    // Fecha de emisión: mes siguiente
+    const fechaOriginal = new Date(receta.fechaDeEmision);
+    const nuevaFecha = new Date(fechaOriginal.getFullYear(), fechaOriginal.getMonth() + 1, fechaOriginal.getDate());
     const fechaISO = nuevaFecha.toISOString().split("T")[0];
 
     setFormData({
@@ -57,20 +46,19 @@ export default function RenovarReceta({
       cantidad: receta.cantidad || 1,
       presentacion: receta.presentacion || "",
       fechaDeEmision: fechaISO,
-      numeroDeDocumento: receta.numeroDeDocumento || "",
       observaciones: receta.observaciones || "",
     });
 
     setError("");
     setSuccess("");
-
-    bsModal.current.show(); 
+    bsModal.current.show();
   }, [receta]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "cantidad") {
-      if (isNaN(value) || value < 1 || value > 2) return;
+      const num = parseInt(value);
+      if (isNaN(num) || num < 1 || num > 2) return;
     }
     setFormData({ ...formData, [name]: value });
   };
@@ -79,6 +67,7 @@ export default function RenovarReceta({
     try {
       const recetaRenovada = { ...formData, estado: "Pendiente" };
 
+      // Llamada PUT para renovar la receta
       const response = await fetch(`http://localhost:3000/recipes/${receta.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -88,10 +77,10 @@ export default function RenovarReceta({
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Error al renovar receta");
 
+      // Actualizar lista de recetas
       setRecetas((prev) => prev.map((r) => (r.id === receta.id ? data : r)));
       setSuccess("Receta renovada con éxito");
       setError("");
-
       bsModal.current.hide();
     } catch (err) {
       console.error(err);
@@ -105,14 +94,7 @@ export default function RenovarReceta({
   };
 
   return (
-    <div
-      className="modal fade"
-      id="renovarRecetaModal"
-      ref={modalRef}
-      tabIndex="-1"
-      aria-labelledby="renovarRecetaModalLabel"
-      aria-hidden="true"
-    >
+    <div className="modal fade" id="renovarRecetaModal" ref={modalRef} tabIndex="-1" aria-labelledby="renovarRecetaModalLabel" aria-hidden="true">
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header" style={{ backgroundColor: "#132074", color: "white" }}>
@@ -149,11 +131,6 @@ export default function RenovarReceta({
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Número de documento</label>
-              <input type="text" className="form-control" name="numeroDeDocumento" value={formData.numeroDeDocumento} disabled />
-            </div>
-
-            <div className="mb-3">
               <label className="form-label">Observaciones</label>
               <textarea className="form-control" name="observaciones" value={formData.observaciones} disabled />
             </div>
@@ -177,3 +154,4 @@ export default function RenovarReceta({
     </div>
   );
 }
+
