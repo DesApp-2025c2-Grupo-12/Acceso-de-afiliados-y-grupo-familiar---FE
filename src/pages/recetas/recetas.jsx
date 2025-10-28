@@ -15,22 +15,20 @@ export default function Recetas() {
     nombreDelMedicamento: "",
     cantidad: 1,
     presentacion: "",
-    fechaDeEmision: "",
-    numeroDeDocumento: "",
-    observaciones: ""
+    observaciones: "",
   });
   const [hoverGuardar, setHoverGuardar] = useState(false);
   const [hoverNueva, setHoverNueva] = useState(false);
   const [hoverBuscar, setHoverBuscar] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [alertaDescarga, setAlertaDescarga] = useState(""); // alerta de descarga
+  const [alertaDescarga, setAlertaDescarga] = useState("");
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
   const [recetaRenovar, setRecetaRenovar] = useState(null);
 
-  const nuevaRecetaRef = useRef(null); // Ref para modal nueva receta
+  const nuevaRecetaRef = useRef(null);
 
-  // Fetch inicial de recetas y grupo familiar
+  // Fetch inicial
   useEffect(() => {
     const fetchRecetas = async () => {
       try {
@@ -50,35 +48,15 @@ export default function Recetas() {
   }, []);
 
   // Alertas temporales
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => setError(""), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [error]);
-
-  useEffect(() => {
-    if (success) {
-      const timer = setTimeout(() => setSuccess(""), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [success]);
-
-  useEffect(() => {
-    if (alertaDescarga) {
-      const timer = setTimeout(() => setAlertaDescarga(""), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [alertaDescarga]);
+  useEffect(() => { if (error) { const t = setTimeout(() => setError(""), 3000); return () => clearTimeout(t); } }, [error]);
+  useEffect(() => { if (success) { const t = setTimeout(() => setSuccess(""), 3000); return () => clearTimeout(t); } }, [success]);
+  useEffect(() => { if (alertaDescarga) { const t = setTimeout(() => setAlertaDescarga(""), 3000); return () => clearTimeout(t); } }, [alertaDescarga]);
 
   const recetasFiltradas = recetas.filter((receta) =>
     receta.nombreDelMedicamento?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const abrirModalNuevaReceta = () => {
-    nuevaRecetaRef.current?.show();
-  };
-
+  const abrirModalNuevaReceta = () => nuevaRecetaRef.current?.show();
   const abrirModalVer = (receta) => setRecetaSeleccionada(receta);
   const abrirModalRenovar = (receta) => setRecetaRenovar(receta);
 
@@ -97,7 +75,7 @@ export default function Recetas() {
         </button>
       </div>
 
-      {/* Mensajes temporales */}
+      {/* Mensajes */}
       {error && <div className="alert alert-danger text-center">{error}</div>}
       {success && <div className="alert alert-success text-center">{success}</div>}
       {alertaDescarga && <div className="alert alert-warning text-center">{alertaDescarga}</div>}
@@ -155,3 +133,4 @@ export default function Recetas() {
     </div>
   );
 }
+
