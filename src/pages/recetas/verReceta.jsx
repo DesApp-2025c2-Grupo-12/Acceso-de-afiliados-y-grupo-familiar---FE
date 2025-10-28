@@ -44,7 +44,12 @@ export default function VerReceta({ receta, setRecetaSeleccionada }) {
                 <div className="row mb-2"><div className="col-5 fw-bold">Presentación:</div><div className="col-7">{receta.presentacion || "-"}</div></div>
                 <div className="row mb-2"><div className="col-5 fw-bold">Paciente:</div><div className="col-7">{receta.paciente || "-"}</div></div>
                 <div className="row mb-2"><div className="col-5 fw-bold">Número de Documento:</div><div className="col-7">{receta.numeroDeDocumento || "-"}</div></div>
-                <div className="row mb-2"><div className="col-5 fw-bold">Fecha de emisión:</div><div className="col-7">{formatFecha(receta.fechaDeEmision)}</div></div>
+                <div className="row mb-2">
+                  <div className="col-5 fw-bold">Fecha de emisión:</div>
+                  <div className="col-7">
+                    {receta.estado === "Aprobada" ? formatFecha(receta.fechaDeEmision) : "-"}
+                  </div>
+                </div>
                 <div className="row mb-2"><div className="col-5 fw-bold">Cantidad:</div><div className="col-7">{receta.cantidad || "-"}</div></div>
                 <div className="row mb-2"><div className="col-5 fw-bold">Estado:</div><div className="col-7">{receta.estado || "-"}</div></div>
                 <div className="row mb-2"><div className="col-5 fw-bold">Observaciones:</div><div className="col-7">{receta.observaciones || "-"}</div></div>
@@ -61,3 +66,4 @@ export default function VerReceta({ receta, setRecetaSeleccionada }) {
     </div>
   );
 }
+
