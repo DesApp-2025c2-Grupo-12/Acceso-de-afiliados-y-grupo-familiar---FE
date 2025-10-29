@@ -7,7 +7,6 @@ import BuscarAutorizacion from "./buscarAutorizacion";
 export default function Autorizaciones() {
   const [autorizaciones, setAutorizaciones] = useState([]);
   const [hoverNueva, setHoverNueva] = useState(false);
-  const [hoverGuardar, setHoverGuardar] = useState(false);
   const [hoverBuscar, setHoverBuscar] = useState(false);
   const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
   const [formData, setFormData] = useState({
@@ -25,9 +24,8 @@ export default function Autorizaciones() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [autorizacionSeleccionada, setAutorizacionSeleccionada] = useState(null);
-
   const [showModal, setShowModal] = useState(false);
-
+  // Carga de autorizaciones
   useEffect(() => {
     const fetchAutorizaciones = async () => {
       try {
@@ -41,6 +39,9 @@ export default function Autorizaciones() {
           paciente: item.nombreDelAfiliado,
           medico: item.nombreDelMedico,
           especialidad: item.especialidad,
+          lugar: item.lugarDePrestacion,
+          internacion: item.diasDeInternacion,
+          observaciones: item.observaciones,
           estado: item.estado || "Pendiente",
         }));
 
@@ -53,16 +54,15 @@ export default function Autorizaciones() {
     fetchAutorizaciones();
   }, []);
 
+  // Carga de integrantes
   useEffect(() => {
     const fetchIntegrantes = async () => {
       try {
         const res = await fetch("http://localhost:3000/affiliate");
-        console.log("fetch /api/affiliates status:", res.status);
         if (!res.ok) throw new Error("Error al obtener los afiliados");
         const data = await res.json();
-        console.log("Integrantes cargados (raw):", data);
         setIntegrantesCuenta(
-          data.map(i => ({
+          data.map((i) => ({
             id: i.id,
             nombreCompleto: `${i.nombre} ${i.apellido}`,
           }))
@@ -74,7 +74,28 @@ export default function Autorizaciones() {
     fetchIntegrantes();
   }, []);
 
-  // filtro
+  // Función para actualizar una autorización en la lista después de cambios
+  const actualizarAutorizacion = (autorizacionActualizada) => {
+    setAutorizaciones((prev) =>
+      prev.map((a) =>
+        a.id === autorizacionActualizada.id
+          ? {
+              ...a,
+              fecha: autorizacionActualizada.fechaDePrestacion,
+              paciente: autorizacionActualizada.nombreDelAfiliado,
+              medico: autorizacionActualizada.nombreDelMedico,
+              especialidad: autorizacionActualizada.especialidad,
+              lugar: autorizacionActualizada.lugarDePrestacion,
+              internacion: autorizacionActualizada.diasDeInternacion,
+              observaciones: autorizacionActualizada.observaciones,
+              estado: autorizacionActualizada.estado,
+            }
+          : a
+      )
+    );
+  };
+
+  // Filtro de búsqueda
   const autorizacionesFiltradas = autorizaciones.filter(
     (a) =>
       a.paciente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -90,12 +111,12 @@ export default function Autorizaciones() {
           style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
           onMouseEnter={() => setHoverNueva(true)}
           onMouseLeave={() => setHoverNueva(false)}
-          onClick={() => setShowModal(true)} // abre modal
+          onClick={() => setShowModal(true)}
         >
           + Nueva Autorización
         </button>
       </div>
-
+      {/* alerta de exito */}
       {error && <div className="alert alert-danger text-center mb-4">{error}</div>}
       {success && <div className="alert alert-success text-center mb-4">{success}</div>}
 
@@ -120,17 +141,15 @@ export default function Autorizaciones() {
         )}
       </div>
 
-      {/* NUEVA AUTORIZACION */}
+      {/* Modal de Nueva Autorización */}
       <NuevaAutorizacion
-        showModal={showModal}      
-        setShowModal={setShowModal} 
+        showModal={showModal}
+        setShowModal={setShowModal}
         integrantesCuenta={integrantesCuenta}
         formData={formData}
         setFormData={setFormData}
         autorizaciones={autorizaciones}
         setAutorizaciones={setAutorizaciones}
-        hoverGuardar={hoverGuardar}
-        setHoverGuardar={setHoverGuardar}
         error={error}
         setError={setError}
         success={success}
@@ -147,10 +166,14 @@ export default function Autorizaciones() {
         }}
       />
 
+      {/* Modal de Ver Autorización */}
       {autorizacionSeleccionada && (
         <VerAutorizacion
           autorizacion={autorizacionSeleccionada}
           setAutorizacionSeleccionada={setAutorizacionSeleccionada}
+          setSuccess={setSuccess}
+          setAutorizaciones={setAutorizaciones} 
+          autorizaciones={autorizaciones}       
         />
       )}
     </div>

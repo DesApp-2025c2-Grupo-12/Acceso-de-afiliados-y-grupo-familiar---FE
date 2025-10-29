@@ -6,8 +6,10 @@ export default function CardAutorizacion({ autorizacion, setAutorizacionSeleccio
     autorizacion.estado === "Pendiente"
       ? "bg-warning text-dark"
       : autorizacion.estado === "Aprobado"
-      ? "bg-success text-white"
-      : "bg-danger text-white";
+      ? "bg-success"
+      : autorizacion.estado === "Observada"
+      ? "bg-secondary text-light"
+      : "bg-danger text-light";
 
   const detalles = [
     { label: "Fecha", value: autorizacion.fecha },
