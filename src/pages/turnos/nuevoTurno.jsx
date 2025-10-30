@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import CardPersonalizada from "../../components/Cards/CardPersonalizada";
 
-export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta }) {
+export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrantesCuenta,pantallaNuevoTurno }) {
   const [especialidades, setEspecialidades] = useState([])
   const [turnosSinRerva, setTurnosSinReserva] = useState([])
   const [especialidad, setEspecialidad] = useState("");
   const [diaSeleccionado, setDiaSeleccionado] = useState("");
+  const [afiliadosSeleccionados, setAfiliadosSeleccionados] = useState({})
   const [fechaInicioSemana, setFechaInicioSemana] = useState(() => {
     return getLunesSemanaActual();
   });
+
 
   // Función para obtener el lunes de la semana actual
   function getLunesSemanaActual() {
@@ -139,37 +141,82 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta }) {
     return fechaInicioSemana.toDateString() === lunesActual.toDateString();
   };
 
-  useEffect(() => {
-    const cargarEspecialidades = async () => {
-      try {
-        const especialidadesRes = await fetch(`http://localhost:3000/appointment/especialidades/`)
-        if (!especialidadesRes.ok) throw new Error("Error al cargar las especialidades")
-        const dataEsp = await especialidadesRes.json()
-        setEspecialidades(dataEsp)
-      } catch (error) {
-        console.error("Error:", error);
-      }
+  const obtenerTurnosNoReservados = async () => {
+    try {
+      const resTurnos = await fetch(`http://localhost:3000/appointment/unreserved-appointments/`)
+      if (!resTurnos.ok) throw new Error("Error al cargar los turnos")
+      const dataTurnos = await resTurnos.json();
+      setTurnosSinReserva(dataTurnos)
+    } catch (error) {
+      console.error("Error:", error);
     }
+  }
+  const cargarEspecialidades = async () => {
+    try {
+      const especialidadesRes = await fetch(`http://localhost:3000/appointment/especialidades/`)
+      if (!especialidadesRes.ok) throw new Error("Error al cargar las especialidades")
+      const dataEsp = await especialidadesRes.json()
+      setEspecialidades(dataEsp)
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
 
-    const obtenerTurnosNoReservados = async () => {
-      try {
-        const resTurnos = await fetch(`http://localhost:3000/appointment/unreserved-appointments/`)
-        if (!resTurnos.ok) throw new Error("Error al cargar los turnos")
-        const dataTurnos = await resTurnos.json();
-        setTurnosSinReserva(dataTurnos)
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    }
-    
+  useEffect(() => {
+
     cargarEspecialidades()
     obtenerTurnosNoReservados()
-  }, [])
+  }, [pantallaNuevoTurno])
 
   const turnosFiltrados = turnosSinRerva.filter(turno =>
     turno.especialidad === especialidad &&
     turno.fecha === diaSeleccionado
   )
+
+  const handleAfiliadoChange = (turnoId, afiliadoId) => {
+    setAfiliadosSeleccionados(prev => ({
+      ...prev,
+      [turnoId]: afiliadoId
+    }));
+
+  }
+  const reservarTurno = async (turno) => {
+    try {
+
+
+      const afiliadoQueReserva = afiliadosSeleccionados[turno.id];
+      if (!afiliadoQueReserva) throw new Error("No se ha seleccionado un afiliado para este turno")
+
+      const bodyData = parseInt(afiliadoQueReserva)
+      const turnoReservado = await fetch(`http://localhost:3000/appointment/${turno.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          affiliateId: bodyData
+        })
+
+      })
+
+      if (!turnoReservado.ok) {
+        throw new Error("Error en la respuesta del servidor");
+      }
+      
+      await obtenerTurnosNoReservados()
+
+      setAfiliadosSeleccionados(prev => {
+        const nuevos = { ...prev };
+        delete nuevos[turno.id];
+        return nuevos;
+      });
+
+      
+      setPantallaNuevoTurno(false);
+
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
 
   return (
     <Container className="my-4 border border-dark">
@@ -287,6 +334,9 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta }) {
           <h5 className="text-center mb-4">
             Turnos disponibles para el {proximosDias.find(d => d.fechaISO === diaSeleccionado)?.label}:
           </h5>
+
+
+
           <Row>
             {turnosFiltrados.map(turno => (
               <Col md={4} key={turno.id} className="mb-3">
@@ -297,9 +347,37 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta }) {
                     { label: "Fecha", value: turno.fecha },
                     { label: "Hora", value: turno.horario },
                     { label: "Lugar", value: turno.lugarDeAtencion },
+
                   ]}
+                  contenidoAdicional={
+                    <div className="mb-3">
+                      <label htmlFor={`afiliado-${turno.id}`} className="form-label">
+                        Seleccionar afiliado:
+                      </label>
+
+
+                      <select
+                        id={`afiliado-${turno.id}`}
+                        className="form-select"
+                        value={afiliadosSeleccionados[turno.id] || ""}
+                        onChange={(e) => handleAfiliadoChange(turno.id, e.target.value)}
+                      >
+                        <option value="">Seleccione un afiliado</option>
+                        {integrantesCuenta && integrantesCuenta.length > 0 ? (
+                          integrantesCuenta.map(afiliado => (
+                            <option key={afiliado.id} value={afiliado.id}>
+                              {afiliado.nombre} {afiliado.apellido}
+                            </option>
+                          ))
+                        ) : (
+                          <option value="" disabled>No hay afiliados disponibles</option>
+                        )}
+                      </select>
+
+                    </div>
+                  }
                   botonTexto="Reservar"
-                  onClick={() => console.log("Reservar turno:", turno.id)}
+                  onClick={() => reservarTurno(turno)}
                 />
               </Col>
             ))}

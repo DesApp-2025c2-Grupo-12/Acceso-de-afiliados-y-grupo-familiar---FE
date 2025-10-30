@@ -5,6 +5,7 @@ export default function CardPersonalizada({
   title,
   subtitle,
   tipo,
+  contenidoAdicional,
   detalles,
   botonTexto,
   onClick,
@@ -26,6 +27,12 @@ export default function CardPersonalizada({
             <strong>{item.label}:</strong> {item.value}
           </Card.Text>
         ))}
+
+        {contenidoAdicional && (
+          <div className="mt-3">
+            {contenidoAdicional}
+          </div>
+        )}
 
         {botonTexto && (
           <Button

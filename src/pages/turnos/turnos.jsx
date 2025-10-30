@@ -7,6 +7,7 @@ export default function Turnos() {
   const [pantallaNuevoTurno, setPantallaNuevoTurno] = useState(false);
   const [alerta, setAlerta] = useState({ msg: "", tipo: "success" });
   const [turnos, setTurnos] = useState([]);
+  const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
 
 
 
@@ -27,6 +28,8 @@ const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "n
   
   useEffect(()=> {
     obtenerTurnosDeAPI()
+    const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
+    setIntegrantesCuenta(grupoFamiliar);
   },[])
 
   const meses = {
@@ -114,6 +117,8 @@ const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "n
           setPantallaNuevoTurno={setPantallaNuevoTurno} 
           setAlerta={setAlerta} 
           generarFechaTurno={generarFechaTurno}
+          integrantesCuenta={integrantesCuenta}
+
         />
       )}
     </Container>
