@@ -13,6 +13,9 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
     return `${dia}/${mes}/${año}`;
   };
 
+  // Mostrar fecha solo si está aprobada
+  const fechaAMostrar = receta.estado === "Aprobada" ? formatFecha(receta.fechaDeEmision) : "***";
+
   return (
     <div className="col-md-6 mb-4">
       <div className="card h-100 shadow-sm">
@@ -20,7 +23,7 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
 
           <h5 className="card-title">
             {receta.nombreDelMedicamento} -{" "}
-            <small className="text-muted">{formatFecha(receta.fechaDeEmision)}</small>
+            <small className="text-muted">{fechaAMostrar}</small>
           </h5>
 
           <p className="text-muted mb-2">{receta.paciente}</p>
