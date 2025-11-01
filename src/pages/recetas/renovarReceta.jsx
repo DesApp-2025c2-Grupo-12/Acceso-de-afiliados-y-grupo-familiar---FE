@@ -29,11 +29,12 @@ export default function RenovarReceta({
   useEffect(() => {
     if (!receta || !bsModal.current) return;
 
-    if (receta.estado !== "Aprobada") {
-      setError("Solo se pueden renovar recetas aprobadas");
-      setSuccess("");
-      return;
-    }
+   if (receta.estado !== "Aprobado") {
+  setError("Solo se pueden renovar recetas aprobadas");
+  setSuccess("");
+  return;
+}
+
 
     setFormData({
       paciente: receta.paciente || "",

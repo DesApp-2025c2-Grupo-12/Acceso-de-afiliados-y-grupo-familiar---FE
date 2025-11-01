@@ -2,7 +2,16 @@ import React from "react";
 
 export default function CardReceta({ receta, handleVer, handleRenovar, handleDescargar }) {
 
-  const estadoClass = receta.estado === "Pendiente" ? "bg-warning text-dark" : "bg-success text-dark";
+  const estadoColores = {
+  "Recibido": "bg-info text-dark",
+  "En análisis": "bg-primary text-white",
+  "Observado": "bg-warning text-dark",
+  "Aprobado": "bg-success text-dark",
+  "Rechazado": "bg-danger text-white",
+};
+
+const estadoClass = estadoColores[receta.estado] || "bg-secondary text-dark";
+
 
   const formatFecha = (fechaStr) => {
     if (!fechaStr) return "-";
@@ -14,7 +23,8 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
   };
 
   // Mostrar fecha solo si está aprobada
-  const fechaAMostrar = receta.estado === "Aprobada" ? formatFecha(receta.fechaDeEmision) : "***";
+  const fechaAMostrar = receta.estado === "Aprobado" ? formatFecha(receta.fechaDeEmision) : "***";
+
 
   return (
     <div className="col-md-6 mb-4">

@@ -136,14 +136,15 @@ export default function NuevaReceta({
       );
     }
 
-    // Si pasa todo, enviar al backend
-  const recetaParaEnviar = {
+   
+  // Si pasa todo, enviar al backend
+const recetaParaEnviar = {
   paciente: pacienteNombre,
   nombreDelMedicamento: formData.nombreDelMedicamento,
   cantidad: formData.cantidad,
   presentacion: formData.presentacion,
   observaciones: formData.observaciones,
-  estado: "Pendiente",
+  estado: "Recibido", // estado inicial actualizado
   numeroDeDocumento: "", // temporal para evitar el error
 };
 

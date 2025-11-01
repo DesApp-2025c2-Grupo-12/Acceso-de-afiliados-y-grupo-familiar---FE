@@ -66,7 +66,8 @@ export default function VerReceta({ receta, setRecetaSeleccionada }) {
                 <div className="row mb-2">
                   <div className="col-5 fw-bold">Fecha de emisión:</div>
                   <div className="col-7">
-                    {receta.estado === "Aprobada" ? formatFecha(receta.fechaDeEmision) : "-"}
+                    {receta.estado === "Aprobado" ? formatFecha(receta.fechaDeEmision) : "-"}
+
                   </div>
                 </div>
                 <div className="row mb-2">
