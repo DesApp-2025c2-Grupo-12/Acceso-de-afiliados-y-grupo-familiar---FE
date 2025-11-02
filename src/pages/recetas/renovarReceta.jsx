@@ -30,9 +30,15 @@ export default function RenovarReceta({
     if (!receta || !bsModal.current) return;
 
    if (receta.estado !== "Aprobado") {
-  setError("Solo se pueden renovar recetas aprobadas");
+  // Limpia antes de volver a mostrar el mismo mensaje
+  setError("");
+  setTimeout(() => {
+    setError("Solo se pueden renovar recetas aprobadas");
+  }, 10);
+  
   setSuccess("");
   return;
+
 }
 
 
