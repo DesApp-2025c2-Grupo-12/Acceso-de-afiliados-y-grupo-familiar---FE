@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import CardPersonalizada from "../../components/Cards/CardPersonalizada";
 
-export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrantesCuenta,pantallaNuevoTurno }) {
+export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrantesCuenta, pantallaNuevoTurno }) {
   const [especialidades, setEspecialidades] = useState([])
   const [turnosSinRerva, setTurnosSinReserva] = useState([])
   const [especialidad, setEspecialidad] = useState("");
@@ -11,6 +11,9 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
   const [fechaInicioSemana, setFechaInicioSemana] = useState(() => {
     return getLunesSemanaActual();
   });
+
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
 
   // Función para obtener el lunes de la semana actual
@@ -164,8 +167,17 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
 
   useEffect(() => {
 
-    cargarEspecialidades()
-    obtenerTurnosNoReservados()
+    if (pantallaNuevoTurno) {
+
+      cargarEspecialidades();
+      obtenerTurnosNoReservados();
+
+
+      setEspecialidad("");
+      setDiaSeleccionado("");
+      setAfiliadosSeleccionados({});
+      setFechaInicioSemana(getLunesSemanaActual());
+    }
   }, [pantallaNuevoTurno])
 
   const turnosFiltrados = turnosSinRerva.filter(turno =>
@@ -182,6 +194,9 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
   }
   const reservarTurno = async (turno) => {
     try {
+
+      setErrorMessage("");
+      setSuccessMessage("");
 
 
       const afiliadoQueReserva = afiliadosSeleccionados[turno.id];
@@ -200,7 +215,9 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
       if (!turnoReservado.ok) {
         throw new Error("Error en la respuesta del servidor");
       }
-      
+
+      setSuccessMessage("¡Turno reservado correctamente!");
+
       await obtenerTurnosNoReservados()
 
       setAfiliadosSeleccionados(prev => {
@@ -208,12 +225,22 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
         delete nuevos[turno.id];
         return nuevos;
       });
+      setEspecialidad("");
+      setDiaSeleccionado("");
+      setAfiliadosSeleccionados({});
 
-      
-      setPantallaNuevoTurno(false);
+      await obtenerTurnosNoReservados();
+      await cargarEspecialidades();
+
+
+      setTimeout(() => {
+        setPantallaNuevoTurno(false);
+      }, 2000);
+
 
     } catch (error) {
       console.error("Error:", error);
+      setErrorMessage(error.message || "Error al reservar el turno");
     }
   }
 
@@ -221,6 +248,28 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
   return (
     <Container className="my-4 border border-dark">
       <h2 className="mb-4">Nuevo Turno</h2>
+
+      {(errorMessage || successMessage) && (
+        <div className="sticky-top" style={{ top: '20px', zIndex: 100 }}>
+          {errorMessage && (
+            <div className="d-flex justify-content-center mb-3">
+              <div className="alert alert-danger d-flex align-items-center" role="alert">
+                <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                <div>{errorMessage}</div>
+              </div>
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="d-flex justify-content-center mb-3">
+              <div className="alert alert-success d-flex align-items-center" role="alert">
+                <i className="bi bi-check-circle-fill me-2"></i>
+                <div>{successMessage}</div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <Row className="mb-4">
         <Col md={12}>
@@ -384,6 +433,7 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
           </Row>
         </>
       )}
+
     </Container>
   );
 }
