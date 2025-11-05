@@ -7,63 +7,74 @@ export default function Turnos() {
   const [pantallaNuevoTurno, setPantallaNuevoTurno] = useState(false);
   const [alerta, setAlerta] = useState({ msg: "", tipo: "success" });
   const [turnos, setTurnos] = useState([]);
+  const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
 
 
 
-const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
+  const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
 
   const obtenerTurnosDeAPI = async () => {
     try {
-       const resTurnos = await fetch(`http://localhost:3000/appointment/affiliated-appointments/${usuarioLogueado.id}`)
-       if(!resTurnos.ok) throw new error("Error al cargar los turnos")
-       const dataTurnos = await resTurnos.json();
-       setTurnos(dataTurnos)
+      const resTurnos = await fetch(`http://localhost:3000/appointment/turnosFuturos/${usuarioLogueado.id}`)
+      if (!resTurnos.ok) throw new Error("Error al cargar los turnos")
+      const dataTurnos = await resTurnos.json();
+      setTurnos(dataTurnos)
     } catch (error) {
-       setErrorMessage(err.message);
-       setSuccessMessage(false);
+      setAlerta({ msg: error.message, tipo: "danger" });
     }
   }
 
-  
-  useEffect(()=> {
-    obtenerTurnosDeAPI()
-  },[])
 
-  const meses = {
-    "enero": 0, "febrero": 1, "marzo": 2, "abril": 3, "mayo": 4,
-    "junio": 5, "julio": 6, "agosto": 7, "septiembre": 8,
-    "octubre": 9, "noviembre": 10, "diciembre": 11
-  };
+  useEffect(() => {
+    obtenerTurnosDeAPI()
+    const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
+    setIntegrantesCuenta(grupoFamiliar);
+  }, [])
+
+  useEffect(() => {
+    if (!pantallaNuevoTurno) {
+      // Cuando se cierra NuevoTurno, recargar los turnos del afiliado
+      obtenerTurnosDeAPI();
+    }
+  }, [pantallaNuevoTurno]);
 
   // Función para generar fecha completa de turno
-  const generarFechaTurno = (hora) => {
-    const hoy = new Date();
-    let fechaTurno = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-    fechaTurno.setHours(parseInt(hora.split(":")[0]));
-    fechaTurno.setMinutes(parseInt(hora.split(":")[1]));
-    if (fechaTurno < hoy) fechaTurno.setDate(fechaTurno.getDate() + 1);
-    const diaSemana = fechaTurno.toLocaleDateString("es-AR", { weekday: "long" });
-    const dia = fechaTurno.getDate();
-    const mes = fechaTurno.toLocaleDateString("es-AR", { month: "long" });
-    const horaStr = `${fechaTurno.getHours().toString().padStart(2, "0")}:${fechaTurno.getMinutes().toString().padStart(2, "0")}`;
-    return `${diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1)} ${dia} de ${mes}, ${horaStr}`;
-  };
 
-  const cancelarTurno = (turno) => {
-    const fechaActual = new Date();
-    const [ , dia, , mes, hora] = turno.fechaYHora.split(/[\s,]+/);
-    const [horas, minutos] = hora.split(":");
-    const fechaTurno = new Date(new Date().getFullYear(), meses[mes.toLowerCase()], parseInt(dia), parseInt(horas), parseInt(minutos));
-    const diferenciaMs = fechaTurno - fechaActual;
-    const horas24 = 24 * 60 * 60 * 1000;
 
-    if (diferenciaMs >= horas24) {
+  const cancelarTurno = async (turno) => {
+    try {
+      const fechaActual = new Date();
+      const fechaTurnoACancelar = new Date(`${turno.fecha}T${turno.horario}`);
+      const diferenciasFechas = fechaTurnoACancelar - fechaActual;
+      const hs24 = 24 * 60 * 60 * 1000;
+
+
+      if (diferenciasFechas < hs24) {
+        setAlerta({ msg: "El turno no puede ser cancelado con menos de 24 horas de anticipación", tipo: "danger" });
+        setTimeout(() => setAlerta({ msg: "", tipo: "success" }), 3000);
+        return;
+      }
+
+
+      const response = await fetch(`http://localhost:3000/appointment/${turno.id}/cancel`, {
+        method: 'PUT',
+        headers: { "Content-Type": "application/json" },
+        
+      });
+
+      if (!response.ok) throw new Error('Error al cancelar el turno');
+
+
+      setAlerta({ msg: `Turno cancelado correctamente`, tipo: "success" });
       setTurnos(prev => prev.filter(t => t.id !== turno.id));
-      setAlerta({ msg: `Turno con ${turno.medico} cancelado correctamente`, tipo: "success" });
-    } else {
-      setAlerta({ msg: "El turno no puede ser cancelado con menos de 24 horas de anticipación", tipo: "danger" });
+
+      setTimeout(() => setAlerta({ msg: "", tipo: "success" }), 3000);
+
+    } catch (error) {
+      console.error('Error cancelando turno:', error);
+      setAlerta({ msg: "Error al cancelar el turno", tipo: "danger" });
+      setTimeout(() => setAlerta({ msg: "", tipo: "success" }), 3000);
     }
-    setTimeout(() => setAlerta({ msg: "", tipo: "success" }), 3000);
   };
 
   const turnosOrdenados = [...turnos].sort(
@@ -76,11 +87,11 @@ const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "n
         <>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h2>Mis Turnos</h2>
-            <Button 
-                variant="primary" 
-                className="fw-bold px-4 py-2 fs-5 rounded-3" 
-                style={{ background: "#132074", border: "none" }} 
-                onClick={() => setPantallaNuevoTurno(true)}
+            <Button
+              variant="primary"
+              className="fw-bold px-4 py-2 fs-5 rounded-3"
+              style={{ background: "#132074", border: "none" }}
+              onClick={() => setPantallaNuevoTurno(true)}
             >Nuevo turno
             </Button>
 
@@ -96,24 +107,28 @@ const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "n
                   subtitle={turno.especialidad}
                   tipo={turno.tipo}
                   detalles={[
-                    { label: "Fecha", value: turno.fecha},
-                    { label: "horario", value: turno.horario},
+                    { label: "Fecha", value: turno.fecha },
+                    { label: "horario", value: turno.horario },
                     { label: "Lugar", value: turno.lugarDeAtencion },
                   ]}
                   botonTexto="Dar de baja"
                   onClick={() => cancelarTurno(turno)}
-               />
+                />
               </Col>
             ))}
+            {turnosOrdenados.length === 0 && (
+              <div className="text-center py-5 mt-5" style={{ minHeight: "50vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                <h5 className="text-muted mb-3">No hay turnos reservados</h5>
+              </div>
+            )}
           </Row>
         </>
       ) : (
-        <NuevoTurno 
-          turnos={turnos} 
-          setTurnos={setTurnos} 
-          setPantallaNuevoTurno={setPantallaNuevoTurno} 
-          setAlerta={setAlerta} 
-          generarFechaTurno={generarFechaTurno}
+        <NuevoTurno
+          setPantallaNuevoTurno={setPantallaNuevoTurno}
+          setAlerta={setAlerta}
+          integrantesCuenta={integrantesCuenta}
+          pantallaNuevoTurno={pantallaNuevoTurno}
         />
       )}
     </Container>

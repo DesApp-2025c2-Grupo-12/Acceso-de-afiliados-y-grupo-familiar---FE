@@ -29,23 +29,24 @@ export default function RenovarReceta({
   useEffect(() => {
     if (!receta || !bsModal.current) return;
 
-    if (receta.estado !== "Aprobada") {
-      setError("Solo se pueden renovar recetas aprobadas");
-      setSuccess("");
-      return;
-    }
+   if (receta.estado !== "Aprobado") {
+  // Limpia antes de volver a mostrar el mismo mensaje
+  setError("");
+  setTimeout(() => {
+    setError("Solo se pueden renovar recetas aprobadas");
+  }, 10);
+  
+  setSuccess("");
+  return;
 
-    // Fecha de emisión: mes siguiente
-    const fechaOriginal = new Date(receta.fechaDeEmision);
-    const nuevaFecha = new Date(fechaOriginal.getFullYear(), fechaOriginal.getMonth() + 1, fechaOriginal.getDate());
-    const fechaISO = nuevaFecha.toISOString().split("T")[0];
+}
+
 
     setFormData({
       paciente: receta.paciente || "",
       nombreDelMedicamento: receta.nombreDelMedicamento || "",
       cantidad: receta.cantidad || 1,
       presentacion: receta.presentacion || "",
-      fechaDeEmision: fechaISO,
       observaciones: receta.observaciones || "",
     });
 
@@ -67,7 +68,6 @@ export default function RenovarReceta({
     try {
       const recetaRenovada = { ...formData, estado: "Pendiente" };
 
-      // Llamada PUT para renovar la receta
       const response = await fetch(`http://localhost:3000/recipes/${receta.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -77,7 +77,6 @@ export default function RenovarReceta({
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Error al renovar receta");
 
-      // Actualizar lista de recetas
       setRecetas((prev) => prev.map((r) => (r.id === receta.id ? data : r)));
       setSuccess("Receta renovada con éxito");
       setError("");
@@ -94,12 +93,28 @@ export default function RenovarReceta({
   };
 
   return (
-    <div className="modal fade" id="renovarRecetaModal" ref={modalRef} tabIndex="-1" aria-labelledby="renovarRecetaModalLabel" aria-hidden="true">
+    <div
+      className="modal fade"
+      id="renovarRecetaModal"
+      ref={modalRef}
+      tabIndex="-1"
+      aria-labelledby="renovarRecetaModalLabel"
+      aria-hidden="true"
+    >
       <div className="modal-dialog">
         <div className="modal-content">
-          <div className="modal-header" style={{ backgroundColor: "#132074", color: "white" }}>
-            <h5 className="modal-title" id="renovarRecetaModalLabel">Renovar Receta</h5>
-            <button type="button" className="btn-close btn-close-white" onClick={handleCancelar} />
+          <div
+            className="modal-header"
+            style={{ backgroundColor: "#132074", color: "white" }}
+          >
+            <h5 className="modal-title" id="renovarRecetaModalLabel">
+              Renovar Receta
+            </h5>
+            <button
+              type="button"
+              className="btn-close btn-close-white"
+              onClick={handleCancelar}
+            />
           </div>
 
           <div className="modal-body">
@@ -107,37 +122,69 @@ export default function RenovarReceta({
 
             <div className="mb-3">
               <label className="form-label">Nombre del medicamento</label>
-              <input type="text" className="form-control" name="nombreDelMedicamento" value={formData.nombreDelMedicamento} disabled />
+              <input
+                type="text"
+                className="form-control"
+                name="nombreDelMedicamento"
+                value={formData.nombreDelMedicamento}
+                disabled
+              />
             </div>
 
             <div className="mb-3">
               <label className="form-label">Cantidad</label>
-              <input type="number" className="form-control" name="cantidad" value={formData.cantidad} onChange={handleChange} min={1} max={2} />
+              <input
+                type="number"
+                className="form-control"
+                name="cantidad"
+                value={formData.cantidad}
+                onChange={handleChange}
+                min={1}
+                max={2}
+              />
             </div>
 
             <div className="mb-3">
               <label className="form-label">Presentación</label>
-              <input type="text" className="form-control" name="presentacion" value={formData.presentacion} disabled />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Fecha de emisión</label>
-              <input type="date" className="form-control" name="fechaDeEmision" value={formData.fechaDeEmision} disabled />
+              <input
+                type="text"
+                className="form-control"
+                name="presentacion"
+                value={formData.presentacion}
+                disabled
+              />
             </div>
 
             <div className="mb-3">
               <label className="form-label">Paciente</label>
-              <input type="text" className="form-control" name="paciente" value={formData.paciente} disabled />
+              <input
+                type="text"
+                className="form-control"
+                name="paciente"
+                value={formData.paciente}
+                disabled
+              />
             </div>
 
             <div className="mb-3">
               <label className="form-label">Observaciones</label>
-              <textarea className="form-control" name="observaciones" value={formData.observaciones} disabled />
+              <textarea
+                className="form-control"
+                name="observaciones"
+                value={formData.observaciones}
+                disabled
+              />
             </div>
           </div>
 
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={handleCancelar}>Cancelar</button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleCancelar}
+            >
+              Cancelar
+            </button>
             <button
               type="button"
               className="btn text-white"
@@ -154,4 +201,3 @@ export default function RenovarReceta({
     </div>
   );
 }
-

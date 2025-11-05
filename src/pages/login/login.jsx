@@ -10,75 +10,105 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  // Función para redireccionar al home
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
+    // Limpiar mensajes previos
+    setErrorMessage("");
+    setSuccessMessage(false);
+
+    // Validar que ingrese un documento 
     if (!documento.trim()) {
       setErrorMessage("❌ Debés ingresar un documento");
       return;
     }
+    // Validar que se ingrese una contraseña
     if (!password.trim()) {
       setErrorMessage("❌ Debés ingresar una contraseña");
       return;
     }
 
-    try {
+    //  Validar que el documento tenga 8 caracteres
+    if (documento.length !== 8) {
+      setErrorMessage("❌ El número de documento debe tener exactamente 8 caracteres");
+      return; // 
+    }
 
+    // Validar que el documento sean solo números
+    if (!/^\d+$/.test(documento)) {
+      setErrorMessage("❌ El documento debe contener solo números");
+      return;
+    }
+    // validar que la contraseña tenga al menos 8 caracteres
+    if (password.length < 8) {
+      setErrorMessage("❌ La contraseña debe tener al menos 8 caracteres");
+      return;
+    }
+
+    try {
+      // Verificar documento
       const resDoc = await fetch(`http://localhost:3000/affiliate/verificar-documento/${documento}`);
-      if (!resDoc.ok) throw new Error("Error al verificar el documento");
+      if (!resDoc.ok) {
+        const errorData = await resDoc.json();
+        throw new Error(errorData.error || "Error al verificar el documento");
+      }
       const dataDoc = await resDoc.json();
       if (!dataDoc.existe) {
         throw new Error("❌ Este documento no pertenece a un afiliado dado de alta");
       }
 
-
+      // Verificar si el afiliado está registrado
       const resPass = await fetch(`http://localhost:3000/affiliate/verificar-password/${documento}`);
       console.log("resPass:", resPass);
       console.log("resPass.ok:", resPass.ok);
       console.log("resPass.status:", resPass.status);
-      if (!resPass.ok) throw new Error("Error al verificar la contraseña");
+      if (!resPass.ok) {
+        const errorData = await resPass.json();
+        throw new Error(errorData.error || "Error al verificar la contraseña");
+      }
       const dataPass = await resPass.json()
-      if (!dataPass.existe) { throw new Error("❌ El Afiliado no esta registrado") }
-
-      /*encodeURIComponent(password) INVESTIGAR SI CONVIENE USAR,HABRIA QUE CAMBIAR COSAS EN EL BACK CALCULO */
-      const resVerPass = await fetch(`http://localhost:3000/affiliate/es-su-contrasena/${documento}/${password}`);
-      if (!resVerPass.ok) throw new Error("Error al verificar la contraseña")
-      const dataVerPass = await resVerPass.json()
-      if (!dataVerPass.existe) {
-        throw new Error("❌ La Contraseña no es correcta");
+      if (!dataPass.existe) {
+        throw new Error("❌ El Afiliado no está registrado")
       }
 
+      // Verificar contraseña
+      /*encodeURIComponent(password) INVESTIGAR SI CONVIENE USAR,HABRIA QUE CAMBIAR COSAS EN EL BACK CALCULO */
+      const resVerPass = await fetch(`http://localhost:3000/affiliate/es-su-contrasena/${documento}/${password}`);
+      if (!resVerPass.ok) {
+        const errorData = await resVerPass.json();
+        throw new Error(errorData.error || "Error al verificar la contraseña");
+      }
+      const dataVerPass = await resVerPass.json()
+      if (!dataVerPass.existe) {
+        throw new Error("❌ La contraseña no es correcta");
+      }
 
+      // Obtener datos del afiliado
       const resAfil = await fetch(`http://localhost:3000/affiliate/afiliado-por-documento/${documento}`)
-      if (!resAfil.ok) throw new Error("Error en el login,Vuelve a intentarlo")
-
+      if (!resAfil.ok) throw new Error("Error en el login. Vuelve a intentarlo")
       const dataAfil = await resAfil.json()
 
-  
+      // Guardar en localStorage
       localStorage.setItem("usuarioLogueado", JSON.stringify(dataAfil))
       const usuario = JSON.parse(localStorage.getItem("usuarioLogueado"))
-    
 
-
+      // Obtener grupo familiar
       const resGrupoFam = await fetch(`http://localhost:3000/affiliate/grupo-familiar/${usuario.perteneceA}`)
-      if(!resGrupoFam.ok) throw  new Error("error GF")
+      if (!resGrupoFam.ok) throw new Error("Error al obtener grupo familiar")
       const dataGrupFam = await resGrupoFam.json()
-      
+
       localStorage.setItem("grupoFamiliar", JSON.stringify(dataGrupFam))
       const grupoFami = JSON.parse(localStorage.getItem("grupoFamiliar"))
-      
 
-      
+
       setErrorMessage("");
       setSuccessMessage(true);
       setTimeout(() => navigate("/home"), 3000);
 
     } catch (err) {
-
       setErrorMessage(err.message);
       setSuccessMessage(false);
-
     }
   };
 

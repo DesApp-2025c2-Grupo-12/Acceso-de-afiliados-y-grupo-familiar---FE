@@ -40,73 +40,148 @@ export default function NuevaReceta({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    //Valida cantidad en frontend
+    if (name === "cantidad") {
+      const num = parseInt(value);
+      if (isNaN(num) || num < 1 || num > 2) return;
+    }
+
+    //Limit observaciones a 300 caracteres
+    if (name === "observaciones" && value.length > 300) return;
+
     setFormData({ ...formData, [name]: value });
   };
 
   const handleGuardar = async () => {
-    try {
-      // Validaciones básicas
-      if (!formData.paciente || !formData.nombreDelMedicamento)
-        throw new Error("Todos los campos son obligatorios");
+  try {
+    // Campos obligatorios
+    if (!formData.paciente) throw new Error("Debe seleccionar un paciente");
+    if (!formData.nombreDelMedicamento)
+      throw new Error("Debe ingresar el nombre del medicamento");
+    if (!formData.presentacion)
+      throw new Error("Debe seleccionar la presentación");
+    if (!formData.cantidad || formData.cantidad < 1 || formData.cantidad > 2)
+      throw new Error("Cantidad inválida (mínimo 1, máximo 2)");
+    if (!formData.observaciones)
+      throw new Error("Debe ingresar observaciones");
+    if (formData.observaciones.length > 300)
+      throw new Error("Observaciones demasiado largas (máximo 300 caracteres)");
 
-      if (
-        !/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]{1,60}$/.test(formData.nombreDelMedicamento)
-      )
-        throw new Error("Nombre del medicamento inválido");
-
-      if (!integrantesCuenta || integrantesCuenta.length === 0)
-        throw new Error(
-          "No se pudo cargar la información del grupo familiar"
-        );
-
-      // Buscar el paciente seleccionado por su DNI (guardado como 'paciente')
-      const pacienteSeleccionado = integrantesCuenta.find(
-        (p) => p.numeroDeDocumento === formData.paciente
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]{1,60}$/.test(formData.nombreDelMedicamento))
+      throw new Error(
+        "Nombre del medicamento inválido (solo letras, números y espacios, máximo 60)"
       );
 
-      // Crear objeto receta
-      const recetaParaEnviar = {
-        paciente: pacienteSeleccionado
-          ? `${pacienteSeleccionado.nombre} ${pacienteSeleccionado.apellido}`
-          : "",
-        numeroDeDocumento: formData.paciente, // DNI del select
-        nombreDelMedicamento: formData.nombreDelMedicamento,
-        cantidad: formData.cantidad,
-        presentacion: formData.presentacion,
-        observaciones: formData.observaciones,
-        estado: "Pendiente",
-      };
+    if (!integrantesCuenta || integrantesCuenta.length === 0)
+      throw new Error("No se pudo cargar la información del grupo familiar");
 
-      const response = await fetch("http://localhost:3000/recipes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(recetaParaEnviar),
-      });
+    // Traer paciente completo
+    const pacienteSeleccionado = integrantesCuenta.find(
+      (p) => p.numeroDeDocumento === formData.paciente
+    );
+    const pacienteNombre = pacienteSeleccionado
+      ? `${pacienteSeleccionado.nombre} ${pacienteSeleccionado.apellido}`
+      : "";
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Error al crear receta");
+    // Validaciones de FRONT (para el mismo mes)
+    const hoy = new Date();
+    const mesActual = hoy.getMonth();
+    const anioActual = hoy.getFullYear();
 
-      // Actualizar lista de recetas
-      setRecetas((prev) => [...prev, data]);
-      setSuccess("Receta creada con éxito");
-      setError("");
+    // Filtrar recetas del mismo paciente en el mes actual
+    const recetasDelPaciente = JSON.parse(localStorage.getItem("recetasCache")) || [];
 
-      // Resetear formulario
-      setFormData({
-        paciente: "",
-        nombreDelMedicamento: "",
-        cantidad: 1,
-        presentacion: "",
-        observaciones: "",
-      });
+    const recetasMes = recetasDelPaciente.filter((r) => {
+      const fecha = new Date(r.createdAt || r.fechaDeEmision || hoy);
+      return (
+        r.numeroDeDocumento === formData.paciente &&
+        fecha.getMonth() === mesActual &&
+        fecha.getFullYear() === anioActual
+      );
+    });
 
-      bsModal.current?.hide();
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-      setSuccess("");
+    // limite total de 30 recetas por mes
+    if (recetasMes.length >= 30) {
+      throw new Error(
+        "Se ha alcanzado el límite de 30 recetas por mes para este paciente"
+      );
     }
-  };
+
+    // Verificar recetas idénticas (mismo medicamento)
+    const recetaDuplicada = recetasMes.find(
+      (r) =>
+        r.nombreDelMedicamento.toLowerCase() ===
+        formData.nombreDelMedicamento.toLowerCase()
+    );
+    if (recetaDuplicada) {
+      throw new Error(
+        `Ya existe una receta para "${formData.nombreDelMedicamento}" en este mes`
+      );
+    }
+
+    //Calcular total de unidades del mismo medicamento
+    const totalCantidad = recetasMes
+      .filter(
+        (r) =>
+          r.nombreDelMedicamento.toLowerCase() ===
+          formData.nombreDelMedicamento.toLowerCase()
+      )
+      .reduce((sum, r) => sum + (r.cantidad || 0), 0);
+
+    const cantidadTotal = totalCantidad + Number(formData.cantidad);
+    if (cantidadTotal > 2) {
+      throw new Error(
+        `Este paciente ya tiene ${totalCantidad} unidades de "${formData.nombreDelMedicamento}" este mes (máximo 2)`
+      );
+    }
+
+   
+  // Si pasa todo, enviar al backend
+const recetaParaEnviar = {
+  paciente: pacienteNombre,
+  nombreDelMedicamento: formData.nombreDelMedicamento,
+  cantidad: formData.cantidad,
+  presentacion: formData.presentacion,
+  observaciones: formData.observaciones,
+  estado: "Recibido", // estado inicial actualizado
+  numeroDeDocumento: "", // temporal para evitar el error
+};
+
+
+    const response = await fetch("http://localhost:3000/recipes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(recetaParaEnviar),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Error al crear receta");
+
+    // Actualizar lista para validaciones futuras
+    setRecetas((prev) => [...prev, data]);
+    const nuevoCache = [...recetasDelPaciente, data];
+    localStorage.setItem("recetasCache", JSON.stringify(nuevoCache));
+
+    setSuccess("Receta creada con éxito");
+    setError("");
+
+    setFormData({
+      paciente: "",
+      nombreDelMedicamento: "",
+      cantidad: 1,
+      presentacion: "",
+      observaciones: "",
+    });
+
+    bsModal.current?.hide();
+  } catch (err) {
+    console.error(err);
+    setError(err.message);
+    setSuccess("");
+  }
+};
+
 
   return (
     <div
@@ -203,6 +278,8 @@ export default function NuevaReceta({
                 name="observaciones"
                 value={formData.observaciones}
                 onChange={handleChange}
+                maxLength={300}
+                placeholder="Ingrese observaciones (máximo 300 caracteres)"
               />
             </div>
           </div>
@@ -233,4 +310,3 @@ export default function NuevaReceta({
     </div>
   );
 }
-

@@ -1,9 +1,10 @@
 export const handleDescargar = (receta, setAlertaDescarga) => {
-  if (receta.estado !== "Aprobada") {
-    setAlertaDescarga("Solo se pueden descargar recetas aprobadas.");
-    setTimeout(() => setAlertaDescarga(""), 3000); // desaparece después de 3s
-    return;
-  }
+  if (receta.estado !== "Aprobado") {
+  setAlertaDescarga("Solo se pueden descargar recetas aprobadas.");
+  setTimeout(() => setAlertaDescarga(""), 3000);
+  return;
+}
+
 
   const formatFecha = (fechaStr) => {
     if (!fechaStr) return "-";
