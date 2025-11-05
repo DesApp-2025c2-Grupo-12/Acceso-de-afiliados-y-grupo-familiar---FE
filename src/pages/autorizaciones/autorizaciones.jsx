@@ -25,14 +25,15 @@ export default function Autorizaciones() {
   const [success, setSuccess] = useState("");
   const [autorizacionSeleccionada, setAutorizacionSeleccionada] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  // Carga de autorizaciones
+  const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
+  const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar") || "[]");
+  const integrantesCuentaStorage = usuarioLogueado ? [usuarioLogueado, ...grupoFamiliar] : [];
   useEffect(() => {
     const fetchAutorizaciones = async () => {
       try {
         const response = await fetch("http://localhost:3000/authorization");
         if (!response.ok) throw new Error("Error al obtener las autorizaciones");
         const data = await response.json();
-
         const listaAdaptada = data.map((item) => ({
           id: item.id,
           fecha: item.fechaDePrestacion,
@@ -44,7 +45,6 @@ export default function Autorizaciones() {
           observaciones: item.observaciones,
           estado: item.estado || "Pendiente",
         }));
-
         setAutorizaciones(listaAdaptada);
       } catch (error) {
         console.error(error);
@@ -53,55 +53,39 @@ export default function Autorizaciones() {
     };
     fetchAutorizaciones();
   }, []);
-
-  // Carga de integrantes
   useEffect(() => {
     const fetchIntegrantes = async () => {
       try {
         const res = await fetch("http://localhost:3000/affiliate");
-        if (!res.ok) throw new Error("Error al obtener los afiliados");
+        if (!res.ok) throw new Error("Error al obtener afiliados");
         const data = await res.json();
-        setIntegrantesCuenta(
-          data.map((i) => ({
-            id: i.id,
-            nombreCompleto: `${i.nombre} ${i.apellido}`,
-          }))
-        );
-      } catch (err) {
-        console.error("Error cargando integrantes:", err);
+  
+        const userDoc = (localStorage.getItem("documentoUsuario") || "").trim();
+        if (!userDoc) {
+          console.warn("No se encontró el documento del usuario logueado");
+          return;
+        }
+        // solo familiares, excluye el titular aunque tenga perteneceA igual a su documento
+        const familiares = data.filter((afiliado) => {
+          const perteneceA = String(afiliado.perteneceA || "").trim();
+          const doc = String(afiliado.numeroDeDocumento || "").trim();
+          return perteneceA === userDoc && doc !== perteneceA;
+        });
+  
+        setIntegrantesCuenta(familiares);
+      } catch (error) {
+        console.error("Error al cargar integrantes:", error);
       }
     };
+  
     fetchIntegrantes();
-  }, []);
-
-  // Función para actualizar una autorización en la lista después de cambios
-  const actualizarAutorizacion = (autorizacionActualizada) => {
-    setAutorizaciones((prev) =>
-      prev.map((a) =>
-        a.id === autorizacionActualizada.id
-          ? {
-              ...a,
-              fecha: autorizacionActualizada.fechaDePrestacion,
-              paciente: autorizacionActualizada.nombreDelAfiliado,
-              medico: autorizacionActualizada.nombreDelMedico,
-              especialidad: autorizacionActualizada.especialidad,
-              lugar: autorizacionActualizada.lugarDePrestacion,
-              internacion: autorizacionActualizada.diasDeInternacion,
-              observaciones: autorizacionActualizada.observaciones,
-              estado: autorizacionActualizada.estado,
-            }
-          : a
-      )
-    );
-  };
-
-  // Filtro de búsqueda
+  }, []);  
+  
   const autorizacionesFiltradas = autorizaciones.filter(
     (a) =>
       a.paciente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       a.medico?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
@@ -116,17 +100,14 @@ export default function Autorizaciones() {
           + Nueva Autorización
         </button>
       </div>
-      {/* alerta de exito */}
       {error && <div className="alert alert-danger text-center mb-4">{error}</div>}
       {success && <div className="alert alert-success text-center mb-4">{success}</div>}
-
       <BuscarAutorizacion
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         hoverBuscar={hoverBuscar}
         setHoverBuscar={setHoverBuscar}
       />
-
       <div className="row">
         {autorizacionesFiltradas.length > 0 ? (
           autorizacionesFiltradas.map((auto) => (
@@ -140,12 +121,10 @@ export default function Autorizaciones() {
           <p className="text-center text-muted mt-4">No se encontraron autorizaciones.</p>
         )}
       </div>
-
-      {/* Modal de Nueva Autorización */}
       <NuevaAutorizacion
         showModal={showModal}
         setShowModal={setShowModal}
-        integrantesCuenta={integrantesCuenta}
+        integrantesCuenta={integrantesCuenta.length > 0 ? integrantesCuenta : integrantesCuentaStorage}
         formData={formData}
         setFormData={setFormData}
         autorizaciones={autorizaciones}
@@ -154,26 +133,14 @@ export default function Autorizaciones() {
         setError={setError}
         success={success}
         setSuccess={setSuccess}
-        onIntegranteSelect={(id) => {
-          const integrante = integrantesCuenta.find((i) => String(i.id) === String(id));
-          if (integrante) {
-            setFormData((prev) => ({
-              ...prev,
-              paciente: integrante.nombreCompleto,
-              pacienteId: integrante.id,
-            }));
-          }
-        }}
       />
-
-      {/* Modal de Ver Autorización */}
       {autorizacionSeleccionada && (
         <VerAutorizacion
           autorizacion={autorizacionSeleccionada}
           setAutorizacionSeleccionada={setAutorizacionSeleccionada}
           setSuccess={setSuccess}
-          setAutorizaciones={setAutorizaciones} 
-          autorizaciones={autorizaciones}       
+          setAutorizaciones={setAutorizaciones}
+          autorizaciones={autorizaciones}
         />
       )}
     </div>

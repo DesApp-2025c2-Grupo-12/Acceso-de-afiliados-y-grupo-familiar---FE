@@ -13,7 +13,6 @@ export default function NuevaAutorizacion({
   success,
   setSuccess,
 }) {
-
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
@@ -22,10 +21,8 @@ export default function NuevaAutorizacion({
       return () => clearTimeout(timer);
     }
   }, [success, setSuccess]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const payload = {
         fechaDePrestacion: formData.fecha,
@@ -38,17 +35,13 @@ export default function NuevaAutorizacion({
         observaciones: formData.observaciones,
         estado: "Pendiente",
       };
-
       const res = await fetch("http://localhost:3000/authorization", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
-
       setAutorizaciones([
         ...autorizaciones,
         {
@@ -60,7 +53,6 @@ export default function NuevaAutorizacion({
           estado: data.estado || "Pendiente",
         },
       ]);
-
       setSuccess("Autorización agregada correctamente");
       setError("");
       setFormData({
@@ -81,15 +73,11 @@ export default function NuevaAutorizacion({
       setSuccess("");
     }
   };
-
   if (!showModal) return null;
-
-  //  Calcula fecha mínima (hoy) y máxima (2 años desde hoy)
   const today = new Date().toISOString().split("T")[0];
   const twoYearsLater = new Date();
   twoYearsLater.setFullYear(twoYearsLater.getFullYear() + 2);
   const maxDate = twoYearsLater.toISOString().split("T")[0];
-
   return (
     <div
       className="modal d-block"
@@ -113,7 +101,6 @@ export default function NuevaAutorizacion({
           <div className="modal-body">
             {error && <div className="alert alert-danger">{error}</div>}
             {success && <div className="alert alert-success">{success}</div>}
-
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label>Fecha</label>
@@ -129,34 +116,32 @@ export default function NuevaAutorizacion({
                   required
                 />
               </div>
-
               <div className="mb-3">
                 <label>Integrante</label>
                 <select
                   className="form-select"
-                  value={formData.pacienteId || ""}
+                  value={formData.pacienteId}
                   onChange={(e) => {
-                    const i = integrantesCuenta.find(
-                      (i) => String(i.id) === e.target.value
+                    const integranteSeleccionado = integrantesCuenta.find(
+                      (i) => String(i.id) === String(e.target.value)
                     );
-                    if (i)
-                      setFormData({
-                        ...formData,
-                        pacienteId: i.id,
-                        paciente: i.nombreCompleto,
-                      });
+                    setFormData({
+                      ...formData,
+                      pacienteId: e.target.value,
+                      paciente: integranteSeleccionado
+                        ? `${integranteSeleccionado.nombre} ${integranteSeleccionado.apellido}`
+                        : "",
+                    });
                   }}
-                  required
                 >
                   <option value="">Seleccionar integrante</option>
                   {integrantesCuenta.map((i) => (
                     <option key={i.id} value={i.id}>
-                      {i.nombreCompleto}
+                      {i.nombre} {i.apellido}
                     </option>
                   ))}
                 </select>
               </div>
-
               <div className="mb-3">
                 <label>Médico</label>
                 <input
@@ -169,7 +154,6 @@ export default function NuevaAutorizacion({
                   required
                 />
               </div>
-
               <div className="mb-3">
                 <label>Especialidad</label>
                 <input
@@ -182,7 +166,6 @@ export default function NuevaAutorizacion({
                   required
                 />
               </div>
-
               <div className="mb-3">
                 <label>Lugar</label>
                 <input
@@ -195,7 +178,6 @@ export default function NuevaAutorizacion({
                   required
                 />
               </div>
-
               <div className="mb-3">
                 <label>Días de internación</label>
                 <input
@@ -209,7 +191,6 @@ export default function NuevaAutorizacion({
                   required
                 />
               </div>
-
               <div className="mb-3">
                 <label>Observaciones</label>
                 <textarea
@@ -220,7 +201,6 @@ export default function NuevaAutorizacion({
                   }
                 ></textarea>
               </div>
-
               <div className="modal-footer">
                 <button type="submit" className="btn btn-primary">
                   Guardar
