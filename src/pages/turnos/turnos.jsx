@@ -56,12 +56,10 @@ export default function Turnos() {
       }
 
 
-      const response = await fetch(`http://localhost:3000/appointment/${turno.id}`, {
+      const response = await fetch(`http://localhost:3000/appointment/${turno.id}/cancel`, {
         method: 'PUT',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          affiliateId: null
-        })
+        
       });
 
       if (!response.ok) throw new Error('Error al cancelar el turno');

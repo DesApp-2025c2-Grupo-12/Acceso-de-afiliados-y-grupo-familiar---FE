@@ -203,17 +203,14 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
       if (!afiliadoQueReserva) throw new Error("No se ha seleccionado un afiliado para este turno")
 
       const bodyData = parseInt(afiliadoQueReserva)
-      const turnoReservado = await fetch(`http://localhost:3000/appointment/${turno.id}`, {
+      const turnoReservado = await fetch(`http://localhost:3000/appointment/${turno.id}/assign/${bodyData}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          affiliateId: bodyData
-        })
-
-      })
+        headers: { "Content-Type": "application/json" }
+      });
 
       if (!turnoReservado.ok) {
-        throw new Error("Error en la respuesta del servidor");
+        const errorData = await turnoReservado.json();
+        throw new Error(errorData.error || "Error en la respuesta del servidor");
       }
 
       setSuccessMessage("¡Turno reservado correctamente!");
