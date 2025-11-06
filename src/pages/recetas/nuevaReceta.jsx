@@ -145,7 +145,7 @@ const recetaParaEnviar = {
   presentacion: formData.presentacion,
   observaciones: formData.observaciones,
   estado: "Recibido", // estado inicial actualizado
-  numeroDeDocumento: "", // temporal para evitar el error
+  numeroDeDocumento: formData.paciente, // temporal para evitar el error
 };
 
 
