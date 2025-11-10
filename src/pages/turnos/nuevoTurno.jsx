@@ -7,14 +7,13 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
   const [turnosSinRerva, setTurnosSinReserva] = useState([])
   const [especialidad, setEspecialidad] = useState("");
   const [diaSeleccionado, setDiaSeleccionado] = useState("");
-  const [afiliadosSeleccionados, setAfiliadosSeleccionados] = useState({})
+  const [afiliadoSeleccionado, setAfiliadoSeleccionado] = useState("");
   const [fechaInicioSemana, setFechaInicioSemana] = useState(() => {
     return getLunesSemanaActual();
   });
 
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
 
   // Función para obtener el lunes de la semana actual
   function getLunesSemanaActual() {
@@ -154,6 +153,7 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
       console.error("Error:", error);
     }
   }
+
   const cargarEspecialidades = async () => {
     try {
       const especialidadesRes = await fetch(`http://localhost:3000/appointment/especialidades/`)
@@ -166,16 +166,12 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
   }
 
   useEffect(() => {
-
     if (pantallaNuevoTurno) {
-
       cargarEspecialidades();
       obtenerTurnosNoReservados();
-
-
       setEspecialidad("");
       setDiaSeleccionado("");
-      setAfiliadosSeleccionados({});
+      setAfiliadoSeleccionado(""); // Reset del afiliado seleccionado
       setFechaInicioSemana(getLunesSemanaActual());
     }
   }, [pantallaNuevoTurno])
@@ -185,24 +181,17 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
     turno.fecha === diaSeleccionado
   )
 
-  const handleAfiliadoChange = (turnoId, afiliadoId) => {
-    setAfiliadosSeleccionados(prev => ({
-      ...prev,
-      [turnoId]: afiliadoId
-    }));
-
-  }
   const reservarTurno = async (turno) => {
     try {
-
       setErrorMessage("");
       setSuccessMessage("");
 
 
-      const afiliadoQueReserva = afiliadosSeleccionados[turno.id];
-      if (!afiliadoQueReserva) throw new Error("No se ha seleccionado un afiliado para este turno")
+      if (!afiliadoSeleccionado) {
+        throw new Error("No se ha seleccionado un afiliado para reservar el turno");
+      }
 
-      const bodyData = parseInt(afiliadoQueReserva)
+      const bodyData = parseInt(afiliadoSeleccionado);
       const turnoReservado = await fetch(`http://localhost:3000/appointment/${turno.id}/assign/${bodyData}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" }
@@ -215,32 +204,23 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
 
       setSuccessMessage("¡Turno reservado correctamente!");
 
-      await obtenerTurnosNoReservados()
 
-      setAfiliadosSeleccionados(prev => {
-        const nuevos = { ...prev };
-        delete nuevos[turno.id];
-        return nuevos;
-      });
       setEspecialidad("");
       setDiaSeleccionado("");
-      setAfiliadosSeleccionados({});
+      setAfiliadoSeleccionado("");
 
       await obtenerTurnosNoReservados();
       await cargarEspecialidades();
 
-
       setTimeout(() => {
         setPantallaNuevoTurno(false);
       }, 2000);
-
 
     } catch (error) {
       console.error("Error:", error);
       setErrorMessage(error.message || "Error al reservar el turno");
     }
   }
-
 
   return (
     <Container className="my-4 border border-dark">
@@ -268,15 +248,40 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
         </div>
       )}
 
+      {/* Filtros superiores - Especialidad y Afiliado */}
       <Row className="mb-4">
-        <Col md={12}>
-          <Form.Select value={especialidad} onChange={(e) => {
-            setEspecialidad(e.target.value);
-            setDiaSeleccionado("");
-            setFechaInicioSemana(getLunesSemanaActual());
-          }}>
+        <Col md={6}>
+          <Form.Select
+            value={especialidad}
+            onChange={(e) => {
+              setEspecialidad(e.target.value);
+              setDiaSeleccionado("");
+              setFechaInicioSemana(getLunesSemanaActual());
+            }}
+          >
             <option value="">Selecciona una especialidad</option>
             {especialidades.map(esp => <option key={esp} value={esp}>{esp}</option>)}
+          </Form.Select>
+        </Col>
+        <Col md={6}>
+          <Form.Select
+            value={afiliadoSeleccionado}
+            onChange={(e) => {
+              setAfiliadoSeleccionado(e.target.value);
+              setErrorMessage("");
+            }
+            }
+          >
+            <option value="">Selecciona un afiliado</option>
+            {integrantesCuenta && integrantesCuenta.length > 0 ? (
+              integrantesCuenta.map(afiliado => (
+                <option key={afiliado.id} value={afiliado.id}>
+                  {afiliado.nombre} {afiliado.apellido} ({afiliado.parentesco})
+                </option>
+              ))
+            ) : (
+              <option value="" disabled>No hay afiliados disponibles</option>
+            )}
           </Form.Select>
         </Col>
       </Row>
@@ -381,7 +386,7 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
             Turnos disponibles para el {proximosDias.find(d => d.fechaISO === diaSeleccionado)?.label}:
           </h5>
 
-
+         
 
           <Row>
             {turnosFiltrados.map(turno => (
@@ -393,44 +398,17 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
                     { label: "Fecha", value: turno.fecha },
                     { label: "Hora", value: turno.horario },
                     { label: "Lugar", value: turno.lugarDeAtencion },
-
                   ]}
-                  contenidoAdicional={
-                    <div className="mb-3">
-                      <label htmlFor={`afiliado-${turno.id}`} className="form-label">
-                        Seleccionar afiliado:
-                      </label>
-
-
-                      <select
-                        id={`afiliado-${turno.id}`}
-                        className="form-select"
-                        value={afiliadosSeleccionados[turno.id] || ""}
-                        onChange={(e) => handleAfiliadoChange(turno.id, e.target.value)}
-                      >
-                        <option value="">Seleccione un afiliado</option>
-                        {integrantesCuenta && integrantesCuenta.length > 0 ? (
-                          integrantesCuenta.map(afiliado => (
-                            <option key={afiliado.id} value={afiliado.id}>
-                              {afiliado.nombre} {afiliado.apellido}
-                            </option>
-                          ))
-                        ) : (
-                          <option value="" disabled>No hay afiliados disponibles</option>
-                        )}
-                      </select>
-
-                    </div>
-                  }
                   botonTexto="Reservar"
                   onClick={() => reservarTurno(turno)}
+                  // Mostrar mensaje si no hay afiliado seleccionado
+                  disabled={!afiliadoSeleccionado}
                 />
               </Col>
             ))}
           </Row>
         </>
       )}
-
     </Container>
   );
 }
