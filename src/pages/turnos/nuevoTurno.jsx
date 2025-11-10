@@ -190,6 +190,8 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
       if (!afiliadoSeleccionado) {
         throw new Error("No se ha seleccionado un afiliado para reservar el turno");
       }
+      
+      //Agregar validacion que solo se pueda sacar turno si es hijo del usuario.
 
       const bodyData = parseInt(afiliadoSeleccionado);
       const turnoReservado = await fetch(`http://localhost:3000/appointment/${turno.id}/assign/${bodyData}`, {
@@ -224,7 +226,19 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
 
   return (
     <Container className="my-4 border border-dark">
-      <h2 className="mb-4">Nuevo Turno</h2>
+
+      <div className="d-flex justify-content-between align-items-center mb-4 pt-3">
+        <Button
+          variant="primary"
+          className="fw-bold px-4 py-2 fs-5 rounded-3"
+          style={{ background: "#132074", border: "none" }}
+          onClick={() => setPantallaNuevoTurno(false)}
+        >
+          Volver
+        </Button>
+        <h2 className="mb-0">Nuevo Turno</h2>
+        <div style={{ width: "100px" }}></div> {/* Espacio vacío para balancear */}
+      </div>
 
       {(errorMessage || successMessage) && (
         <div className="sticky-top" style={{ top: '20px', zIndex: 100 }}>
@@ -386,7 +400,7 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
             Turnos disponibles para el {proximosDias.find(d => d.fechaISO === diaSeleccionado)?.label}:
           </h5>
 
-         
+
 
           <Row>
             {turnosFiltrados.map(turno => (

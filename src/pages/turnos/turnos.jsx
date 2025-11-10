@@ -8,6 +8,7 @@ export default function Turnos() {
   const [alerta, setAlerta] = useState({ msg: "", tipo: "success" });
   const [turnos, setTurnos] = useState([]);
   const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
+  const [turnosHijos, setTurnosHijos] = useState([]);
 
 
 
@@ -16,9 +17,26 @@ export default function Turnos() {
   const obtenerTurnosDeAPI = async () => {
     try {
       const resTurnos = await fetch(`http://localhost:3000/appointment/turnosFuturos/${usuarioLogueado.id}`)
-      if (!resTurnos.ok) throw new Error("Error al cargar los turnos")
+      if (!resTurnos.ok) {
+        const errorData = await resTurnos.json();
+        throw new Error(errorData.error || "Error en la respuesta del servidor");
+      }
       const dataTurnos = await resTurnos.json();
       setTurnos(dataTurnos)
+    } catch (error) {
+      setAlerta({ msg: error.message, tipo: "danger" });
+    }
+  }
+
+  const obtenerTurnosHijosAPI = async () => {
+    try {
+      const resTurnosHijos = await fetch(`http://localhost:3000/appointment/${usuarioLogueado.id}/turnosHijos`)
+      if (!resTurnosHijos.ok) {
+        const errorData = await resTurnosHijos.json();
+        throw new Error(errorData.error || "Error en la respuesta del servidor");
+      }
+      const dataTurnosHijos = await resTurnosHijos.json()
+      setTurnosHijos(dataTurnosHijos)
     } catch (error) {
       setAlerta({ msg: error.message, tipo: "danger" });
     }
@@ -27,18 +45,19 @@ export default function Turnos() {
 
   useEffect(() => {
     obtenerTurnosDeAPI()
+    obtenerTurnosHijosAPI()
     const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
     setIntegrantesCuenta(grupoFamiliar);
   }, [])
 
   useEffect(() => {
     if (!pantallaNuevoTurno) {
-      // Cuando se cierra NuevoTurno, recargar los turnos del afiliado
       obtenerTurnosDeAPI();
+      obtenerTurnosHijosAPI()
     }
   }, [pantallaNuevoTurno]);
 
-  // Función para generar fecha completa de turno
+
 
 
   const cancelarTurno = async (turno) => {
@@ -59,7 +78,7 @@ export default function Turnos() {
       const response = await fetch(`http://localhost:3000/appointment/${turno.id}/cancel`, {
         method: 'PUT',
         headers: { "Content-Type": "application/json" },
-        
+
       });
 
       if (!response.ok) throw new Error('Error al cancelar el turno');
@@ -81,12 +100,16 @@ export default function Turnos() {
     (a, b) => new Date(a.fechaYHora) - new Date(b.fechaYHora)
   );
 
+  const turnosOrdenadosHijos = [...turnosHijos].sort(
+    (a, b) => new Date(a.fechaYHora) - new Date(b.fechaYHora)
+  );
+
   return (
     <Container className="my-4">
       {!pantallaNuevoTurno ? (
         <>
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2>Mis Turnos</h2>
+            <h2>Turnos</h2>
             <Button
               variant="primary"
               className="fw-bold px-4 py-2 fs-5 rounded-3"
@@ -100,27 +123,79 @@ export default function Turnos() {
           {alerta.msg && <Alert variant={alerta.tipo}>{alerta.msg}</Alert>}
 
           <Row>
-            {turnosOrdenados.map(turno => (
-              <Col md={6} lg={4} key={turno.id} className="mb-3">
-                <CardPersonalizada
-                  title={turno.nombreDelPrestador}
-                  subtitle={turno.especialidad}
-                  tipo={turno.tipo}
-                  detalles={[
-                    { label: "Fecha", value: turno.fecha },
-                    { label: "horario", value: turno.horario },
-                    { label: "Lugar", value: turno.lugarDeAtencion },
-                  ]}
-                  botonTexto="Dar de baja"
-                  onClick={() => cancelarTurno(turno)}
-                />
-              </Col>
-            ))}
-            {turnosOrdenados.length === 0 && (
-              <div className="text-center py-5 mt-5" style={{ minHeight: "50vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                <h5 className="text-muted mb-3">No hay turnos reservados</h5>
-              </div>
-            )}
+            {/* Columna Mis Turnos */}
+            <Col md={6}>
+              <Card className="h-100 border shadow-sm">
+                <Card.Header className="bg-light">
+                  <h4 className="mb-0">Mis Turnos</h4>
+                </Card.Header>
+                <Card.Body className="d-flex flex-column">
+                  {turnosOrdenados.length > 0 ? (
+                    <Row>
+                      {turnosOrdenados.map(turno => (
+                        <Col md={12} key={turno.id} className="mb-3">
+                          <CardPersonalizada
+                            title={turno.nombreDelPrestador}
+                            subtitle={turno.especialidad}
+                            tipo={turno.tipo}
+                            detalles={[
+                              { label: "Fecha", value: turno.fecha },
+                              { label: "Horario", value: turno.horario },
+                              { label: "Lugar", value: turno.lugarDeAtencion },
+                            ]}
+                            botonTexto="Dar de baja"
+                            onClick={() => cancelarTurno(turno)}
+                          />
+                        </Col>
+                      ))}
+                    </Row>
+                  ) : (
+                    <div className="text-center py-5 flex-grow-1 d-flex align-items-center justify-content-center">
+                      <div>
+                        <h5 className="text-muted mb-3">No tenés turnos asignados actualmente</h5>
+                      </div>
+                    </div>
+                  )}
+                </Card.Body>
+              </Card>
+            </Col>
+
+            {/* Columna Turnos Hijos */}
+            <Col md={6}>
+              <Card className="h-100 border shadow-sm">
+                <Card.Header className="bg-light">
+                  <h4 className="mb-0">Turnos Hijos</h4>
+                </Card.Header>
+                <Card.Body className="d-flex flex-column">
+                  {turnosOrdenadosHijos.length > 0 ? (
+                    <Row>
+                      {turnosOrdenadosHijos.map(turno => (
+                        <Col md={12} key={turno.id} className="mb-3">
+                          <CardPersonalizada
+                            title={turno.nombreDelPrestador}
+                            subtitle={turno.especialidad}
+                            tipo={turno.tipo}
+                            detalles={[
+                              { label: "Fecha", value: turno.fecha },
+                              { label: "Horario", value: turno.horario },
+                              { label: "Lugar", value: turno.lugarDeAtencion },
+                            ]}
+                            botonTexto="Dar de baja"
+                            onClick={() => cancelarTurno(turno)}
+                          />
+                        </Col>
+                      ))}
+                    </Row>
+                  ) : (
+                    <div className="text-center py-5 flex-grow-1 d-flex align-items-center justify-content-center">
+                      <div>
+                        <h5 className="text-muted mb-3">No hay turnos asignados a tus hijos</h5>
+                      </div>
+                    </div>
+                  )}
+                </Card.Body>
+              </Card>
+            </Col>
           </Row>
         </>
       ) : (
@@ -130,7 +205,8 @@ export default function Turnos() {
           integrantesCuenta={integrantesCuenta}
           pantallaNuevoTurno={pantallaNuevoTurno}
         />
-      )}
-    </Container>
+      )
+      }
+    </Container >
   );
 }
