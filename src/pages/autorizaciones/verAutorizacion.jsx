@@ -101,7 +101,7 @@ export default function VerAutorizacion({
 
             <div className="modal-body text-start">
               <p>
-                <strong>Fecha prevista:</strong> {autorizacion.fecha}
+                <strong>Estado:</strong> {autorizacion.estado}
               </p>
               <p>
                 <strong>Integrante:</strong> {autorizacion.paciente}
@@ -123,7 +123,7 @@ export default function VerAutorizacion({
                 {autorizacion.observaciones || "Ninguna"}
               </p>
               <p>
-                <strong>Estado:</strong> {autorizacion.estado}
+                <strong>Fecha prevista:</strong> {autorizacion.fecha}
               </p>
 
               {/* Si está Observada, permitir escribir motivo */}

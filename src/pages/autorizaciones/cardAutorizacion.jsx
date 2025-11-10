@@ -23,7 +23,7 @@ export default function CardAutorizacion({ autorizacion, setAutorizacionSeleccio
       <CardPersonalizada
         title={
           <div className="d-flex justify-content-between align-items-center">
-            <span className="fw-semibold">Autorización</span>
+            <span className="fw-semibold"></span>
             <span className={`badge ${estadoClass} px-3 py-2`}>{autorizacion.estado}</span>
           </div>
         }
