@@ -28,6 +28,11 @@ export default function Autorizaciones() {
   const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
   const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar") || "[]");
   const integrantesCuentaStorage = usuarioLogueado ? [usuarioLogueado, ...grupoFamiliar] : [];
+
+  // ESTADOS NUEVOS para el modal de confirmación de borrado
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [autorizacionAEliminar, setAutorizacionAEliminar] = useState(null);
+
   useEffect(() => {
     const fetchAutorizaciones = async () => {
       try {
@@ -53,13 +58,14 @@ export default function Autorizaciones() {
     };
     fetchAutorizaciones();
   }, []);
+
   useEffect(() => {
     const fetchIntegrantes = async () => {
       try {
         const res = await fetch("http://localhost:3000/affiliate");
         if (!res.ok) throw new Error("Error al obtener afiliados");
         const data = await res.json();
-  
+
         const userDoc = (localStorage.getItem("documentoUsuario") || "").trim();
         if (!userDoc) {
           console.warn("No se encontró el documento del usuario logueado");
@@ -71,21 +77,63 @@ export default function Autorizaciones() {
           const doc = String(afiliado.numeroDeDocumento || "").trim();
           return perteneceA === userDoc && doc !== perteneceA;
         });
-  
+
         setIntegrantesCuenta(familiares);
       } catch (error) {
         console.error("Error al cargar integrantes:", error);
       }
     };
-  
+
     fetchIntegrantes();
-  }, []);  
-  
+  }, []);
+
   const autorizacionesFiltradas = autorizaciones.filter(
     (a) =>
       a.paciente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       a.medico?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  //  FUNCIÓN para abrir el modal al presionar el tachito
+  const handleRequestDelete = (autorizacion) => {
+    setAutorizacionAEliminar(autorizacion);
+    setShowDeleteModal(true);
+  };
+
+  //  FUNCIÓN para cancelar el modal
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setAutorizacionAEliminar(null);
+  };
+
+  //  FUNCIÓN para confirmar y ejecutar el DELETE
+  const handleConfirmDelete = async () => {
+    if (!autorizacionAEliminar) return;
+
+    try {
+      const res = await fetch(
+        `http://localhost:3000/authorization/${autorizacionAEliminar.id}`,
+        { method: "DELETE" }
+      );
+
+      if (!res.ok) throw new Error("Error al eliminar la autorización");
+
+      // quitar del estado local
+      setAutorizaciones((prev) =>
+        prev.filter((a) => a.id !== autorizacionAEliminar.id)
+      );
+
+      setSuccess("Autorización eliminada correctamente.");
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      console.error(err);
+      setError("No se pudo eliminar la autorización.");
+      setTimeout(() => setError(""), 3000);
+    } finally {
+      setShowDeleteModal(false);
+      setAutorizacionAEliminar(null);
+    }
+  };
+
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
@@ -100,14 +148,17 @@ export default function Autorizaciones() {
           + Nueva Autorización
         </button>
       </div>
+
       {error && <div className="alert alert-danger text-center mb-4">{error}</div>}
       {success && <div className="alert alert-success text-center mb-4">{success}</div>}
+
       <BuscarAutorizacion
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         hoverBuscar={hoverBuscar}
         setHoverBuscar={setHoverBuscar}
       />
+
       <div className="row">
         {autorizacionesFiltradas.length > 0 ? (
           autorizacionesFiltradas.map((auto) => (
@@ -115,16 +166,22 @@ export default function Autorizaciones() {
               key={auto.id}
               autorizacion={auto}
               setAutorizacionSeleccionada={setAutorizacionSeleccionada}
+              onRequestDelete={handleRequestDelete} // pasamos la función al card
             />
           ))
         ) : (
-          <p className="text-center text-muted mt-4">No se encontraron autorizaciones.</p>
+          <p className="text-center text-muted mt-4">
+            No se encontraron autorizaciones.
+          </p>
         )}
       </div>
+
       <NuevaAutorizacion
         showModal={showModal}
         setShowModal={setShowModal}
-        integrantesCuenta={integrantesCuenta.length > 0 ? integrantesCuenta : integrantesCuentaStorage}
+        integrantesCuenta={
+          integrantesCuenta.length > 0 ? integrantesCuenta : integrantesCuentaStorage
+        }
         formData={formData}
         setFormData={setFormData}
         autorizaciones={autorizaciones}
@@ -134,6 +191,7 @@ export default function Autorizaciones() {
         success={success}
         setSuccess={setSuccess}
       />
+
       {autorizacionSeleccionada && (
         <VerAutorizacion
           autorizacion={autorizacionSeleccionada}
@@ -142,6 +200,65 @@ export default function Autorizaciones() {
           setAutorizaciones={setAutorizaciones}
           autorizaciones={autorizaciones}
         />
+      )}
+
+      {/*  MODAL de confirmación de borrado */}
+      {showDeleteModal && autorizacionAEliminar && (
+        <>
+          <div className="modal-backdrop fade show" style={{ zIndex: 1040 }}></div>
+
+          <div
+            className="modal d-block"
+            tabIndex="-1"
+            role="dialog"
+            style={{ zIndex: 1050 }}
+            onClick={handleCancelDelete}
+          >
+            <div
+              className="modal-dialog modal-dialog-centered"
+              role="document"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Confirmar eliminación</h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    aria-label="Close"
+                    onClick={handleCancelDelete}
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <p>
+                    ¿Querés eliminar la autorización de{" "}
+                    <strong>{autorizacionAEliminar.paciente}</strong> con fecha{" "}
+                    <strong>{autorizacionAEliminar.fecha}</strong>?
+                  </p>
+                  <p className="text-muted small">
+                    Esta acción no se puede deshacer.
+                  </p>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={handleCancelDelete}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={handleConfirmDelete}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
