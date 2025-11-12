@@ -29,18 +29,14 @@ export default function RenovarReceta({
   useEffect(() => {
     if (!receta || !bsModal.current) return;
 
-   if (receta.estado !== "Aprobado") {
-  // Limpia antes de volver a mostrar el mismo mensaje
-  setError("");
-  setTimeout(() => {
-    setError("Solo se pueden renovar recetas aprobadas");
-  }, 10);
-  
-  setSuccess("");
-  return;
-
-}
-
+    if (receta.estado !== "Aprobado") {
+      setError("");
+      setTimeout(() => {
+        setError("Solo se pueden renovar recetas aprobadas");
+      }, 10);
+      setSuccess("");
+      return;
+    }
 
     setFormData({
       paciente: receta.paciente || "",
@@ -66,7 +62,56 @@ export default function RenovarReceta({
 
   const handleGuardar = async () => {
     try {
-      const recetaRenovada = { ...formData, estado: "Pendiente" };
+      if (!formData.cantidad || formData.cantidad < 1 || formData.cantidad > 2) {
+        throw new Error("Cantidad inválida (mínimo 1, máximo 2)");
+      }
+
+      // Traer recetas del paciente desde cache local
+      const recetasDelPaciente = JSON.parse(localStorage.getItem("recetasCache")) || [];
+      const hoy = new Date();
+      const mesActual = hoy.getMonth();
+      const anioActual = hoy.getFullYear();
+
+      // Filtrar recetas del mismo paciente y mes actual, excluyendo la receta original
+      const recetasMes = recetasDelPaciente.filter((r) => {
+        const fecha = new Date(r.createdAt || r.fechaDeEmision || hoy);
+        return (
+          r.numeroDeDocumento === receta.numeroDeDocumento &&
+          fecha.getMonth() === mesActual &&
+          fecha.getFullYear() === anioActual &&
+          r.id !== receta.id
+        );
+      });
+
+      // Calcular total de unidades del mismo medicamento (solo recetas que no están aprobadas)
+      const totalCantidad = recetasMes
+        .filter(
+          (r) =>
+            r.nombreDelMedicamento.toLowerCase() ===
+              formData.nombreDelMedicamento.toLowerCase() &&
+            r.estado !== "Aprobado"
+        )
+        .reduce((sum, r) => sum + (r.cantidad || 0), 0);
+
+      const cantidadTotal = totalCantidad + Number(formData.cantidad);
+      if (cantidadTotal > 2) {
+        throw new Error(
+          `Este paciente ya tiene ${totalCantidad} unidades de "${formData.nombreDelMedicamento}" este mes (máximo 2)`
+        );
+      }
+
+      // Construir objeto para enviar al backend
+      const recetaRenovada = {
+        paciente: formData.paciente,
+        nombreDelMedicamento: formData.nombreDelMedicamento,
+        cantidad: formData.cantidad,
+        presentacion: formData.presentacion,
+        observaciones: formData.observaciones,
+        estado: "Recibido", // siempre recibido al renovar
+        numeroDeDocumento: receta.numeroDeDocumento,
+        affiliateId: receta.affiliateId,
+        fechaDeEmision: new Date(), // nueva fecha de emisión
+      };
 
       const response = await fetch(`http://localhost:3000/recipes/${receta.id}`, {
         method: "PUT",
@@ -77,7 +122,13 @@ export default function RenovarReceta({
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Error al renovar receta");
 
+      // Actualizar lista de recetas
       setRecetas((prev) => prev.map((r) => (r.id === receta.id ? data : r)));
+
+      // Actualizar cache local para futuras validaciones
+      const nuevoCache = recetasDelPaciente.map((r) => (r.id === receta.id ? data : r));
+      localStorage.setItem("recetasCache", JSON.stringify(nuevoCache));
+
       setSuccess("Receta renovada con éxito");
       setError("");
       bsModal.current.hide();
