@@ -189,9 +189,17 @@ export default function Autorizaciones() {
       <NuevaAutorizacion
         showModal={showModal}
         setShowModal={setShowModal}
-        integrantesCuenta={
-          integrantesCuenta.length > 0 ? integrantesCuenta : integrantesCuentaStorage
-        }
+        integrantesCuenta={(() => {
+          const lista = integrantesCuenta.length > 0 ? integrantesCuenta : integrantesCuentaStorage;
+          // eliminar duplicados por documento o id
+          const vistos = new Set();
+          return lista.filter((i) => {
+            const doc = i.numeroDeDocumento || i.documento || "";
+            if (vistos.has(doc)) return false;
+            vistos.add(doc);
+            return true;
+          });
+        })()}
         formData={formData}
         setFormData={setFormData}
         autorizaciones={autorizaciones}
