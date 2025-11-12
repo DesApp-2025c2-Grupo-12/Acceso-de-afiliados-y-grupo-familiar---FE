@@ -4,7 +4,6 @@ export default function VerAutorizacion({
   autorizacion,
   setAutorizacionSeleccionada,
   setSuccess, // viene del padre prop
-  autorizaciones, // viene del padre prop
   setAutorizaciones, // viene del padre prop
 }) {
   const [show, setShow] = useState(false);

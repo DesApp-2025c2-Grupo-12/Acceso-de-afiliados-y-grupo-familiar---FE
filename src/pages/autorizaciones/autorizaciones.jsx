@@ -39,17 +39,27 @@ export default function Autorizaciones() {
         const response = await fetch("http://localhost:3000/authorization");
         if (!response.ok) throw new Error("Error al obtener las autorizaciones");
         const data = await response.json();
-        const listaAdaptada = data.map((item) => ({
-          id: item.id,
-          fecha: item.fechaDePrestacion,
-          paciente: item.nombreDelAfiliado,
-          medico: item.nombreDelMedico,
-          especialidad: item.especialidad,
-          lugar: item.lugarDePrestacion,
-          internacion: item.diasDeInternacion,
-          observaciones: item.observaciones,
-          estado: item.estado || "Pendiente",
-        }));
+        const listaAdaptada = data.map((item) => {
+        // transformar la fecha a dd/mm/aaaa
+          const fechaOriginal = item.fechaDePrestacion;
+          let fechaFormateada = fechaOriginal;
+          if (fechaOriginal && fechaOriginal.includes("-")) {
+            const [yyyy, mm, dd] = fechaOriginal.split("-");
+            fechaFormateada = `${dd}/${mm}/${yyyy}`;
+          }
+
+          return {
+            id: item.id,
+            fecha: fechaFormateada,
+            paciente: item.nombreDelAfiliado,
+            medico: item.nombreDelMedico,
+            especialidad: item.especialidad,
+            lugar: item.lugarDePrestacion,
+            internacion: item.diasDeInternacion,
+            observaciones: item.observaciones,
+            estado: item.estado || "Pendiente",
+          };
+        });
         setAutorizaciones(listaAdaptada);
       } catch (error) {
         console.error(error);
