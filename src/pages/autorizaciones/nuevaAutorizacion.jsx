@@ -41,7 +41,12 @@ export default function NuevaAutorizacion({
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
+      if (!res.ok) {
+        const mensajeError = data.message || data.error || `Error ${res.status}`;
+        // Si el backend devolvió un array de errores de Joi, los unimos
+        const detalleError = data.errors ? data.errors.join(". ") : "";
+        throw new Error(`${mensajeError}${detalleError ? ": " + detalleError : ""}`);
+      }
       setAutorizaciones([
         ...autorizaciones,
         {
