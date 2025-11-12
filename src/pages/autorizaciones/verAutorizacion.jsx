@@ -103,9 +103,6 @@ export default function VerAutorizacion({
                 <strong>Estado:</strong> {autorizacion.estado}
               </p>
               <p>
-                <strong>Integrante:</strong> {autorizacion.paciente}
-              </p>
-              <p>
                 <strong>Médico:</strong> {autorizacion.medico}
               </p>
               <p>

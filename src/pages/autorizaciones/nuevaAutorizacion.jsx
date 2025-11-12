@@ -47,9 +47,11 @@ export default function NuevaAutorizacion({
         {
           id: data.id || Date.now(),
           fecha: data.fechaDePrestacion,
-          paciente: data.nombreDelAfiliado,
           medico: data.nombreDelMedico,
           especialidad: data.especialidad,
+          lugar: data.lugarDePrestacion,
+          observaciones: data.observaciones,
+          internacion: data.diasDeInternacion,
           estado: data.estado || "Pendiente",
         },
       ]);
@@ -62,7 +64,7 @@ export default function NuevaAutorizacion({
         medico: "",
         especialidad: "",
         lugar: "",
-        internacion: 1,
+        internacion: 0,
         observaciones: "",
         tipodeAF: "",
       });
@@ -185,9 +187,10 @@ export default function NuevaAutorizacion({
                   className="form-control"
                   value={formData.internacion}
                   onChange={(e) =>
-                    setFormData({ ...formData, internacion: e.target.value })
+                    setFormData({ ...formData, internacion: Number(e.target.value) })
                   }
-                  min={1}
+                  min={0}
+                  placeholder="0"
                   required
                 />
               </div>

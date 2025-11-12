@@ -16,7 +16,7 @@ export default function Autorizaciones() {
     medico: "",
     especialidad: "",
     lugar: "",
-    internacion: 1,
+    internacion: 0,
     observaciones: "",
     tipodeAF: "",
   });
