@@ -1,10 +1,11 @@
+import { jsPDF } from "jspdf";
+
 export const handleDescargar = (receta, setAlertaDescarga) => {
   if (receta.estado !== "Aprobado") {
-  setAlertaDescarga("Solo se pueden descargar recetas aprobadas.");
-  setTimeout(() => setAlertaDescarga(""), 3000);
-  return;
-}
-
+    setAlertaDescarga("Solo se pueden descargar recetas aprobadas.");
+    setTimeout(() => setAlertaDescarga(""), 3000);
+    return;
+  }
 
   const formatFecha = (fechaStr) => {
     if (!fechaStr) return "-";
@@ -15,30 +16,35 @@ export const handleDescargar = (receta, setAlertaDescarga) => {
     return `${dia}/${mes}/${año}`;
   };
 
-  const contenido = `
-Receta Médica
------------------------
-ID: ${receta.id}
-Paciente: ${receta.paciente}
-Medicamento: ${receta.nombreDelMedicamento}
-Presentación: ${receta.presentacion}
-Cantidad: ${receta.cantidad}
-Fecha de Emisión: ${formatFecha(receta.fechaDeEmision)}
-Estado: ${receta.estado}
-Observaciones: ${receta.observaciones || "Ninguna"}
-Documento: ${receta.numeroDeDocumento}
-  `.trim();
+  const doc = new jsPDF();
 
-  const blob = new Blob([contenido], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
+  // Encabezado
+  doc.setFontSize(16);
+  doc.text("Receta Médica", 105, 20, { align: "center" });
+  doc.setFontSize(12);
+  doc.line(20, 25, 190, 25); // línea horizontal debajo del título
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `Receta_${receta.paciente}_${receta.id}.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  // Contenido de la receta
+  let y = 40; // posición vertical inicial
+  const lineHeight = 10;
 
-  URL.revokeObjectURL(url);
+  const campos = [
+    ["ID", receta.id],
+    ["Paciente", receta.paciente],
+    ["Documento", receta.numeroDeDocumento],
+    ["Medicamento", receta.nombreDelMedicamento],
+    ["Presentación", receta.presentacion],
+    ["Cantidad", receta.cantidad],
+    ["Fecha de Emisión", formatFecha(receta.fechaDeEmision)],
+    ["Estado", receta.estado],
+    ["Observaciones", receta.observaciones || "Ninguna"],
+  ];
+
+  campos.forEach(([label, valor]) => {
+    doc.text(`${label}: ${valor}`, 20, y);
+    y += lineHeight;
+  });
+
+  // Guardar PDF
+  doc.save(`Receta_${receta.paciente}_${receta.id}.pdf`);
 };
-

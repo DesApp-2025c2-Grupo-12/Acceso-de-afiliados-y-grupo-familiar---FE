@@ -20,7 +20,6 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
 
   const fechaAMostrar = receta.estado === "Aprobado" ? formatFecha(receta.fechaDeEmision) : "***";
 
-  
   return (
     <div className="col-md-6 mb-4">
       <div className="card h-100 shadow-sm" style={{ border: "1px solid #ccc" }}>
@@ -48,35 +47,31 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
           <p className="text-muted mb-3">{receta.paciente}</p>
 
           <div className="d-flex justify-content-center flex-wrap gap-2">
-  {["Ver", "Renovar", "Descargar"].map((accion) => (
-    <button
-      key={accion}
-      className="btn btn-sm rounded-pill"
-      style={{
-        border: "1px solid black",
-        color: "black",
-        backgroundColor: "white",
-        borderRadius: "50px",
-        padding: "3px 12px",
-        fontSize: "0.9rem",
-        transition: "all 0.2s ease-in-out",
-      }}
-      onMouseEnter={(e) => {
-        e.target.style.backgroundColor = "#c5c5c5ff";
-      }}
-      onMouseLeave={(e) => {
-        e.target.style.backgroundColor = "white";
-      }}
-      onClick={() => {
-        if (accion === "Ver") handleVer(receta);
-        else if (accion === "Renovar") handleRenovar(receta);
-        else handleDescargar(receta);
-      }}
-    >
-      {accion}
-    </button>
-  ))}
-</div>
+            {receta.estado === "Aprobado" && ["Ver", "Renovar", "Descargar"].map((accion) => (
+              <button
+                key={accion}
+                className="btn btn-sm rounded-pill"
+                style={{
+                  border: "1px solid black",
+                  color: "black",
+                  backgroundColor: "white",
+                  borderRadius: "50px",
+                  padding: "3px 12px",
+                  fontSize: "0.9rem",
+                  transition: "all 0.2s ease-in-out",
+                }}
+                onMouseEnter={(e) => { e.target.style.backgroundColor = "#c5c5c5ff"; }}
+                onMouseLeave={(e) => { e.target.style.backgroundColor = "white"; }}
+                onClick={() => {
+                  if (accion === "Ver") handleVer(receta);
+                  else if (accion === "Renovar") handleRenovar(receta);
+                  else handleDescargar(receta);
+                }}
+              >
+                {accion}
+              </button>
+            ))}
+          </div>
 
         </div>
       </div>
