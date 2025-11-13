@@ -117,15 +117,16 @@ export default function Reintegros() {
                             </div>
                         ) : (
                             <Row>
-                                {reintegrosFiltrados.map(reintegroFiltrado => (
-                                    <Col md={6} key={reintegroFiltrado.id} className="mb-3"> {/* ← Cambiar a md={6} para 2 columnas */}
+                                <div className="row">
+                                    {reintegrosFiltrados.map(reintegroFiltrado => (
                                         <CardReintegro
+                                            key={reintegroFiltrado.id}
                                             reintegroFiltrado={reintegroFiltrado}
                                             seleccionarReintegro={setReintegroSeleccionado}
                                             abrirModalDetalle={setModalDetalleAbierto}
                                         />
-                                    </Col>
-                                ))}
+                                    ))}
+                                </div>
                             </Row>
                         )}
                     </Card.Body>

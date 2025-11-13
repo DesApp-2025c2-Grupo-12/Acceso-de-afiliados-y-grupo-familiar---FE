@@ -1,9 +1,12 @@
+// Home.jsx - VERSIÓN FINAL CORREGIDA
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./home.css";
+import CardPersonalizada from "../../components/Cards/CardPersonalizada";
 
 export default function Home() {
   const navigate = useNavigate();
+  const ultimoTurno = JSON.parse(localStorage.getItem('ultimoTurno') || 'null');
 
   return (
     <div className="container my-5">
@@ -16,15 +19,25 @@ export default function Home() {
         <div className="col-md-6">
           <div className="card shadow-lg h-100">
             <div className="card-body d-flex flex-column">
-              <h5 className="card-title">Próximo turno</h5>
-              <p className="card-text">
-                <strong>Médico:</strong> Dr. Alejandra Pizarn.<br />
-                <strong>Especialidad:</strong> Psicóloga clínica.<br />
-                <strong>Fecha:</strong> Lunes 21 de Septiembre.<br />
-                <strong>Hora:</strong> 10:00 AM
-              </p>
-              <button 
-                onClick={() => navigate("/turnos")} 
+              
+              {ultimoTurno ? ( // ← VERIFICAR SI HAY DATOS
+                <CardPersonalizada
+                  header= "PROXIMO TURNO"
+                  title={ultimoTurno.nombreDelPrestador}
+                  subtitle={ultimoTurno.especialidad}
+                  tipo={ultimoTurno.tipo || "Turno"}
+                  detalles={[
+                    { label: "Fecha", value: ultimoTurno.fecha },
+                    { label: "Horario", value: ultimoTurno.horario?.substring(0, 5) },
+                    { label: "Lugar", value: ultimoTurno.lugarDeAtencion },
+                  ]}
+                />
+              ) : (
+                <p className="text-muted">No tenés turnos programados</p> // ← MENSAJE ALTERNATIVO
+              )}
+              
+              <button
+                onClick={() => navigate("/turnos")}
                 className="btn btn-blue mt-auto align-self-center"
               >
                 Ir a Turnos
@@ -42,8 +55,8 @@ export default function Home() {
                 <strong>Medicamento:</strong> Ibuprofeno 600mg.<br />
                 <strong>Dosis:</strong> Cada 8 horas.
               </p>
-              <button 
-                onClick={() => navigate("/recetas")} 
+              <button
+                onClick={() => navigate("/recetas")}
                 className="btn btn-blue mt-auto align-self-center"
               >
                 Ir a Recetas
@@ -61,8 +74,8 @@ export default function Home() {
                 <strong>Especialidad:</strong> Neurocirugia<br />
                 <strong>Reintegro:</strong> $160.000.
               </p>
-              <button 
-                onClick={() => navigate("/reintegros")} 
+              <button
+                onClick={() => navigate("/reintegros")}
                 className="btn btn-blue mt-auto align-self-center"
               >
                 Ir a Reintegros
@@ -80,8 +93,8 @@ export default function Home() {
                 <strong>Paciente:</strong> Franco Cantero<br />
                 <strong>Lugar de Prestacion:</strong> Hospital municipal de Hurlingham
               </p>
-              <button 
-                onClick={() => navigate("/autorizaciones")} 
+              <button
+                onClick={() => navigate("/autorizaciones")}
                 className="btn btn-blue mt-auto align-self-center"
               >
                 Ir a Autorización

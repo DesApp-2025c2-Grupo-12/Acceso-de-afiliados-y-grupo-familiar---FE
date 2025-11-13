@@ -6,4 +6,14 @@
 
 .content {
   display: flex;
+  flex-grow: 1;
+}
+
+.content.with-background {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),
+    url(https://peoplefeedback.es/wp-content/uploads/2023/07/grupo-personas-que-esperan-pasillo-hospital-salas-espera-iluminacion-alta-definicion-tonos-intensos.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }

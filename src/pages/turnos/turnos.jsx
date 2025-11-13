@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Card, Row, Col, Container, Alert } from "react-bootstrap";
 import NuevoTurno from "./nuevoTurno";
 import CardPersonalizada from "../../components/Cards/CardPersonalizada";
+import Home from "../home/home";
 
 export default function Turnos() {
   const [pantallaNuevoTurno, setPantallaNuevoTurno] = useState(false);
@@ -9,7 +10,7 @@ export default function Turnos() {
   const [turnos, setTurnos] = useState([]);
   const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
   const [turnosHijos, setTurnosHijos] = useState([]);
-
+  const [ultimoTurno, setUltimoTurno] = useState(null);
 
 
   const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
@@ -51,14 +52,27 @@ export default function Turnos() {
   }, [])
 
   useEffect(() => {
+    if (turnos.length > 0) {
+      actualizarHome();
+    }
+  }, [turnos]);
+
+
+  useEffect(() => {
     if (!pantallaNuevoTurno) {
       obtenerTurnosDeAPI();
-      obtenerTurnosHijosAPI()
+      obtenerTurnosHijosAPI();
     }
   }, [pantallaNuevoTurno]);
 
-
-
+  const actualizarHome = () => {
+    const turnosOrdenados = [...turnos].sort(
+      (a, b) => new Date(a.fechaYHora) - new Date(b.fechaYHora)
+    );
+    const turnoMasReciente = turnosOrdenados[0];
+    setUltimoTurno(turnoMasReciente);
+    localStorage.setItem('ultimoTurno', JSON.stringify(turnoMasReciente));
+  }
 
   const cancelarTurno = async (turno) => {
     try {
@@ -137,21 +151,21 @@ export default function Turnos() {
                         <Col md={12} key={turno.id} className="mb-3">
                           <CardPersonalizada
                             title={turno.nombreDelPrestador}
-                            titleClassName="h5 fw-bold text-dark mb-1" 
+                            titleClassName="h5 fw-bold text-dark mb-1"
                             subtitle={turno.especialidad}
-                            subtitleClassName="text-primary fw-normal mb-2" 
+                            subtitleClassName="text-primary fw-normal mb-2"
                             tipo={turno.tipo}
-                            tipoClassName="badge bg-warning text-dark fs-7 mb-2" 
+                            tipoClassName="badge bg-warning text-dark fs-7 mb-2"
                             detalles={[
                               { label: "Fecha", value: turno.fecha },
-                              { label: "Horario", value: turno.horario?.substring(0, 5) }, 
+                              { label: "Horario", value: turno.horario?.substring(0, 5) },
                               { label: "Lugar", value: turno.lugarDeAtencion },
                             ]}
-                            detallesClassName="text-secondary small mb-2" 
+                            detallesClassName="text-secondary small mb-2"
                             botonTexto="Cancelar turno"
                             onClick={() => cancelarTurno(turno)}
-                            cardClassName="border shadow-sm" 
-                            bodyClassName="p-3" 
+                            cardClassName="border shadow-sm"
+                            bodyClassName="p-3"
                           />
                         </Col>
                       ))}

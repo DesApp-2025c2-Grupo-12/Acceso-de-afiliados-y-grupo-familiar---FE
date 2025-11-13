@@ -23,13 +23,14 @@ import ProtectedRoute from './components/protectedRoutes/protectedRoutes'
 function App() {
   const location = useLocation();
   const hideNav = location.pathname === "/" || location.pathname === "/register";
+  const showBackground = location.pathname === "/home";
   return (
 
 
     <div className="d-flex flex-column min-vh-100">
-       <Header />
+      <Header />
 
-      <div className="content">
+      <div className={`content ${showBackground ? 'with-background' : ''}`}>
 
         {!hideNav && <Navbar />}
         <main className="container my-5 flex-grow-1">
