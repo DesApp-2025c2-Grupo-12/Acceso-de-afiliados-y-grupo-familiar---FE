@@ -164,18 +164,19 @@ export default function Login() {
       {successMessage && (
         <div className="d-flex justify-content-center mt-3">
           <div className="alert alert-success d-flex align-items-center" role="alert">
-            <div className="spinner-border spinner-border-sm me-2" role="status"></div>
+            <div className="bi bi-check-circle-fill me-2" role="status"></div>
             <div>¡Usuario Logeado correctamente!</div>
           </div>
         </div>)}
 
       <div className="text-center mt-2">
         <p>
-          <a href="#">¿Olvidaste tu nombre de usuario o contraseña?</a>
-        </p>
-        <p>
           ¿No tienes una cuenta? <Link to="/register">Crear una cuenta</Link>
         </p>
+        <p>
+          <a href="#">¿Olvidaste tu nombre de usuario o contraseña?</a>
+        </p>
+
       </div>
     </>
   );

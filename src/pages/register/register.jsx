@@ -134,7 +134,7 @@ export default function Register() {
         {successMessage && (
           <div className="d-flex justify-content-center mt-3">
             <div className="alert alert-success d-flex align-items-center" role="alert">
-              <div className="spinner-border spinner-border-sm me-2" role="status"></div>
+              <div className="bi bi-check-circle-fill me-2" role="status"></div>
               <div>¡Usuario registrado correctamente!</div>
             </div>
           </div>
