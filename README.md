@@ -24,7 +24,33 @@ El proyecto de afiliados es una aplicación web desarrollada con el fin de que l
 Acceso-de-afiliados-y-grupo-familiar---FE/
 │
 ├─ public/
-│   └─ vite.svg
+│   ├─ vite.svg
+│   └─ imagenes/
+│       └─ prestadores/
+│           ├─ 1/
+│           │   ├─ 1.jpg
+│           │   ├─ 2.jpg
+│           │   └─ 3.jpg
+│           ├─ 2/
+│           │   ├─ 1.jpg
+│           │   ├─ 2.jpg
+│           │   └─ 3.jpg
+│           ├─ 3/
+│           │   ├─ 1.jpg
+│           │   ├─ 2.jpg
+│           │   └─ 3.jpg
+│           ├─ 4/
+│           │   ├─ 1.jpg
+│           │   ├─ 2.jpg
+│           │   └─ 3.jpg
+│           ├─ 5/
+│           │   ├─ 1.jpg
+│           │   ├─ 2.jpg
+│           │   └─ 3.jpg
+│           └─ 6/
+│               ├─ 1.jpg
+│               ├─ 2.jpg
+│               └─ 3.jpg
 │
 ├─ src/
 │   ├─ assets/
@@ -41,31 +67,33 @@ Acceso-de-afiliados-y-grupo-familiar---FE/
 │   │   └─ Navbar/
 │   │       └─ Navbar.jsx
 │   │
-│   └─ protectedRoutes/
-│       └─ protectedRoutes.jsx
+│   ├─ protectedRoutes/
+│   │   └─ protectedRoutes.jsx
+│   │
+│   └─ pages/
+│       ├─ autorizaciones/
+│       │   └─ Autorizaciones.jsx
+│       ├─ home/
+│       │   └─ Home.jsx
+│       ├─ login/
+│       │   └─ Login.jsx
+│       ├─ prestadores/
+│       │   ├─ Prestadores.jsx
+│       │   ├─ PrestadorCard.jsx
+│       │   ├─ PrestadorDetallesModal.jsx
+│       │   ├─ PrestadorFilters.jsx
+│       │   ├─ PrestadorList.jsx
+│       │   └─ PrestadorModal.jsx
+│       └─ recetas/
+│           ├─ BuscarReceta.jsx
+│           ├─ CardReceta.jsx
+│           ├─ DescargarReceta.jsx
+│           ├─ NuevaReceta.jsx
+│           ├─ Receta.jsx
+│           └─ RenovarReceta.jsx
 │
 ├─ data/
 │   └─ prestadores.json
-│
-├─ pages/
-│   ├─ autorizaciones/
-│   │   └─ Autorizaciones.jsx
-│   ├─ home/
-│   │   └─ Home.jsx
-│   ├─ login/
-│   │   └─ Login.jsx
-│   ├─ prestadores/
-│   │   ├─ Prestadores.jsx
-│   │   ├─ PrestadorFilters.jsx
-│   │   ├─ PrestadorList.jsx
-│   │   └─ PrestadorModal.jsx
-│   └─ recetas/
-│       ├─ BuscarReceta.jsx
-│       ├─ CardReceta.jsx
-│       ├─ Receta.jsx
-│       ├─ DescargarReceta.jsx
-│       ├─ NuevaReceta.jsx
-│       └─ RenovarReceta.jsx
 │
 ├─ utils/
 │   ├─ filtro.jsx
@@ -82,6 +110,7 @@ Acceso-de-afiliados-y-grupo-familiar---FE/
 ├─ eslint.config.js
 ├─ .gitignore
 └─ README.md
+
 
 
 ```

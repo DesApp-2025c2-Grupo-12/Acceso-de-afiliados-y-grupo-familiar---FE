@@ -81,7 +81,10 @@ export default function Prestadores() {
 
   return (
     <Container className="my-5">
-      <h2 className="text-center mb-4">Prestadores</h2>
+      {/* 🔹 Encabezado estilo MIS RECETAS */}
+      <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
+        <h2 className="fw-bold text-dark fs-3 mb-0">PRESTADORES</h2>
+      </div>
 
       <PrestadorFilters
         search={search}
@@ -98,17 +101,41 @@ export default function Prestadores() {
       {loading && <p className="text-center">Cargando prestadores...</p>}
       {fetchError && <p className="text-danger text-center">{fetchError}</p>}
 
-      {/* Mensaje mejorado cuando no hay resultados */}
-      {!loading && !fetchError && prestadores.length === 0 && (
-        <Card className="text-center my-4 p-4 border-0 shadow-sm">
-          <Card.Body>
-            <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>🔍</div>
-            <Card.Text className="text-muted fst-italic">
-              No se encontraron prestadores que coincidan con tu búsqueda.
-            </Card.Text>
-          </Card.Body>
-        </Card>
-      )}
+      {/* Mensaje cuando no hay resultados */}
+{!loading && !fetchError && prestadores.length === 0 && (
+  <Card className="text-center my-4 p-4 border-0 shadow-sm bg-light">
+    <Card.Body>
+      <div
+        className="d-inline-flex align-items-center justify-content-center mb-3 rounded-circle"
+        style={{
+          width: "70px",
+          height: "70px",
+          backgroundColor: "#001F87",
+          color: "white",
+          fontSize: "2rem",
+        }}
+      >
+        🔍
+      </div>
+      <Card.Text
+        className="fst-italic"
+        style={{
+          color: "#001F87",
+          fontWeight: "500",
+          fontSize: "1.1rem",
+          border: "1px solid #001F87",
+          borderRadius: "50px",
+          padding: "0.8rem 1.5rem",
+          display: "inline-block",
+          backgroundColor: "white",
+        }}
+      >
+        No se encontraron prestadores que coincidan con tu búsqueda.
+      </Card.Text>
+    </Card.Body>
+  </Card>
+)}
+
 
       <PrestadorList prestadores={prestadores} onSelect={setSelectedPrestador} />
 
@@ -119,4 +146,3 @@ export default function Prestadores() {
     </Container>
   );
 }
-

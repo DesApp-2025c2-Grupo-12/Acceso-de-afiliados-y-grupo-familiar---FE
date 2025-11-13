@@ -1,31 +1,18 @@
 import { Row, Col } from "react-bootstrap";
-import CardPersonalizada from "../../components/Cards/CardPersonalizada"; // nombre exacto del archivo
+import PrestadorCard from "./PrestadorCard";
 
 export default function PrestadorList({ prestadores, onSelect }) {
-  if (!prestadores.length) return null; // Evita duplicar mensaje "No se encontraron prestadores"
+  if (!prestadores.length) return null;
 
   return (
     <Row className="g-3">
       {prestadores.map((p) => (
-        <Col md={4} key={p.id} className="d-flex">
-          <div className="d-flex flex-column h-100 w-100">
-            <CardPersonalizada
-              title={p.nombreCompleto}
-              subtitle={p.especialidad}
-              tipo={p.esCentro ? "Centro Médico" : p.direccion}
-              detalles={[
-                { label: "Especialidad", value: p.especialidad },
-                { label: "Ubicación", value: p.direccion },
-                { label: "Teléfono", value: p.telefono },
-                { label: "Correo", value: p.correoElectronico },
-              ]}
-              botonTexto="Ver perfil"
-              onClick={() => onSelect(p)}
-            />
-          </div>
+        <Col md={6} lg={6} key={p.id}>
+          <PrestadorCard prestador={p} onVerDetalles={onSelect} />
         </Col>
       ))}
     </Row>
   );
 }
+
 

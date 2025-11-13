@@ -59,7 +59,7 @@ export default function PrestadorFilters({
       {location === "Buenos Aires" && (
         <Row className="mb-4">
           <Col md={4}>
-            <Form.Label>Zona:</Form.Label>
+            
             <Form.Select value={zona} onChange={(e) => setZona(e.target.value)}>
               <option value="">Todas las zonas</option>
               <option value="Norte">Zona Norte</option>
