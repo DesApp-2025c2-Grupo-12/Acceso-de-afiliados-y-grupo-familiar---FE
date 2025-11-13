@@ -53,9 +53,9 @@ export default function NuevaReceta({
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleGuardar = async () => {
+const handleGuardar = async () => {
   try {
-    // Campos obligatorios
+    // Validaciones básicas
     if (!formData.paciente) throw new Error("Debe seleccionar un paciente");
     if (!formData.nombreDelMedicamento)
       throw new Error("Debe ingresar el nombre del medicamento");
@@ -67,7 +67,6 @@ export default function NuevaReceta({
       throw new Error("Debe ingresar observaciones");
     if (formData.observaciones.length > 300)
       throw new Error("Observaciones demasiado largas (máximo 300 caracteres)");
-
     if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]{1,60}$/.test(formData.nombreDelMedicamento))
       throw new Error(
         "Nombre del medicamento inválido (solo letras, números y espacios, máximo 60)"
@@ -80,19 +79,22 @@ export default function NuevaReceta({
     const pacienteSeleccionado = integrantesCuenta.find(
       (p) => p.numeroDeDocumento === formData.paciente
     );
-    const pacienteNombre = pacienteSeleccionado
-      ? `${pacienteSeleccionado.nombre} ${pacienteSeleccionado.apellido}`
-      : "";
+    if (!pacienteSeleccionado)
+      throw new Error("No se encontró el paciente seleccionado");
 
-    // Validaciones de FRONT (para el mismo mes)
+    const pacienteNombre = `${pacienteSeleccionado.nombre} ${pacienteSeleccionado.apellido}`;
+
+    // 1️⃣ Traer todas las recetas desde el backend
+    const responseFetch = await fetch("http://localhost:3000/recipes");
+    if (!responseFetch.ok) throw new Error("Error al cargar recetas");
+    const allRecetas = await responseFetch.json();
+
+    // 2️⃣ Filtrar las del mismo paciente y mes actual
     const hoy = new Date();
     const mesActual = hoy.getMonth();
     const anioActual = hoy.getFullYear();
 
-    // Filtrar recetas del mismo paciente en el mes actual
-    const recetasDelPaciente = JSON.parse(localStorage.getItem("recetasCache")) || [];
-
-    const recetasMes = recetasDelPaciente.filter((r) => {
+    const recetasMes = allRecetas.filter((r) => {
       const fecha = new Date(r.createdAt || r.fechaDeEmision || hoy);
       return (
         r.numeroDeDocumento === formData.paciente &&
@@ -101,14 +103,7 @@ export default function NuevaReceta({
       );
     });
 
-    // limite total de 30 recetas por mes
-    if (recetasMes.length >= 30) {
-      throw new Error(
-        "Se ha alcanzado el límite de 30 recetas por mes para este paciente"
-      );
-    }
-
-    // Verificar recetas idénticas (mismo medicamento)
+    // 3️⃣ Validación de duplicado
     const recetaDuplicada = recetasMes.find(
       (r) =>
         r.nombreDelMedicamento.toLowerCase() ===
@@ -120,7 +115,7 @@ export default function NuevaReceta({
       );
     }
 
-    //Calcular total de unidades del mismo medicamento
+    // 4️⃣ Validación de cantidad total
     const totalCantidad = recetasMes
       .filter(
         (r) =>
@@ -136,19 +131,19 @@ export default function NuevaReceta({
       );
     }
 
-   
-  // Si pasa todo, enviar al backend
-const recetaParaEnviar = {
-  paciente: pacienteNombre,
-  nombreDelMedicamento: formData.nombreDelMedicamento,
-  cantidad: formData.cantidad,
-  presentacion: formData.presentacion,
-  observaciones: formData.observaciones,
-  estado: "Recibido", // estado inicial actualizado
-  numeroDeDocumento: formData.paciente, // temporal para evitar el error
-};
+    // 5️⃣ Preparar receta para enviar
+    const recetaParaEnviar = {
+      paciente: pacienteNombre,
+      nombreDelMedicamento: formData.nombreDelMedicamento,
+      cantidad: formData.cantidad,
+      presentacion: formData.presentacion,
+      observaciones: formData.observaciones,
+      estado: "Recibido",
+      numeroDeDocumento: formData.paciente,
+      affiliateId: pacienteSeleccionado.id, // clave FK correcta
+    };
 
-
+    // 6️⃣ Guardar en backend
     const response = await fetch("http://localhost:3000/recipes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -158,14 +153,17 @@ const recetaParaEnviar = {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Error al crear receta");
 
-    // Actualizar lista para validaciones futuras
+    // 7️⃣ Actualizar estado y localStorage
     setRecetas((prev) => [...prev, data]);
-    const nuevoCache = [...recetasDelPaciente, data];
-    localStorage.setItem("recetasCache", JSON.stringify(nuevoCache));
+    localStorage.setItem(
+      "recetasCache",
+      JSON.stringify([...recetasMes, data])
+    );
 
     setSuccess("Receta creada con éxito");
     setError("");
 
+    // 8️⃣ Reset del form
     setFormData({
       paciente: "",
       nombreDelMedicamento: "",
