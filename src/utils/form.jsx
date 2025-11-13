@@ -9,4 +9,8 @@ export const formularioBase = {
   formaPago: "",
   cbuAlias: "",
   factura: null,
+  // Nuevos campos
+  facturacion_Cuit: "",
+  facturacion_Fecha: "",
+  facturacion_NombreDePersonaACobrar: ""
 };

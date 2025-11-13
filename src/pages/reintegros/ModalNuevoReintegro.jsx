@@ -20,31 +20,33 @@ export default function ModalNuevoReintegro({
   };
 
   const handleSubmit = () => {
-    if (!form.integranteDNI || !form.monto) {
-      alert("Por favor selecciona un integrante y completa el monto.");
+    // Validar campos obligatorios
+    if (!form.integranteDNI || !form.monto || !form.facturacion_Cuit || !form.facturacion_Fecha) {
+      alert("Por favor completa todos los campos obligatorios.");
       return;
     }
 
     const integrante = grupoFamiliar.find((m) => m.DNI === form.integranteDNI);
 
+    // Convertir al formato que espera el backend
     const nuevoReintegro = {
-      id: Date.now(),
-      fecha: form.fechaPrestacion,
-      paciente: integrante ? integrante.nombre : "",
-      medico: form.medico,
+      fechaDePrestacion: form.fechaPrestacion, // ← Ya viene en YYYY-MM-DD
+      nombreDelAfiliado: integrante ? integrante.nombre : "",
+      nombreDelMedico: form.medico,
       especialidad: form.especialidad,
-      monto: form.monto,
-      estado: "Pendiente",
-      lugarAtencion: form.lugarAtencion,
-      formaPago: form.formaPago,
-      cbuAlias: form.cbuAlias,
-      descripcion: form.descripcion,
+      lugarDeAtencion: form.lugarAtencion,
+      facturacion_Fecha: form.facturacion_Fecha, // ← Ya viene en YYYY-MM-DD
+      facturacion_Cuit: form.facturacion_Cuit,
+      facturacion_ValorTotal: Number(form.monto),
+      facturacion_NombreDePersonaACobrar: form.facturacion_NombreDePersonaACobrar || (integrante ? integrante.nombre : ""),
+      formaDePago: form.formaPago,
+      cbu: form.cbuAlias,
+      observaciones: form.descripcion
     };
 
     onSave && onSave(nuevoReintegro);
-
     onHide && onHide();
-    setForm({ ...initialForm });
+    setForm({ ...initialForm }); // Ya incluye los nuevos campos
   };
 
   return (
@@ -54,8 +56,9 @@ export default function ModalNuevoReintegro({
       </Modal.Header>
 
       <Modal.Body>
+        {/* Campos existentes */}
         <div className="mb-3">
-          <label className="form-label">Seleccionar integrante</label>
+          <label className="form-label">Seleccionar integrante *</label>
           <select className="form-select" name="integranteDNI" value={form.integranteDNI} onChange={handleInputChange}>
             <option value="">Seleccionar...</option>
             {grupoFamiliar.map((miembro) => (
@@ -67,48 +70,77 @@ export default function ModalNuevoReintegro({
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Fecha de la prestación</label>
-          <input type="text" placeholder="DD/MM/YYYY" className="form-control" name="fechaPrestacion" value={form.fechaPrestacion} onChange={handleInputChange}/>
+          <label className="form-label">Fecha de la prestación *</label>
+          <input
+            type="date"
+            className="form-control"
+            name="fechaPrestacion"
+            value={form.fechaPrestacion}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        {/* NUEVOS CAMPOS OBLIGATORIOS */}
+        <div className="mb-3">
+          <label className="form-label">CUIT de facturación *</label>
+          <input type="text" placeholder="XX-XXXXXXXX-X" className="form-control" name="facturacion_Cuit" value={form.facturacion_Cuit} onChange={handleInputChange} />
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Médico</label>
-          <input type="text" className="form-control" name="medico" value={form.medico} onChange={handleInputChange}/>
+          <label className="form-label">Fecha de facturación *</label>
+          <input
+            type="date"
+            className="form-control"
+            name="facturacion_Fecha"
+            value={form.facturacion_Fecha}
+            onChange={handleInputChange}
+          />
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Especialidad</label>
-          <input type="text" className="form-control" name="especialidad" value={form.especialidad} onChange={handleInputChange}/>
+          <label className="form-label">Nombre de persona a cobrar *</label>
+          <input type="text" className="form-control" name="facturacion_NombreDePersonaACobrar" value={form.facturacion_NombreDePersonaACobrar} onChange={handleInputChange} placeholder="Nombre completo" />
+        </div>
+
+        {/* Campos existentes continuan... */}
+        <div className="mb-3">
+          <label className="form-label">Médico *</label>
+          <input type="text" className="form-control" name="medico" value={form.medico} onChange={handleInputChange} />
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Monto</label>
-          <input type="text" className="form-control" name="monto" value={form.monto} onChange={handleInputChange}/>
+          <label className="form-label">Especialidad *</label>
+          <input type="text" className="form-control" name="especialidad" value={form.especialidad} onChange={handleInputChange} />
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Lugar de atención</label>
-          <input type="text" className="form-control" name="lugarAtencion" value={form.lugarAtencion} onChange={handleInputChange}/>
+          <label className="form-label">Monto *</label>
+          <input type="number" className="form-control" name="monto" value={form.monto} onChange={handleInputChange} />
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Forma de pago</label>
-          <input type="text" className="form-control" name="formaPago" value={form.formaPago} onChange={handleInputChange}/>
+          <label className="form-label">Lugar de atención *</label>
+          <input type="text" className="form-control" name="lugarAtencion" value={form.lugarAtencion} onChange={handleInputChange} />
         </div>
 
         <div className="mb-3">
-          <label className="form-label">CBU / Alias</label>
-          <input type="text" className="form-control" name="cbuAlias" value={form.cbuAlias} onChange={handleInputChange}/>
+          <label className="form-label">Forma de pago *</label>
+          <input type="text" className="form-control" name="formaPago" value={form.formaPago} onChange={handleInputChange} />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">CBU *</label>
+          <input type="text" className="form-control" name="cbuAlias" value={form.cbuAlias} onChange={handleInputChange} />
         </div>
 
         <div className="mb-3">
           <label className="form-label">Descripción (opcional)</label>
-          <textarea className="form-control" name="descripcion" value={form.descripcion} onChange={handleInputChange}/>
+          <textarea className="form-control" name="descripcion" value={form.descripcion} onChange={handleInputChange} />
         </div>
 
         <div className="mb-3">
           <label className="form-label">Factura / Comprobante (opcional)</label>
-          <input type="file" className="form-control" name="factura" onChange={handleInputChange}/>
+          <input type="file" className="form-control" name="factura" onChange={handleInputChange} />
         </div>
       </Modal.Body>
 
