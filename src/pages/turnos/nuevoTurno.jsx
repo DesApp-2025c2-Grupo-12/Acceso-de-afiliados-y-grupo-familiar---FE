@@ -15,6 +15,8 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
+
   // Función para obtener el lunes de la semana actual
   function getLunesSemanaActual() {
     const hoy = new Date();
@@ -165,6 +167,25 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
     }
   }
 
+  const esHijo = async () => {
+    try {
+      const resEsHijo = await fetch(`http://localhost:3000/affiliate/${usuarioLogueado.id}/esHijo/${afiliadoSeleccionado}`)
+    if (!resEsHijo.ok) {
+        const errorData = await resEsHijo.json();
+        throw new Error(errorData.error || "Error en la respuesta del servidor");
+      }
+    
+      const dataEsHijo = await resEsHijo.json()
+    
+    return dataEsHijo
+    } catch (error) {
+      console.error("Error:", error);
+      setErrorMessage(error.message || "Error para determinar si es hijo del usuario");
+      throw error;
+    }
+    
+  }
+
   useEffect(() => {
     if (pantallaNuevoTurno) {
       cargarEspecialidades();
@@ -190,8 +211,12 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
       if (!afiliadoSeleccionado) {
         throw new Error("No se ha seleccionado un afiliado para reservar el turno");
       }
-      
-      //Agregar validacion que solo se pueda sacar turno si es hijo del usuario.
+      const resultadoEsHijo = await esHijo();
+      const esElUsuarioLogueado = parseInt(afiliadoSeleccionado) === usuarioLogueado.id;
+
+      if(!esElUsuarioLogueado && !resultadoEsHijo.existe) {
+       throw new Error("Solo podés reservar turnos para vos o tus hijos");
+      }
 
       const bodyData = parseInt(afiliadoSeleccionado);
       const turnoReservado = await fetch(`http://localhost:3000/appointment/${turno.id}/assign/${bodyData}`, {
@@ -406,8 +431,8 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
             {turnosFiltrados.map(turno => (
               <Col md={4} key={turno.id} className="mb-3">
                 <CardPersonalizada
-                  title={turno.nombreDelPrestador}
-                  subtitle={turno.especialidad}
+                  header={turno.nombreDelPrestador}
+                  title={turno.especialidad}
                   detalles={[
                     { label: "Fecha", value: turno.fecha },
                     { label: "Hora", value: turno.horario },

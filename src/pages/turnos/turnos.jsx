@@ -86,6 +86,7 @@ export default function Turnos() {
 
       setAlerta({ msg: `Turno cancelado correctamente`, tipo: "success" });
       setTurnos(prev => prev.filter(t => t.id !== turno.id));
+      setTurnosHijos(prev => prev.filter(t => t.id !== turno.id))
 
       setTimeout(() => setAlerta({ msg: "", tipo: "success" }), 3000);
 
@@ -125,7 +126,7 @@ export default function Turnos() {
           <Row>
             {/* Columna Mis Turnos */}
             <Col md={6}>
-              <Card className="h-100 border shadow-sm">
+              <Card className=" border shadow-sm">
                 <Card.Header className="bg-light">
                   <h4 className="mb-0">Mis Turnos</h4>
                 </Card.Header>
@@ -136,15 +137,21 @@ export default function Turnos() {
                         <Col md={12} key={turno.id} className="mb-3">
                           <CardPersonalizada
                             title={turno.nombreDelPrestador}
+                            titleClassName="h5 fw-bold text-dark mb-1" 
                             subtitle={turno.especialidad}
+                            subtitleClassName="text-primary fw-normal mb-2" 
                             tipo={turno.tipo}
+                            tipoClassName="badge bg-warning text-dark fs-7 mb-2" 
                             detalles={[
                               { label: "Fecha", value: turno.fecha },
-                              { label: "Horario", value: turno.horario },
+                              { label: "Horario", value: turno.horario?.substring(0, 5) }, 
                               { label: "Lugar", value: turno.lugarDeAtencion },
                             ]}
-                            botonTexto="Dar de baja"
+                            detallesClassName="text-secondary small mb-2" 
+                            botonTexto="Cancelar turno"
                             onClick={() => cancelarTurno(turno)}
+                            cardClassName="border shadow-sm" 
+                            bodyClassName="p-3" 
                           />
                         </Col>
                       ))}
@@ -162,7 +169,7 @@ export default function Turnos() {
 
             {/* Columna Turnos Hijos */}
             <Col md={6}>
-              <Card className="h-100 border shadow-sm">
+              <Card className=" border shadow-sm">
                 <Card.Header className="bg-light">
                   <h4 className="mb-0">Turnos Hijos</h4>
                 </Card.Header>
@@ -172,6 +179,7 @@ export default function Turnos() {
                       {turnosOrdenadosHijos.map(turno => (
                         <Col md={12} key={turno.id} className="mb-3">
                           <CardPersonalizada
+                            header={turno.afiliado.nombre + " " + turno.afiliado.apellido}
                             title={turno.nombreDelPrestador}
                             subtitle={turno.especialidad}
                             tipo={turno.tipo}
