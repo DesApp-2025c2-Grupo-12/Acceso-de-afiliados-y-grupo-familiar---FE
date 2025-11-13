@@ -26,30 +26,48 @@ export default function Reintegros() {
 
     const grupoFamiliar = grupoFamiliarInicial;
 
-    const agregarReintegro = (nuevo) => {
-        setReintegros((prev) => [nuevo, ...prev]);
-        alert("Reintegro guardado con éxito ✅");
+    const agregarReintegro = async (nuevoReintegro) => {
+        try {
+            const response = await fetch("http://localhost:3000/refund", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(nuevoReintegro)
+            });
+
+            if (!response.ok) throw new Error("Error al crear reintegro");
+
+            const reintegroCreado = await response.json();
+
+            setReintegros((prev) => [reintegroCreado, ...prev]);
+            alert("Reintegro guardado con éxito ✅");
+
+        } catch (error) {
+            console.error("Error completo:", error);
+            alert("Error al guardar el reintegro ❌");
+        }
     };
-    
+
     const [reintegroSeleccionado, setReintegroSeleccionado] = useState(null);
     const [modalDetalleAbierto, setModalDetalleAbierto] = useState(false);
 
     // Fetch inicial de recetas y grupo familiar
-  useEffect(() => {
-    const fetchReintegros = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/refund");
-        if (!response.ok) throw new Error("Error al cargar reintegros");
-        const data = await response.json();
-        setReintegros(data);
-      } catch (err) {
-        console.error("Error fetching reintegros:", err);
-        setError("No se pudieron cargar las reintegros");
-      }
-      
-    };
-    fetchReintegros();
-    },[])
+    useEffect(() => {
+        const fetchReintegros = async () => {
+            try {
+                const response = await fetch("http://localhost:3000/refund");
+                if (!response.ok) throw new Error("Error al cargar reintegros");
+                const data = await response.json();
+                setReintegros(data);
+            } catch (err) {
+                console.error("Error fetching reintegros:", err);
+                setError("No se pudieron cargar las reintegros");
+            }
+
+        };
+        fetchReintegros();
+    }, [])
 
     return (
         <Container>
@@ -76,12 +94,12 @@ export default function Reintegros() {
                 ) : (
                     reintegrosFiltrados.map(reintegroFiltrado => (
                         <>
-                        <CardReintegro
-                        reintegroFiltrado={reintegroFiltrado}
-                        seleccionarReintegro={setReintegroSeleccionado}
-                        abrirModalDetalle={setModalDetalleAbierto}
-                        ></CardReintegro>
-                    </>
+                            <CardReintegro
+                                reintegroFiltrado={reintegroFiltrado}
+                                seleccionarReintegro={setReintegroSeleccionado}
+                                abrirModalDetalle={setModalDetalleAbierto}
+                            ></CardReintegro>
+                        </>
                     ))
                 )}
             </div>

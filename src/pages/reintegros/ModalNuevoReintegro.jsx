@@ -21,7 +21,7 @@ export default function ModalNuevoReintegro({
 
   const handleSubmit = () => {
     // Validar campos obligatorios
-    if (!form.integranteDNI || !form.monto || !form.facturacion_Cuit || !form.facturacion_Fecha) {
+    if (!form.integranteDNI || !form.monto || !form.facturacion_Cuit || !form.facturacion_Fecha || !form.formaPago) {
       alert("Por favor completa todos los campos obligatorios.");
       return;
     }
@@ -125,7 +125,13 @@ export default function ModalNuevoReintegro({
 
         <div className="mb-3">
           <label className="form-label">Forma de pago *</label>
-          <input type="text" className="form-control" name="formaPago" value={form.formaPago} onChange={handleInputChange} />
+          <select className="form-select" name="formaPago" value={form.formaPago} onChange={handleInputChange}>
+            <option value="">Seleccionar...</option>
+            <option value="transferencia">Transferencia</option>
+            <option value="deposito">Depósito</option>
+            <option value="cheque">Cheque</option>
+            <option value="efectivo">Efectivo</option>
+          </select>
         </div>
 
         <div className="mb-3">
