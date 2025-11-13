@@ -25,15 +25,14 @@ export default function NuevaAutorizacion({
     e.preventDefault();
     try {
       const payload = {
+        affiliateId: formData.pacienteId,
         fechaDePrestacion: formData.fecha,
-        nombreDelAfiliado: formData.paciente,
-        afiliadoId: formData.pacienteId || null,
         nombreDelMedico: formData.medico,
         especialidad: formData.especialidad,
         lugarDePrestacion: formData.lugar,
         diasDeInternacion: Number(formData.internacion),
         observaciones: formData.observaciones,
-        estado: "Pendiente",
+        //estado: "Pendiente",
       };
       const res = await fetch("http://localhost:3000/authorization", {
         method: "POST",
@@ -52,6 +51,7 @@ export default function NuevaAutorizacion({
         {
           id: data.id || Date.now(),
           fecha: data.fechaDePrestacion,
+          paciente: data.nombreDelAfiliado,
           medico: data.nombreDelMedico,
           especialidad: data.especialidad,
           lugar: data.lugarDePrestacion,
