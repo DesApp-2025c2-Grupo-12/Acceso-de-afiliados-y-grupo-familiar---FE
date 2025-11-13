@@ -9,6 +9,7 @@ export default function Turnos() {
   const [turnos, setTurnos] = useState([]);
   const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
   const [turnosHijos, setTurnosHijos] = useState([]);
+  const [afiTieneHijos,setAfiTieneHijos] = useState(false);
 
 
 
@@ -58,7 +59,25 @@ export default function Turnos() {
   }, [pantallaNuevoTurno]);
 
 
+  const tieneHijos = async() =>  {
+    try {
+      const resTieneHijos = await fetch(`http://localhost:3000/appointment/${usuarioLogueado.id}/tieneHijos`)
+      if(resTieneHijos.ok){
+         const errorData = await resTieneHijos.json();
+        throw new Error(errorData.error || "Error en la respuesta del servidor");
+      }
 
+      const dataTieneHijos = resTieneHijos.json()
+
+      if(dataTieneHijos.existe) {
+        setAfiTieneHijos(true)
+      }
+
+
+    } catch (error) {
+        setAlerta({ msg: error.message, tipo: "danger" });
+    }
+  }
 
   const cancelarTurno = async (turno) => {
     try {
@@ -197,7 +216,8 @@ export default function Turnos() {
                   ) : (
                     <div className="text-center py-5 flex-grow-1 d-flex align-items-center justify-content-center">
                       <div>
-                        <h5 className="text-muted mb-3">No hay turnos asignados a tus hijos</h5>
+                        {afiTieneHijos &&<h5 className="text-muted mb-3">No hay turnos asignados a tus hijos</h5>}
+                        {!afiTieneHijos && <h5 className="text-muted mb-3">No tenes hijos a tu cargo</h5>}
                       </div>
                     </div>
                   )}
