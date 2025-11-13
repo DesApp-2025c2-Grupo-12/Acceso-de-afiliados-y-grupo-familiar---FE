@@ -34,40 +34,47 @@ export default function Autorizaciones() {
   const [autorizacionAEliminar, setAutorizacionAEliminar] = useState(null);
 
   useEffect(() => {
-    const fetchAutorizaciones = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/authorization");
-        if (!response.ok) throw new Error("Error al obtener las autorizaciones");
-        const data = await response.json();
-        const listaAdaptada = data.map((item) => {
-        // transformar la fecha a dd/mm/aaaa
-          const fechaOriginal = item.fechaDePrestacion;
-          let fechaFormateada = fechaOriginal;
-          if (fechaOriginal && fechaOriginal.includes("-")) {
-            const [yyyy, mm, dd] = fechaOriginal.split("-");
-            fechaFormateada = `${dd}/${mm}/${yyyy}`;
-          }
+  if (!usuarioLogueado) return;
 
-          return {
-            id: item.id,
-            fecha: fechaFormateada,
-            paciente: item.nombreDelAfiliado,
-            medico: item.nombreDelMedico,
-            especialidad: item.especialidad,
-            lugar: item.lugarDePrestacion,
-            internacion: item.diasDeInternacion,
-            observaciones: item.observaciones,
-            estado: item.estado || "Pendiente",
-          };
-        });
-        setAutorizaciones(listaAdaptada);
-      } catch (error) {
-        console.error(error);
-        setError("No se pudieron cargar las autorizaciones");
-      }
-    };
-    fetchAutorizaciones();
-  }, []);
+  const fetchAutorizaciones = async () => {
+    try {
+      const res = await fetch(`http://localhost:3000/authorization?numeroDeDocumento=${usuarioLogueado.numeroDeDocumento}`);
+      if (!res.ok) throw new Error("Error al obtener las autorizaciones");
+
+      const data = await res.json();
+
+      const lista = data.map(item => {
+        const fechaOriginal = item.fechaDePrestacion;
+        let fechaFormateada = fechaOriginal;
+        if (fechaOriginal && fechaOriginal.includes("-")) {
+          const [yyyy, mm, dd] = fechaOriginal.split("-");
+          fechaFormateada = `${dd}/${mm}/${yyyy}`;
+        }
+
+        return {
+          id: item.id,
+          fecha: fechaFormateada,
+          paciente: item.nombreDelAfiliado,
+          medico: item.nombreDelMedico,
+          especialidad: item.especialidad,
+          lugar: item.lugarDePrestacion,
+          internacion: item.diasDeInternacion,
+          observaciones: item.observaciones,
+          estado: item.estado || "Pendiente",
+        };
+      });
+
+      setAutorizaciones(lista);
+    } catch (error) {
+      console.error(error);
+      setError("No se pudieron cargar las autorizaciones");
+    }
+  };
+
+  fetchAutorizaciones();
+}, [usuarioLogueado?.numeroDeDocumento]);
+
+  
 
   useEffect(() => {
     const fetchIntegrantes = async () => {
