@@ -11,6 +11,8 @@ export default function Reintegros() {
     const [modalAbierto, setModalAbierto] = useState(false);
     const [busqueda, setBusqueda] = useState("");
     const [reintegros, setReintegros] = useState([]);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     const term = normalizar(busqueda.trim());
     const camposBusqueda = [
@@ -30,29 +32,26 @@ export default function Reintegros() {
         try {
             const response = await fetch("http://localhost:3000/refund", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(nuevoReintegro)
             });
 
             if (!response.ok) throw new Error("Error al crear reintegro");
 
             const reintegroCreado = await response.json();
-
             setReintegros((prev) => [reintegroCreado, ...prev]);
-            alert("Reintegro guardado con éxito ✅");
+            setSuccess("Reintegro guardado con éxito ✅"); // ← EN LUGAR DE alert()
 
         } catch (error) {
             console.error("Error completo:", error);
-            alert("Error al guardar el reintegro ❌");
+            setError("Error al guardar el reintegro ❌"); // ← EN LUGAR DE alert()
         }
     };
+
 
     const [reintegroSeleccionado, setReintegroSeleccionado] = useState(null);
     const [modalDetalleAbierto, setModalDetalleAbierto] = useState(false);
 
-    // Fetch inicial de recetas y grupo familiar
     useEffect(() => {
         const fetchReintegros = async () => {
             try {
@@ -68,6 +67,20 @@ export default function Reintegros() {
         };
         fetchReintegros();
     }, [])
+
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => setError(""), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
+
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => setSuccess(""), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
 
     return (
         <Container>
@@ -88,6 +101,8 @@ export default function Reintegros() {
                         onChange={(e) => setBusqueda(e.target.value)}
                     />
                 </div>
+                {error && <div className="alert alert-danger text-center">{error}</div>}
+                {success && <div className="alert alert-success text-center">{success}</div>}
 
                 <Card className="h-100 border shadow-sm">
                     <Card.Header className="bg-light">
