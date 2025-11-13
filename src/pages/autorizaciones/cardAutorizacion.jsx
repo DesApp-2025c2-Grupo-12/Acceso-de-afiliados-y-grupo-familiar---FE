@@ -8,12 +8,16 @@ export default function CardAutorizacion({
 }) {
   const estadoClass =
     autorizacion.estado === "Pendiente"
-      ? "bg-warning text-dark"
-      : autorizacion.estado === "Aprobado"
-      ? "bg-success"
+      ? "bg-info text-dark"
+      : autorizacion.estado === "Aprobada"
+      ? "bg-success text-dark" 
       : autorizacion.estado === "Observada"
-      ? "bg-secondary text-light"
-      : "bg-danger text-light";
+      ? "bg-warning text-dark" 
+      : autorizacion.estado === "En análisis"
+      ? "bg-danger-subtle text-dark" 
+      : autorizacion.estado === "Rechazada"  
+      ? "bg-danger text-dark" 
+      : "bg-light text-dark"; 
 
   const detalles = [
     { label: "Fecha", value: autorizacion.fecha },
