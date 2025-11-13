@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container } from "react-bootstrap";
+import { Container, Row, Col, Card } from "react-bootstrap";
 import "./reintegros.css";
 import grupoFamiliarInicial from "../../data/grupoFamiliar.json";
 import { normalizar, coincide } from "../../utils/filtros";
@@ -89,19 +89,32 @@ export default function Reintegros() {
                     />
                 </div>
 
-                {reintegrosFiltrados.length === 0 ? (
-                    <h5>No se encontraron reintegros</h5>
-                ) : (
-                    reintegrosFiltrados.map(reintegroFiltrado => (
-                        <>
-                            <CardReintegro
-                                reintegroFiltrado={reintegroFiltrado}
-                                seleccionarReintegro={setReintegroSeleccionado}
-                                abrirModalDetalle={setModalDetalleAbierto}
-                            ></CardReintegro>
-                        </>
-                    ))
-                )}
+                <Card className="h-100 border shadow-sm">
+                    <Card.Header className="bg-light">
+                        <h4 className="mb-0">Todos los Reintegros</h4>
+                    </Card.Header>
+                    <Card.Body className="d-flex flex-column">
+                        {reintegrosFiltrados.length === 0 ? (
+                            <div className="text-center py-5 flex-grow-1 d-flex align-items-center justify-content-center">
+                                <div>
+                                    <h5 className="text-muted mb-3">No se encontraron reintegros</h5>
+                                </div>
+                            </div>
+                        ) : (
+                            <Row>
+                                {reintegrosFiltrados.map(reintegroFiltrado => (
+                                    <Col md={6} key={reintegroFiltrado.id} className="mb-3"> {/* ← Cambiar a md={6} para 2 columnas */}
+                                        <CardReintegro
+                                            reintegroFiltrado={reintegroFiltrado}
+                                            seleccionarReintegro={setReintegroSeleccionado}
+                                            abrirModalDetalle={setModalDetalleAbierto}
+                                        />
+                                    </Col>
+                                ))}
+                            </Row>
+                        )}
+                    </Card.Body>
+                </Card>
             </div>
 
             <ModalNuevoReintegro

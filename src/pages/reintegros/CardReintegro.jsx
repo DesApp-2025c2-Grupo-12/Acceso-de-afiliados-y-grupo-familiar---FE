@@ -1,6 +1,5 @@
-import { Card, Row, Col } from "react-bootstrap";
-import "./reintegros.css";
-
+import React from "react";
+import CardPersonalizada from "../../components/Cards/CardPersonalizada";
 
 export default function CardReintegro({ reintegroFiltrado, seleccionarReintegro, abrirModalDetalle }) {
 
@@ -9,40 +8,27 @@ export default function CardReintegro({ reintegroFiltrado, seleccionarReintegro,
     abrirModalDetalle(true);
   };
 
+  const detalles = [
+    { label: "Médico", value: reintegroFiltrado.nombreDelMedico },
+    { label: "Especialidad", value: reintegroFiltrado.especialidad },
+    { label: "Fecha facturación", value: reintegroFiltrado.facturacion_Fecha }
+  ];
+
+  const contenidoAdicional = (
+    <div className="h4 text-success fw-bold text-center mt-2">
+      ${reintegroFiltrado.facturacion_ValorTotal}
+    </div>
+  );
 
   return (
-    <>
-      <Card className="mb-3 card-reintegro" key={reintegroFiltrado.id}>
-
-        <Card.Body>
-          <Row className="align-items-center">
-            <Col md={3}>
-              <div className="monto">{reintegroFiltrado.facturacion_ValorTotal}</div>
-              <div className="fecha">{reintegroFiltrado.facturacion_Fecha}</div>
-            </Col>
-
-            <Col md={5}>
-              <div className="paciente">{reintegroFiltrado.nombreDelAfiliado}</div>
-              <div className="datos-medico">
-                <span>Médico: {reintegroFiltrado.nombreDelMedico}</span> |{" "}
-                <span>Especialidad: {reintegroFiltrado.especialidad}</span>
-              </div>
-            </Col>
-
-            <Col md={4} className="text-end">
-              <div className={`estado pendiente`}>
-                Pendiente
-              </div>
-              <div className="acciones">
-                <a href="#" onClick={() => handleVerDetalle(reintegroFiltrado) }>
-                  Ver detalle
-                </a>
-              </div>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
-
-    </>
-  )
+    <CardPersonalizada
+      title={reintegroFiltrado.nombreDelAfiliado}
+      subtitle={`Estado: Pendiente`}
+      tipo="Reintegro"
+      detalles={detalles}
+      contenidoAdicional={contenidoAdicional}
+      botonTexto="Ver detalle"
+      onClick={() => handleVerDetalle(reintegroFiltrado)}
+    />
+  );
 }
