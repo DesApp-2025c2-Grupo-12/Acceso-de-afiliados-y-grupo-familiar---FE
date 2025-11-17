@@ -28,7 +28,6 @@ export default function Recetas() {
 
   const nuevaRecetaRef = useRef(null);
 
-  // Fetch inicial
   useEffect(() => {
     const fetchRecetas = async () => {
       try {
@@ -36,6 +35,8 @@ export default function Recetas() {
         if (!response.ok) throw new Error("Error al cargar recetas");
         const data = await response.json();
         setRecetas(data);
+        // also cache for validations if you want
+        localStorage.setItem("recetasCache", JSON.stringify(data));
       } catch (err) {
         console.error("Error fetching recetas:", err);
         setError("No se pudieron cargar las recetas");
@@ -47,7 +48,7 @@ export default function Recetas() {
     setIntegrantesCuenta(grupoFamiliar);
   }, []);
 
-  // Alertas temporales
+  // alert timeouts (sin cambios)
   useEffect(() => { if (error) { const t = setTimeout(() => setError(""), 3000); return () => clearTimeout(t); } }, [error]);
   useEffect(() => { if (success) { const t = setTimeout(() => setSuccess(""), 3000); return () => clearTimeout(t); } }, [success]);
   useEffect(() => { if (alertaDescarga) { const t = setTimeout(() => setAlertaDescarga(""), 3000); return () => clearTimeout(t); } }, [alertaDescarga]);
@@ -58,7 +59,9 @@ export default function Recetas() {
 
   const abrirModalNuevaReceta = () => nuevaRecetaRef.current?.show();
   const abrirModalVer = (receta) => setRecetaSeleccionada(receta);
-  const abrirModalRenovar = (receta) => setRecetaRenovar(receta);
+
+  // <<-- cambio clave: pasar una copia para forzar nueva referencia
+  const abrirModalRenovar = (receta) => setRecetaRenovar(receta ? { ...receta } : null);
 
   return (
     <div className="container">
@@ -120,6 +123,7 @@ export default function Recetas() {
 
       <RenovarReceta
         receta={recetaRenovar}
+        setRecetaRenovar={setRecetaRenovar}
         formData={formData}
         setFormData={setFormData}
         setRecetas={setRecetas}
@@ -133,4 +137,3 @@ export default function Recetas() {
     </div>
   );
 }
-
