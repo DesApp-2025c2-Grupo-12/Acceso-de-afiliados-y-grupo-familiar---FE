@@ -20,7 +20,7 @@ export default function PrestadorDetallesModal({ prestador, onClose }) {
         <p><strong>Teléfono:</strong> {prestador.telefono}</p>
         <p><strong>Correo:</strong> {prestador.correoElectronico}</p>
         <p>
-          <strong>Horario:</strong> {prestador.horarioInicio} - {prestador.horarioFin}
+          <strong>Horario:</strong> {prestador.horarioInicio?.slice(0,5)} - {prestador.horarioFin?.slice(0,5)}
         </p>
         <p><strong>Días:</strong> {prestador.dias}</p>
       </Modal.Body>
