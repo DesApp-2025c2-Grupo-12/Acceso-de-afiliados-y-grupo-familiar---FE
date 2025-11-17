@@ -18,7 +18,6 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
     return `${dia}/${mes}/${año}`;
   };
 
-  // Usamos fechaDeAprobacion cuando exista; si no, fallback a fechaDeEmision
   const fechaAprobacion = receta.fechaDeAprobacion || receta.fechaDeEmision || null;
   const fechaAMostrar = receta.estado === "Aprobado" ? formatFecha(fechaAprobacion) : "***";
 
@@ -49,9 +48,29 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
           <p className="text-muted mb-3">{receta.paciente}</p>
 
           <div className="d-flex justify-content-center flex-wrap gap-2">
-            {receta.estado === "Aprobado" && ["Ver", "Renovar", "Descargar"].map((accion) => (
+
+            {/* ✔️ VER SIEMPRE DISPONIBLE */}
+            <button
+              className="btn btn-sm rounded-pill"
+              style={{
+                border: "1px solid black",
+                color: "black",
+                backgroundColor: "white",
+                borderRadius: "50px",
+                padding: "3px 12px",
+                fontSize: "0.9rem",
+                transition: "all 0.2s ease-in-out",
+              }}
+              onMouseEnter={(e) => { e.target.style.backgroundColor = "#c5c5c5ff"; }}
+              onMouseLeave={(e) => { e.target.style.backgroundColor = "white"; }}
+              onClick={() => handleVer(receta)}
+            >
+              Ver
+            </button>
+
+            {/* ✔️ RENOVAR SOLO SI ESTA APROBADO */}
+            {receta.estado === "Aprobado" && (
               <button
-                key={accion}
                 className="btn btn-sm rounded-pill"
                 style={{
                   border: "1px solid black",
@@ -64,15 +83,33 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
                 }}
                 onMouseEnter={(e) => { e.target.style.backgroundColor = "#c5c5c5ff"; }}
                 onMouseLeave={(e) => { e.target.style.backgroundColor = "white"; }}
-                onClick={() => {
-                  if (accion === "Ver") handleVer(receta);
-                  else if (accion === "Renovar") handleRenovar(receta);
-                  else handleDescargar(receta);
-                }}
+                onClick={() => handleRenovar(receta)}
               >
-                {accion}
+                Renovar
               </button>
-            ))}
+            )}
+
+            {/* ✔️ DESCARGAR SOLO SI ESTA APROBADO */}
+            {receta.estado === "Aprobado" && (
+              <button
+                className="btn btn-sm rounded-pill"
+                style={{
+                  border: "1px solid black",
+                  color: "black",
+                  backgroundColor: "white",
+                  borderRadius: "50px",
+                  padding: "3px 12px",
+                  fontSize: "0.9rem",
+                  transition: "all 0.2s ease-in-out",
+                }}
+                onMouseEnter={(e) => { e.target.style.backgroundColor = "#c5c5c5ff"; }}
+                onMouseLeave={(e) => { e.target.style.backgroundColor = "white"; }}
+                onClick={() => handleDescargar(receta)}
+              >
+                Descargar
+              </button>
+            )}
+
           </div>
 
         </div>
