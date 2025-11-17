@@ -24,6 +24,9 @@ export default function VerReceta({ receta, setRecetaSeleccionada }) {
     return `${dia}/${mes}/${año}`;
   };
 
+  // Preferimos fechaDeAprobacion, si no existe mostramos fechaDeEmision (compatibilidad)
+  const fechaAprobacion = receta?.fechaDeAprobacion || receta?.fechaDeEmision || null;
+
   return (
     <div className="modal fade" id="verRecetaModal" tabIndex="-1" aria-hidden="true">
       <div className="modal-dialog">
@@ -63,11 +66,11 @@ export default function VerReceta({ receta, setRecetaSeleccionada }) {
                   <div className="col-5 fw-bold">Estado:</div>
                   <div className="col-7">{receta.estado || "-"}</div>
                 </div>
+               
                 <div className="row mb-2">
-                  <div className="col-5 fw-bold">Fecha de emisión:</div>
+                  <div className="col-5 fw-bold">Fecha de aprobación:</div>
                   <div className="col-7">
-                    {receta.estado === "Aprobado" ? formatFecha(receta.fechaDeEmision) : "-"}
-
+                    {receta.estado === "Aprobado" ? formatFecha(fechaAprobacion) : "-"}
                   </div>
                 </div>
                 <div className="row mb-2">

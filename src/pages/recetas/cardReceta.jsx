@@ -18,7 +18,9 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
     return `${dia}/${mes}/${año}`;
   };
 
-  const fechaAMostrar = receta.estado === "Aprobado" ? formatFecha(receta.fechaDeEmision) : "***";
+  // Usamos fechaDeAprobacion cuando exista; si no, fallback a fechaDeEmision
+  const fechaAprobacion = receta.fechaDeAprobacion || receta.fechaDeEmision || null;
+  const fechaAMostrar = receta.estado === "Aprobado" ? formatFecha(fechaAprobacion) : "***";
 
   return (
     <div className="col-md-6 mb-4">
