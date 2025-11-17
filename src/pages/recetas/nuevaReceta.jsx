@@ -213,18 +213,19 @@ const handleGuardar = async () => {
             <div className="mb-3">
               <label className="form-label">Seleccionar integrante</label>
               <select
-                className="form-select"
-                name="paciente"
-                value={formData.paciente}
-                onChange={handleChange}
-              >
-                <option value="">Seleccionar...</option>
-                {integrantesCuenta.map((persona, idx) => (
-                  <option key={idx} value={persona.numeroDeDocumento}>
-                    {persona.nombre} {persona.apellido}
-                  </option>
-                ))}
-              </select>
+  className="form-select"
+  name="paciente"
+  value={formData.paciente}
+  onChange={handleChange}
+>
+  <option value="">Seleccionar...</option>
+  {integrantesCuenta.map((persona, idx) => (
+    <option key={idx} value={persona.numeroDeDocumento}>
+      {persona.nombre} {persona.apellido} ({persona.parentesco})
+    </option>
+  ))}
+</select>
+
             </div>
 
             <div className="mb-3">

@@ -55,7 +55,7 @@ export default function VerReceta({ receta, setRecetaSeleccionada }) {
                 </div>
 
                 <div className="row mb-2">
-                  <div className="col-5 fw-bold">Paciente:</div>
+                  <div className="col-5 fw-bold">Afiliado:</div>
                   <div className="col-7">{receta.paciente || "-"}</div>
                 </div>
 
