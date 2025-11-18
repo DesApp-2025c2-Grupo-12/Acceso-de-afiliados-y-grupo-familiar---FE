@@ -17,6 +17,17 @@
   transition: background-color 0.3s;
 }
 
+.miBotonRecetaDisabled {
+  background-color: #132074; /* Mismo azul que el habilitado */
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  color: white;
+  opacity: 0.65; /* Esto lo hace "apagado" */
+  cursor: default;
+}
+
 .miBotonReceta:hover {
   background-color: #2b47b9;
 }
