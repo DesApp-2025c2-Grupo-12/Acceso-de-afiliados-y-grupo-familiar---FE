@@ -5,6 +5,8 @@ import VerReceta from "./verReceta";
 import RenovarReceta from "./renovarReceta";
 import BuscarReceta from "./buscarReceta";
 import { handleDescargar } from "./descargarReceta";
+import { calcularEdad } from "../../utils/utils";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 export default function Recetas() {
   const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
@@ -25,8 +27,11 @@ export default function Recetas() {
   const [alertaDescarga, setAlertaDescarga] = useState("");
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
   const [recetaRenovar, setRecetaRenovar] = useState(null);
+  const [desactivarBotonMenorDeEdad, setDesactivarBotonMenorDeEdad] = useState(null)
 
   const nuevaRecetaRef = useRef(null);
+
+  const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
 
   useEffect(() => {
     const fetchRecetas = async () => {
@@ -46,6 +51,11 @@ export default function Recetas() {
 
     const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
     setIntegrantesCuenta(grupoFamiliar);
+    if (calcularEdad(usuarioLogueado.fechaDeNacimiento) <= 16) {
+      setDesactivarBotonMenorDeEdad(true)
+    } else {
+      setDesactivarBotonMenorDeEdad(false)
+    }
   }, []);
 
   // alert timeouts (sin cambios)
@@ -67,15 +77,27 @@ export default function Recetas() {
     <div className="container">
       <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
         <h2 className="fw-bold text-dark fs-3 mb-0">MIS RECETAS</h2>
-        <button
-          className="btn text-white px-4 py-2 fs-5"
-          style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
-          onMouseEnter={() => setHoverNueva(true)}
-          onMouseLeave={() => setHoverNueva(false)}
-          onClick={abrirModalNuevaReceta}
+        <OverlayTrigger
+          placement="top"
+          overlay={
+            <Tooltip>
+              Debes ser mayor de 16 años de edad para crear una nueva receta
+            </Tooltip>
+          }
         >
-          + Nueva Receta
-        </button>
+          <span className="d-inline-block">
+            <button
+              disabled={desactivarBotonMenorDeEdad}
+              className="btn text-white px-4 py-2 fs-5"
+              style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
+              onMouseEnter={() => setHoverNueva(true)}
+              onMouseLeave={() => setHoverNueva(false)}
+              onClick={abrirModalNuevaReceta}
+            >
+              + Nueva Receta
+            </button>
+          </span>
+        </OverlayTrigger>
       </div>
 
       {/* Mensajes */}

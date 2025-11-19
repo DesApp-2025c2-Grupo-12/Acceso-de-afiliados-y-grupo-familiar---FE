@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { Container, Row, Col, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import "./reintegros.css";
 import grupoFamiliarInicial from "../../data/grupoFamiliar.json";
 import { normalizar, coincide } from "../../utils/filtros";
 import ModalNuevoReintegro from "./ModalNuevoReintegro";
 import ModalDetalleReintegro from "./ModalDetalleReintegro";
 import CardReintegro from "./CardReintegro";
+import { calcularEdad } from "../../utils/utils";
 
 export default function Reintegros() {
     const [modalAbierto, setModalAbierto] = useState(false);
@@ -13,6 +14,9 @@ export default function Reintegros() {
     const [reintegros, setReintegros] = useState([]);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [desactivarBotonMenorDeEdad, setDesactivarBotonMenorDeEdad] = useState(null)
+
+    const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
 
     const term = normalizar(busqueda.trim());
     const camposBusqueda = [
@@ -66,6 +70,11 @@ export default function Reintegros() {
 
         };
         fetchReintegros();
+        if (calcularEdad(usuarioLogueado.fechaDeNacimiento) <= 16) {
+            setDesactivarBotonMenorDeEdad(true)
+        } else {
+            setDesactivarBotonMenorDeEdad(false)
+        }
     }, [])
 
     useEffect(() => {
@@ -87,9 +96,24 @@ export default function Reintegros() {
             <div className="container mt-4">
                 <div className="d-flex justify-content-between align-items-center mb-3">
                     <h3 className="titulo-reintegros">MIS REINTEGROS</h3>
-                    <button className="miBotonReceta" onClick={() => setModalAbierto(true)}>
-                        + Nuevo Reintegro
-                    </button>
+                    <OverlayTrigger
+                        placement="top"
+                        overlay={
+                            <Tooltip>
+                                Debes ser mayor de 16 años de edad para crear un nuevo reintegro
+                            </Tooltip>
+                        }
+                    >
+                        <span className="d-inline-block">
+                            <button
+                                disabled={desactivarBotonMenorDeEdad}
+                                className={`miBotonBase ${desactivarBotonMenorDeEdad ? 'miBotonRecetaDisabled' : 'miBotonReceta'}`}
+                                onClick={() => setModalAbierto(true)}
+                            >
+                                + Nuevo Reintegro
+                            </button>
+                        </span>
+                    </OverlayTrigger>
                 </div>
 
                 <div className="d-flex justify-content-between align-items-center mb-4">

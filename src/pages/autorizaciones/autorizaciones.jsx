@@ -3,7 +3,12 @@ import CardAutorizacion from "./cardAutorizacion";
 import NuevaAutorizacion from "./nuevaAutorizacion";
 import VerAutorizacion from "./verAutorizacion";
 import BuscarAutorizacion from "./buscarAutorizacion";
+<<<<<<< HEAD
 import EditarAutorizacion from "./editarAutorizacion";
+=======
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { calcularEdad } from "../../utils/utils";
+>>>>>>> ddc29de82c0230f4e762ff5d8ab7eb5d4689eebf
 
 export default function Autorizaciones() {
   const [autorizaciones, setAutorizaciones] = useState([]);
@@ -29,6 +34,7 @@ export default function Autorizaciones() {
   const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
   const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar") || "[]");
   const integrantesCuentaStorage = usuarioLogueado ? [usuarioLogueado, ...grupoFamiliar] : [];
+  const [desactivarBotonMenorDeEdad, setDesactivarBotonMenorDeEdad] = useState(null)
 
 
   // ESTADOS NUEVOS para el modal de confirmación de borrado y modificacion
@@ -40,47 +46,52 @@ export default function Autorizaciones() {
 
 
   useEffect(() => {
-  if (!usuarioLogueado) return;
+    if (!usuarioLogueado) return;
 
-  const fetchAutorizaciones = async () => {
-    try {
-      const res = await fetch(`http://localhost:3000/authorization?numeroDeDocumento=${usuarioLogueado.numeroDeDocumento}`);
-      if (!res.ok) throw new Error("Error al obtener las autorizaciones");
+    const fetchAutorizaciones = async () => {
+      try {
+        const res = await fetch(`http://localhost:3000/authorization?numeroDeDocumento=${usuarioLogueado.numeroDeDocumento}`);
+        if (!res.ok) throw new Error("Error al obtener las autorizaciones");
 
-      const data = await res.json();
+        const data = await res.json();
 
-      const lista = data.map(item => {
-        const fechaOriginal = item.fechaDePrestacion;
-        let fechaFormateada = fechaOriginal;
-        if (fechaOriginal && fechaOriginal.includes("-")) {
-          const [yyyy, mm, dd] = fechaOriginal.split("-");
-          fechaFormateada = `${dd}/${mm}/${yyyy}`;
-        }
+        const lista = data.map(item => {
+          const fechaOriginal = item.fechaDePrestacion;
+          let fechaFormateada = fechaOriginal;
+          if (fechaOriginal && fechaOriginal.includes("-")) {
+            const [yyyy, mm, dd] = fechaOriginal.split("-");
+            fechaFormateada = `${dd}/${mm}/${yyyy}`;
+          }
 
-        return {
-          id: item.id,
-          fecha: fechaFormateada,
-          paciente: item.nombreDelAfiliado,
-          medico: item.nombreDelMedico,
-          especialidad: item.especialidad,
-          lugar: item.lugarDePrestacion,
-          internacion: item.diasDeInternacion,
-          observaciones: item.observaciones,
-          estado: item.estado || "Pendiente",
-        };
-      });
+          return {
+            id: item.id,
+            fecha: fechaFormateada,
+            paciente: item.nombreDelAfiliado,
+            medico: item.nombreDelMedico,
+            especialidad: item.especialidad,
+            lugar: item.lugarDePrestacion,
+            internacion: item.diasDeInternacion,
+            observaciones: item.observaciones,
+            estado: item.estado || "Pendiente",
+          };
+        });
 
-      setAutorizaciones(lista);
-    } catch (error) {
-      console.error(error);
-      setError("No se pudieron cargar las autorizaciones");
+        setAutorizaciones(lista);
+      } catch (error) {
+        console.error(error);
+        setError("No se pudieron cargar las autorizaciones");
+      }
+    };
+
+    fetchAutorizaciones();
+    if (calcularEdad(usuarioLogueado.fechaDeNacimiento) <= 16) {
+      setDesactivarBotonMenorDeEdad(true)
+    } else {
+      setDesactivarBotonMenorDeEdad(false)
     }
-  };
+  }, [usuarioLogueado?.numeroDeDocumento]);
 
-  fetchAutorizaciones();
-}, [usuarioLogueado?.numeroDeDocumento]);
 
-  
 
   useEffect(() => {
     const fetchIntegrantes = async () => {
@@ -173,15 +184,27 @@ export default function Autorizaciones() {
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
         <h2 className="fw-bold text-dark fs-3 mb-0">MIS AUTORIZACIONES</h2>
-        <button
-          className="btn text-white px-4 py-2 fs-5"
-          style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
-          onMouseEnter={() => setHoverNueva(true)}
-          onMouseLeave={() => setHoverNueva(false)}
-          onClick={() => setShowModal(true)}
+        <OverlayTrigger
+          placement="top"
+          overlay={
+            <Tooltip>
+              Debes ser mayor de edad para crear una nueva autorización
+            </Tooltip>
+          }
         >
-          + Nueva Autorización
-        </button>
+          <span className="d-inline-block">
+            <button
+              disabled={desactivarBotonMenorDeEdad}
+              className="btn text-white px-4 py-2 fs-5"
+              style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
+              onMouseEnter={() => setHoverNueva(true)}
+              onMouseLeave={() => setHoverNueva(false)}
+              onClick={() => setShowModal(true)}
+            >
+              + Nueva Autorización
+            </button>
+          </span>
+        </OverlayTrigger>
       </div>
 
       {error && <div className="alert alert-danger text-center mb-4">{error}</div>}

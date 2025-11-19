@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Row, Col, Container, Alert } from "react-bootstrap";
+import { OverlayTrigger, Tooltip, Button, Card, Row, Col, Container, Alert } from "react-bootstrap";
 import NuevoTurno from "./nuevoTurno";
 import CardPersonalizada from "../../components/Cards/CardPersonalizada";
 import Home from "../home/home";
+import { calcularEdad } from "../../utils/utils";
 
 export default function Turnos() {
   const [pantallaNuevoTurno, setPantallaNuevoTurno] = useState(false);
@@ -10,7 +11,8 @@ export default function Turnos() {
   const [turnos, setTurnos] = useState([]);
   const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
   const [turnosHijos, setTurnosHijos] = useState([]);
-  const [afiTieneHijos,setAfiTieneHijos] = useState(false);
+  const [afiTieneHijos, setAfiTieneHijos] = useState(null);
+  const [desactivarBotonMenorDeEdad, setDesactivarBotonMenorDeEdad] = useState(null)
 
   const [ultimoTurno, setUltimoTurno] = useState(null);
 
@@ -51,6 +53,13 @@ export default function Turnos() {
     obtenerTurnosHijosAPI()
     const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
     setIntegrantesCuenta(grupoFamiliar);
+    if (calcularEdad(usuarioLogueado.fechaDeNacimiento) <= 16) {
+      setDesactivarBotonMenorDeEdad(true)
+    } else {
+      setDesactivarBotonMenorDeEdad(false)
+    }
+    //tieneHijos()
+
   }, [])
 
   useEffect(() => {
@@ -68,23 +77,26 @@ export default function Turnos() {
   }, [pantallaNuevoTurno]);
 
 
-  const tieneHijos = async() =>  {
+  const tieneHijos = async () => {
     try {
       const resTieneHijos = await fetch(`http://localhost:3000/appointment/${usuarioLogueado.id}/tieneHijos`)
-      if(resTieneHijos.ok){
-         const errorData = await resTieneHijos.json();
+      if (!resTieneHijos.ok) {
+        const errorData = await resTieneHijos.json();
         throw new Error(errorData.error || "Error en la respuesta del servidor");
       }
 
-      const dataTieneHijos = resTieneHijos.json()
+      const dataTieneHijos = await resTieneHijos.json()
 
-      if(dataTieneHijos.existe) {
+      if (dataTieneHijos.existe) {
         setAfiTieneHijos(true)
+      }
+      else {
+        setAfiTieneHijos(false)
       }
 
 
     } catch (error) {
-        setAlerta({ msg: error.message, tipo: "danger" });
+      setAlerta({ msg: error.message, tipo: "danger" });
     }
   }
   const actualizarHome = () => {
@@ -147,13 +159,26 @@ export default function Turnos() {
         <>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h2>Turnos</h2>
-            <Button
-              variant="primary"
-              className="fw-bold px-4 py-2 fs-5 rounded-3"
-              style={{ background: "#132074", border: "none" }}
-              onClick={() => setPantallaNuevoTurno(true)}
-            >Nuevo turno
-            </Button>
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip>
+                  Debes ser mayor de 16 años de edad para sacar un turno
+                </Tooltip>
+              }
+            >
+              <span className="d-inline-block">
+                <Button
+                  disabled={desactivarBotonMenorDeEdad}
+                  variant="primary"
+                  className="fw-bold px-4 py-2 fs-5 rounded-3"
+                  style={{ background: "#132074", border: "none" }}
+                  onClick={() => setPantallaNuevoTurno(true)}
+                >
+                 + Nuevo turno
+                </Button>
+              </span>
+            </OverlayTrigger>
 
           </div>
 
@@ -161,7 +186,7 @@ export default function Turnos() {
 
           <Row>
             {/* Columna Mis Turnos */}
-            <Col md={6}>
+            <Col md={!afiTieneHijos ? 6 : 12}>
               <Card className=" border shadow-sm">
                 <Card.Header className="bg-light">
                   <h4 className="mb-0">Mis Turnos</h4>
@@ -204,7 +229,7 @@ export default function Turnos() {
             </Col>
 
             {/* Columna Turnos Hijos */}
-            <Col md={6}>
+            {afiTieneHijos && <Col md={6}>
               <Card className=" border shadow-sm">
                 <Card.Header className="bg-light">
                   <h4 className="mb-0">Turnos Hijos</h4>
@@ -233,14 +258,13 @@ export default function Turnos() {
                   ) : (
                     <div className="text-center py-5 flex-grow-1 d-flex align-items-center justify-content-center">
                       <div>
-                        {afiTieneHijos &&<h5 className="text-muted mb-3">No hay turnos asignados a tus hijos</h5>}
-                        {!afiTieneHijos && <h5 className="text-muted mb-3">No tenes hijos a tu cargo</h5>}
+                        <h5 className="text-muted mb-3">No hay turnos asignados a tus hijos</h5>
                       </div>
                     </div>
                   )}
                 </Card.Body>
               </Card>
-            </Col>
+            </Col>}
           </Row>
         </>
       ) : (
