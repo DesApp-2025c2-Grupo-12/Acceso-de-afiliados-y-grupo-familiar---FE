@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 export default function VerAutorizacion({
   autorizacion,
-  setAutorizacionSeleccionada,
+  setAutorizacionParaVer,
   setSuccess, // viene del padre prop
   setAutorizaciones, // viene del padre prop
 }) {
@@ -47,7 +47,7 @@ export default function VerAutorizacion({
     setTimeout(() => setSuccess(""), 4000);
 
     setShow(false);
-    setTimeout(() => setAutorizacionSeleccionada(null), 200);
+    setTimeout(() => setAutorizacionParaVer(null), 200);
   } catch (err) {
     console.error(err);
     alert(err.message);
@@ -66,7 +66,7 @@ export default function VerAutorizacion({
 
   const cerrarModal = () => {
     setShow(false);
-    setTimeout(() => setAutorizacionSeleccionada(null), 200);
+    setTimeout(() => setAutorizacionParaVer(null), 200);
   };
 
   if (!mounted) return null;

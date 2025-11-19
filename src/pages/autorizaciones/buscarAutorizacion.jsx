@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function BuscarAutorizacion({ searchTerm, setSearchTerm, hoverBuscar, setHoverBuscar }) {
+export default function BuscarAutorizacion({ searchTerm, setSearchTerm}) {
   return (
     <div className="d-flex align-items-center mb-4 flex-nowrap" style={{ gap: "8px" }}>
       
@@ -13,8 +13,6 @@ export default function BuscarAutorizacion({ searchTerm, setSearchTerm, hoverBus
         value={searchTerm}                
         onChange={(e) => setSearchTerm(e.target.value)} 
       />
-
-     
     </div>
   );
 }

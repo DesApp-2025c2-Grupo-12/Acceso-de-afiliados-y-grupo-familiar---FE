@@ -3,6 +3,7 @@ import CardAutorizacion from "./cardAutorizacion";
 import NuevaAutorizacion from "./nuevaAutorizacion";
 import VerAutorizacion from "./verAutorizacion";
 import BuscarAutorizacion from "./buscarAutorizacion";
+import EditarAutorizacion from "./editarAutorizacion";
 
 export default function Autorizaciones() {
   const [autorizaciones, setAutorizaciones] = useState([]);
@@ -29,9 +30,14 @@ export default function Autorizaciones() {
   const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar") || "[]");
   const integrantesCuentaStorage = usuarioLogueado ? [usuarioLogueado, ...grupoFamiliar] : [];
 
-  // ESTADOS NUEVOS para el modal de confirmación de borrado
+
+  // ESTADOS NUEVOS para el modal de confirmación de borrado y modificacion
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [autorizacionAEliminar, setAutorizacionAEliminar] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [autorizacionParaVer, setAutorizacionParaVer] = useState(null);
+  
+
 
   useEffect(() => {
   if (!usuarioLogueado) return;
@@ -85,7 +91,7 @@ export default function Autorizaciones() {
 
         const userDoc = (localStorage.getItem("documentoUsuario") || "").trim();
         if (!userDoc) {
-          console.warn("No se encontró el documento del usuario logueado");
+       //   console.warn("No se encontró el documento del usuario logueado");
           return;
         }
         // solo familiares, excluye el titular aunque tenga perteneceA igual a su documento
@@ -116,10 +122,22 @@ export default function Autorizaciones() {
     setShowDeleteModal(true);
   };
 
+  const onRequestEdit = (autorizacion) => {
+    setAutorizacionSeleccionada(autorizacion); 
+    setShowEditModal(true);
+  };
+
+
   //  FUNCIÓN para cancelar el modal
   const handleCancelDelete = () => {
     setShowDeleteModal(false);
     setAutorizacionAEliminar(null);
+  };
+
+  const handleUpdateAuthorization = (updated) => {
+    setAutorizaciones(prev =>
+      prev.map(a => a.id === updated.id ? updated : a)
+    );
   };
 
   //  FUNCIÓN para confirmar y ejecutar el DELETE
@@ -182,8 +200,9 @@ export default function Autorizaciones() {
             <CardAutorizacion
               key={auto.id}
               autorizacion={auto}
-              setAutorizacionSeleccionada={setAutorizacionSeleccionada}
+              setAutorizacionParaVer={setAutorizacionParaVer} 
               onRequestDelete={handleRequestDelete} // pasamos la función al card
+              onRequestEdit={onRequestEdit}  // se lo paso a la card
             />
           ))
         ) : (
@@ -217,10 +236,10 @@ export default function Autorizaciones() {
         setSuccess={setSuccess}
       />
 
-      {autorizacionSeleccionada && (
+      {autorizacionParaVer  && (
         <VerAutorizacion
-          autorizacion={autorizacionSeleccionada}
-          setAutorizacionSeleccionada={setAutorizacionSeleccionada}
+          autorizacion={autorizacionParaVer }
+          setAutorizacionParaVer={setAutorizacionParaVer}
           setSuccess={setSuccess}
           setAutorizaciones={setAutorizaciones}
           autorizaciones={autorizaciones}
@@ -285,6 +304,29 @@ export default function Autorizaciones() {
           </div>
         </>
       )}
+{showEditModal && autorizacionSeleccionada &&(
+  <EditarAutorizacion
+    showModal={showEditModal}
+    setShowModal={setShowEditModal}  
+    data={autorizacionSeleccionada}  
+    integrantesCuenta={(() => {
+      const lista = integrantesCuenta.length > 0 ? integrantesCuenta : integrantesCuentaStorage;
+      // eliminar duplicados por documento o id
+      const vistos = new Set();
+      return lista.filter((i) => {
+        const doc = i.numeroDeDocumento || i.documento || "";
+        if (vistos.has(doc)) return false;
+        vistos.add(doc);
+        return true;
+      });
+    })()}
+    onUpdate={handleUpdateAuthorization}
+    setSuccess={setSuccess}
+    setError={setError}
+  />
+)}
+
+
     </div>
   );
 }
