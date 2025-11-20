@@ -3,13 +3,9 @@ import CardAutorizacion from "./cardAutorizacion";
 import NuevaAutorizacion from "./nuevaAutorizacion";
 import VerAutorizacion from "./verAutorizacion";
 import BuscarAutorizacion from "./buscarAutorizacion";
-<<<<<<< HEAD
 import EditarAutorizacion from "./editarAutorizacion";
-=======
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { calcularEdad } from "../../utils/utils";
->>>>>>> ddc29de82c0230f4e762ff5d8ab7eb5d4689eebf
-
 export default function Autorizaciones() {
   const [autorizaciones, setAutorizaciones] = useState([]);
   const [hoverNueva, setHoverNueva] = useState(false);
