@@ -13,6 +13,7 @@ export default function Turnos() {
   const [turnosHijos, setTurnosHijos] = useState([]);
   const [afiTieneHijos, setAfiTieneHijos] = useState(null);
   const [desactivarBotonMenorDeEdad, setDesactivarBotonMenorDeEdad] = useState(null)
+  const [hoverTurno, setHoverTurno] = useState(false);
 
   const [ultimoTurno, setUltimoTurno] = useState(null);
 
@@ -159,27 +160,50 @@ export default function Turnos() {
         <>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h2>Turnos</h2>
-            <OverlayTrigger
-              placement="top"
-              overlay={
-                <Tooltip>
-                  Debes ser mayor de 16 años de edad para sacar un turno
-                </Tooltip>
-              }
-            >
-              <span className="d-inline-block">
-                <Button
-                  disabled={desactivarBotonMenorDeEdad}
-                  variant="primary"
-                  className="fw-bold px-4 py-2 fs-5 rounded-3"
-                  style={{ background: "#132074", border: "none" }}
-                  onClick={() => setPantallaNuevoTurno(true)}
-                >
-                 + Nuevo turno
-                </Button>
-              </span>
-            </OverlayTrigger>
 
+            {/* 🆕 Tooltip CONDICIONAL - solo se muestra si es menor */}
+            {desactivarBotonMenorDeEdad ? (
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip>
+                    Debes ser mayor de 16 años de edad para sacar un turno
+                  </Tooltip>
+                }
+              >
+                <span className="d-inline-block">
+                  <Button
+                    disabled={desactivarBotonMenorDeEdad}
+                    variant="primary"
+                    className="fw-bold px-4 py-2 fs-5 rounded-3"
+                    style={{
+                      background: hoverTurno ? "#b0b0b0" : "#132074",
+                      border: "none"
+                    }}
+                    onMouseEnter={() => setHoverTurno(true)}
+                    onMouseLeave={() => setHoverTurno(false)}
+                    onClick={() => setPantallaNuevoTurno(true)}
+                  >
+                    + Nuevo turno
+                  </Button>
+                </span>
+              </OverlayTrigger>
+            ) : (
+
+              <Button
+                variant="primary"
+                className="fw-bold px-4 py-2 fs-5 rounded-3"
+                style={{
+                  background: hoverTurno ? "#b0b0b0" : "#132074",
+                  border: "none"
+                }}
+                onMouseEnter={() => setHoverTurno(true)}
+                onMouseLeave={() => setHoverTurno(false)}
+                onClick={() => setPantallaNuevoTurno(true)}
+              >
+                + Nuevo turno
+              </Button>
+            )}
           </div>
 
           {alerta.msg && <Alert variant={alerta.tipo}>{alerta.msg}</Alert>}

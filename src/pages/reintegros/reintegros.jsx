@@ -96,24 +96,33 @@ export default function Reintegros() {
             <div className="container mt-4">
                 <div className="d-flex justify-content-between align-items-center mb-3">
                     <h3 className="titulo-reintegros">MIS REINTEGROS</h3>
-                    <OverlayTrigger
-                        placement="top"
-                        overlay={
-                            <Tooltip>
-                                Debes ser mayor de 16 años de edad para crear un nuevo reintegro
-                            </Tooltip>
-                        }
-                    >
-                        <span className="d-inline-block">
-                            <button
-                                disabled={desactivarBotonMenorDeEdad}
-                                className={`miBotonBase ${desactivarBotonMenorDeEdad ? 'miBotonRecetaDisabled' : 'miBotonReceta'}`}
-                                onClick={() => setModalAbierto(true)}
-                            >
-                                + Nuevo Reintegro
-                            </button>
-                        </span>
-                    </OverlayTrigger>
+                    {desactivarBotonMenorDeEdad ? (
+                        <OverlayTrigger
+                            placement="top"
+                            overlay={
+                                <Tooltip>
+                                    Debes ser mayor de 16 años de edad para crear un nuevo reintegro
+                                </Tooltip>
+                            }
+                        >
+                            <span className="d-inline-block">
+                                <button
+                                    disabled={desactivarBotonMenorDeEdad}
+                                    className={`miBotonBase ${desactivarBotonMenorDeEdad ? 'miBotonRecetaDisabled' : 'miBotonReceta'}`}
+                                    onClick={() => setModalAbierto(true)}
+                                >
+                                    + Nuevo Reintegro
+                                </button>
+                            </span>
+                        </OverlayTrigger>
+                    ) : (
+                        <button
+                            className="miBotonBase miBotonReceta"
+                            onClick={() => setModalAbierto(true)}
+                        >
+                            + Nuevo Reintegro
+                        </button>
+                    )}
                 </div>
 
                 <div className="d-flex justify-content-between align-items-center mb-4">

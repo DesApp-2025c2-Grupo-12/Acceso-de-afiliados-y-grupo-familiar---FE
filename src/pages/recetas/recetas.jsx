@@ -77,27 +77,39 @@ export default function Recetas() {
     <div className="container">
       <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
         <h2 className="fw-bold text-dark fs-3 mb-0">MIS RECETAS</h2>
-        <OverlayTrigger
-          placement="top"
-          overlay={
-            <Tooltip>
-              Debes ser mayor de 16 años de edad para crear una nueva receta
-            </Tooltip>
-          }
-        >
-          <span className="d-inline-block">
-            <button
-              disabled={desactivarBotonMenorDeEdad}
-              className="btn text-white px-4 py-2 fs-5"
-              style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
-              onMouseEnter={() => setHoverNueva(true)}
-              onMouseLeave={() => setHoverNueva(false)}
-              onClick={abrirModalNuevaReceta}
-            >
-              + Nueva Receta
-            </button>
-          </span>
-        </OverlayTrigger>
+        {desactivarBotonMenorDeEdad ? (
+          <OverlayTrigger
+            placement="top"
+            overlay={
+              <Tooltip>
+                Debes ser mayor de 16 años de edad para crear una nueva receta
+              </Tooltip>
+            }
+          >
+            <span className="d-inline-block">
+              <button
+                disabled={desactivarBotonMenorDeEdad}
+                className="btn text-white px-4 py-2 fs-5"
+                style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
+                onMouseEnter={() => setHoverNueva(true)}
+                onMouseLeave={() => setHoverNueva(false)}
+                onClick={abrirModalNuevaReceta}
+              >
+                + Nueva Receta
+              </button>
+            </span>
+          </OverlayTrigger>
+        ) : (
+          <button
+            className="btn text-white px-4 py-2 fs-5"
+            style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
+            onMouseEnter={() => setHoverNueva(true)}
+            onMouseLeave={() => setHoverNueva(false)}
+            onClick={abrirModalNuevaReceta}
+          >
+            + Nueva Receta
+          </button>
+        )}
       </div>
 
       {/* Mensajes */}

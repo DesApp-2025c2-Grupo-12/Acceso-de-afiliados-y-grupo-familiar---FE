@@ -38,7 +38,7 @@ export default function Autorizaciones() {
   const [autorizacionAEliminar, setAutorizacionAEliminar] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [autorizacionParaVer, setAutorizacionParaVer] = useState(null);
-  
+
 
 
   useEffect(() => {
@@ -98,7 +98,7 @@ export default function Autorizaciones() {
 
         const userDoc = (localStorage.getItem("documentoUsuario") || "").trim();
         if (!userDoc) {
-       //   console.warn("No se encontró el documento del usuario logueado");
+          //   console.warn("No se encontró el documento del usuario logueado");
           return;
         }
         // solo familiares, excluye el titular aunque tenga perteneceA igual a su documento
@@ -130,7 +130,7 @@ export default function Autorizaciones() {
   };
 
   const onRequestEdit = (autorizacion) => {
-    setAutorizacionSeleccionada(autorizacion); 
+    setAutorizacionSeleccionada(autorizacion);
     setShowEditModal(true);
   };
 
@@ -180,27 +180,40 @@ export default function Autorizaciones() {
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
         <h2 className="fw-bold text-dark fs-3 mb-0">MIS AUTORIZACIONES</h2>
-        <OverlayTrigger
-          placement="top"
-          overlay={
-            <Tooltip>
-              Debes ser mayor de edad para crear una nueva autorización
-            </Tooltip>
-          }
-        >
-          <span className="d-inline-block">
-            <button
-              disabled={desactivarBotonMenorDeEdad}
-              className="btn text-white px-4 py-2 fs-5"
-              style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
-              onMouseEnter={() => setHoverNueva(true)}
-              onMouseLeave={() => setHoverNueva(false)}
-              onClick={() => setShowModal(true)}
-            >
-              + Nueva Autorización
-            </button>
-          </span>
-        </OverlayTrigger>
+
+        {desactivarBotonMenorDeEdad ? (
+          <OverlayTrigger
+            placement="top"
+            overlay={
+              <Tooltip>
+                Debes ser mayor de edad para crear una nueva autorización
+              </Tooltip>
+            }
+          >
+            <span className="d-inline-block">
+              <button
+                disabled={desactivarBotonMenorDeEdad}
+                className="btn text-white px-4 py-2 fs-5"
+                style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
+                onMouseEnter={() => setHoverNueva(true)}
+                onMouseLeave={() => setHoverNueva(false)}
+                onClick={() => setShowModal(true)}
+              >
+                + Nueva Autorización
+              </button>
+            </span>
+          </OverlayTrigger>
+        ) : (
+          <button
+            className="btn text-white px-4 py-2 fs-5"
+            style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
+            onMouseEnter={() => setHoverNueva(true)}
+            onMouseLeave={() => setHoverNueva(false)}
+            onClick={() => setShowModal(true)}
+          >
+            + Nueva Autorización
+          </button>
+        )}
       </div>
 
       {error && <div className="alert alert-danger text-center mb-4">{error}</div>}
@@ -219,7 +232,7 @@ export default function Autorizaciones() {
             <CardAutorizacion
               key={auto.id}
               autorizacion={auto}
-              setAutorizacionParaVer={setAutorizacionParaVer} 
+              setAutorizacionParaVer={setAutorizacionParaVer}
               onRequestDelete={handleRequestDelete} // pasamos la función al card
               onRequestEdit={onRequestEdit}  // se lo paso a la card
             />
@@ -255,9 +268,9 @@ export default function Autorizaciones() {
         setSuccess={setSuccess}
       />
 
-      {autorizacionParaVer  && (
+      {autorizacionParaVer && (
         <VerAutorizacion
-          autorizacion={autorizacionParaVer }
+          autorizacion={autorizacionParaVer}
           setAutorizacionParaVer={setAutorizacionParaVer}
           setSuccess={setSuccess}
           setAutorizaciones={setAutorizaciones}
@@ -323,27 +336,27 @@ export default function Autorizaciones() {
           </div>
         </>
       )}
-{showEditModal && autorizacionSeleccionada &&(
-  <EditarAutorizacion
-    showModal={showEditModal}
-    setShowModal={setShowEditModal}  
-    data={autorizacionSeleccionada}  
-    integrantesCuenta={(() => {
-      const lista = integrantesCuenta.length > 0 ? integrantesCuenta : integrantesCuentaStorage;
-      // eliminar duplicados por documento o id
-      const vistos = new Set();
-      return lista.filter((i) => {
-        const doc = i.numeroDeDocumento || i.documento || "";
-        if (vistos.has(doc)) return false;
-        vistos.add(doc);
-        return true;
-      });
-    })()}
-    onUpdate={handleUpdateAuthorization}
-    setSuccess={setSuccess}
-    setError={setError}
-  />
-)}
+      {showEditModal && autorizacionSeleccionada && (
+        <EditarAutorizacion
+          showModal={showEditModal}
+          setShowModal={setShowEditModal}
+          data={autorizacionSeleccionada}
+          integrantesCuenta={(() => {
+            const lista = integrantesCuenta.length > 0 ? integrantesCuenta : integrantesCuentaStorage;
+            // eliminar duplicados por documento o id
+            const vistos = new Set();
+            return lista.filter((i) => {
+              const doc = i.numeroDeDocumento || i.documento || "";
+              if (vistos.has(doc)) return false;
+              vistos.add(doc);
+              return true;
+            });
+          })()}
+          onUpdate={handleUpdateAuthorization}
+          setSuccess={setSuccess}
+          setError={setError}
+        />
+      )}
 
 
     </div>
