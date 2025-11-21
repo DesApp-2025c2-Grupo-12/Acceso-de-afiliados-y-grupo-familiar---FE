@@ -130,7 +130,7 @@ const handleGuardar = async () => {
         `Este paciente ya tiene ${totalCantidad} unidades de "${formData.nombreDelMedicamento}" este mes (máximo 2)`
       );
     }
-
+    const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado"))
     // 5️⃣ Preparar receta para enviar
     const recetaParaEnviar = {
       paciente: pacienteNombre,
@@ -140,7 +140,8 @@ const handleGuardar = async () => {
       observaciones: formData.observaciones,
       estado: "Recibido",
       numeroDeDocumento: formData.paciente,
-      affiliateId: pacienteSeleccionado.id, // clave FK correcta
+      affiliateId: pacienteSeleccionado.id, // clave FK correcta,
+      usuarioLogueadoId: usuarioLogueado.id
     };
 
     // 6️⃣ Guardar en backend

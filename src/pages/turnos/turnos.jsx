@@ -229,7 +229,7 @@ export default function Turnos() {
             </Col>
 
             {/* Columna Turnos Hijos */}
-            {afiTieneHijos && <Col md={6}>
+            {!afiTieneHijos && <Col md={6}>
               <Card className=" border shadow-sm">
                 <Card.Header className="bg-light">
                   <h4 className="mb-0">Turnos Hijos</h4>
@@ -242,14 +242,18 @@ export default function Turnos() {
                           <CardPersonalizada
                             header={turno.afiliado.nombre + " " + turno.afiliado.apellido}
                             title={turno.nombreDelPrestador}
+                            titleClassName="h5 fw-bold text-dark mb-1"
                             subtitle={turno.especialidad}
+                            subtitleClassName="text-primary fw-normal mb-2"
                             tipo={turno.tipo}
+                            tipoClassName="badge bg-warning text-dark fs-7 mb-2"
                             detalles={[
                               { label: "Fecha", value: turno.fecha },
                               { label: "Horario", value: turno.horario },
                               { label: "Lugar", value: turno.lugarDeAtencion },
                             ]}
-                            botonTexto="Dar de baja"
+                            detallesClassName="text-secondary small mb-2"
+                            botonTexto="Cancelar turno"
                             onClick={() => cancelarTurno(turno)}
                           />
                         </Col>

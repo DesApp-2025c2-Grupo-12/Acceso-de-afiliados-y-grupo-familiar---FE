@@ -21,6 +21,8 @@ export default function NuevaAutorizacion({
       return () => clearTimeout(timer);
     }
   }, [success, setSuccess]);
+
+  const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado"))
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -32,6 +34,7 @@ export default function NuevaAutorizacion({
         lugarDePrestacion: formData.lugar,
         diasDeInternacion: Number(formData.internacion),
         observaciones: formData.observaciones,
+        usuarioLogueadoId: usuarioLogueado.id
         //estado: "Pendiente",
       };
       const res = await fetch("http://localhost:3000/authorization", {

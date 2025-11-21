@@ -94,7 +94,7 @@ export default function Login() {
       const usuario = JSON.parse(localStorage.getItem("usuarioLogueado"))
 
       // Obtener grupo familiar
-      const resGrupoFam = await fetch(`http://localhost:3000/affiliate/grupo-familiar/${usuario.perteneceA}`)
+      const resGrupoFam = await fetch(`http://localhost:3000/affiliate/grupo-familiar/${usuario.numeroDeDocumento}`)
       if (!resGrupoFam.ok) throw new Error("Error al obtener grupo familiar")
       const dataGrupFam = await resGrupoFam.json()
 
