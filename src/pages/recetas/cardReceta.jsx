@@ -1,4 +1,7 @@
 import React from "react";
+import { OverlayTrigger, Tooltip } from "react-bootstrap"; 
+import { calcularEdad } from "../../utils/utils";
+
 
 export default function CardReceta({ receta, handleVer, handleRenovar, handleDescargar }) {
   const estadoColores = {
@@ -8,6 +11,9 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
     "Aprobado": { backgroundColor: "#469F5E", color: "black" },
     "Rechazado": { backgroundColor: "#aa3737ff", color: "black" },
   };
+
+  const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
+  const desactivarBotonMenorDeEdad = calcularEdad(usuarioLogueado?.fechaDeNacimiento) <= 16;
 
   const formatFecha = (fechaStr) => {
     if (!fechaStr) return "-";
@@ -24,7 +30,7 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
   return (
     <div className="col-md-6 mb-4">
       <div className="card h-100 shadow-sm" style={{ border: "1px solid #ccc" }}>
-        
+
         {/* Franja superior con el estado */}
         <div
           style={{
@@ -67,26 +73,55 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
             >
               Ver
             </button>
-
-            {/* ✔️ RENOVAR SOLO SI ESTA APROBADO */}
+            {/* 🆕 RENOVAR SOLO SI ESTA APROBADO Y CON CONTROL DE EDAD */}
             {receta.estado === "Aprobado" && (
-              <button
-                className="btn btn-sm rounded-pill"
-                style={{
-                  border: "1px solid black",
-                  color: "black",
-                  backgroundColor: "white",
-                  borderRadius: "50px",
-                  padding: "3px 12px",
-                  fontSize: "0.9rem",
-                  transition: "all 0.2s ease-in-out",
-                }}
-                onMouseEnter={(e) => { e.target.style.backgroundColor = "#c5c5c5ff"; }}
-                onMouseLeave={(e) => { e.target.style.backgroundColor = "white"; }}
-                onClick={() => handleRenovar(receta)}
-              >
-                Renovar
-              </button>
+              desactivarBotonMenorDeEdad ? (
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip>
+                      Debes ser mayor de 16 años de edad para renovar recetas
+                    </Tooltip>
+                  }
+                >
+                  <span className="d-inline-block">
+                    <button
+                      className="btn btn-sm rounded-pill"
+                      style={{
+                        border: "1px solid black",
+                        color: "black",
+                        backgroundColor: "white",
+                        borderRadius: "50px",
+                        padding: "3px 12px",
+                        fontSize: "0.9rem",
+                        opacity: 0.6,
+                        cursor: "not-allowed",
+                      }}
+                      disabled
+                    >
+                      Renovar
+                    </button>
+                  </span>
+                </OverlayTrigger>
+              ) : (
+                <button
+                  className="btn btn-sm rounded-pill"
+                  style={{
+                    border: "1px solid black",
+                    color: "black",
+                    backgroundColor: "white",
+                    borderRadius: "50px",
+                    padding: "3px 12px",
+                    fontSize: "0.9rem",
+                    transition: "all 0.2s ease-in-out",
+                  }}
+                  onMouseEnter={(e) => { e.target.style.backgroundColor = "#c5c5c5ff"; }}
+                  onMouseLeave={(e) => { e.target.style.backgroundColor = "white"; }}
+                  onClick={() => handleRenovar(receta)}
+                >
+                  Renovar
+                </button>
+              )
             )}
 
             {/* ✔️ DESCARGAR SOLO SI ESTA APROBADO */}

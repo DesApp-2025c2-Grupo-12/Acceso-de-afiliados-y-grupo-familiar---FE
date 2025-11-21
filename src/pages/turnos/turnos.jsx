@@ -59,7 +59,7 @@ export default function Turnos() {
     } else {
       setDesactivarBotonMenorDeEdad(false)
     }
-    //tieneHijos()
+    tieneHijos()
 
   }, [])
 
@@ -80,7 +80,7 @@ export default function Turnos() {
 
   const tieneHijos = async () => {
     try {
-      const resTieneHijos = await fetch(`http://localhost:3000/appointment/${usuarioLogueado.id}/tieneHijos`)
+      const resTieneHijos = await fetch(`http://localhost:3000/affiliate/tieneHijos/${usuarioLogueado.id}`)
       if (!resTieneHijos.ok) {
         const errorData = await resTieneHijos.json();
         throw new Error(errorData.error || "Error en la respuesta del servidor");
@@ -154,12 +154,22 @@ export default function Turnos() {
     (a, b) => new Date(a.fechaYHora) - new Date(b.fechaYHora)
   );
 
+  const formatFecha = (fechaStr) => {
+    if (!fechaStr) return "-";
+    const fecha = new Date(fechaStr);
+    const dia = String(fecha.getDate()).padStart(2, "0");
+    const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+    const año = fecha.getFullYear();
+    return `${dia}/${mes}/${año}`;
+  };
+
+
   return (
     <Container className="my-4">
       {!pantallaNuevoTurno ? (
         <>
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2>Turnos</h2>
+            <h2 className="fw-bold text-dark fs-3 mb-0">MIS TURNOS</h2>
 
             {/* 🆕 Tooltip CONDICIONAL - solo se muestra si es menor */}
             {desactivarBotonMenorDeEdad ? (
@@ -210,16 +220,22 @@ export default function Turnos() {
 
           <Row>
             {/* Columna Mis Turnos */}
-            <Col md={!afiTieneHijos ? 6 : 12}>
-              <Card className=" border shadow-sm">
+            {/* Columna Mis Turnos */}
+            <Col md={!afiTieneHijos ? 12 : 6}>
+              <Card className="border shadow-sm h-100">
                 <Card.Header className="bg-light">
-                  <h4 className="mb-0">Mis Turnos</h4>
+                  <h4 className="mb-0">Turnos Propios</h4>
                 </Card.Header>
                 <Card.Body className="d-flex flex-column">
                   {turnosOrdenados.length > 0 ? (
-                    <Row>
+                    <Row className="justify-content-center">
                       {turnosOrdenados.map(turno => (
-                        <Col md={12} key={turno.id} className="mb-3">
+                        <Col
+                          md={!afiTieneHijos ? 6 : 12}
+                          lg={!afiTieneHijos ? 4 : 12}
+                          key={turno.id}
+                          className="mb-3"
+                        >
                           <CardPersonalizada
                             title={turno.nombreDelPrestador}
                             titleClassName="h5 fw-bold text-dark mb-1"
@@ -228,14 +244,14 @@ export default function Turnos() {
                             tipo={turno.tipo}
                             tipoClassName="badge bg-warning text-dark fs-7 mb-2"
                             detalles={[
-                              { label: "Fecha", value: turno.fecha },
+                              { label: "Fecha", value: formatFecha(turno.fecha) },
                               { label: "Horario", value: turno.horario?.substring(0, 5) },
                               { label: "Lugar", value: turno.lugarDeAtencion },
                             ]}
                             detallesClassName="text-secondary small mb-2"
                             botonTexto="Cancelar turno"
                             onClick={() => cancelarTurno(turno)}
-                            cardClassName="border shadow-sm"
+                            cardClassName="border shadow-sm h-100"
                             bodyClassName="p-3"
                           />
                         </Col>
@@ -251,48 +267,51 @@ export default function Turnos() {
                 </Card.Body>
               </Card>
             </Col>
-
             {/* Columna Turnos Hijos */}
-            {!afiTieneHijos && <Col md={6}>
-              <Card className=" border shadow-sm">
-                <Card.Header className="bg-light">
-                  <h4 className="mb-0">Turnos Hijos</h4>
-                </Card.Header>
-                <Card.Body className="d-flex flex-column">
-                  {turnosOrdenadosHijos.length > 0 ? (
-                    <Row>
-                      {turnosOrdenadosHijos.map(turno => (
-                        <Col md={12} key={turno.id} className="mb-3">
-                          <CardPersonalizada
-                            header={turno.afiliado.nombre + " " + turno.afiliado.apellido}
-                            title={turno.nombreDelPrestador}
-                            titleClassName="h5 fw-bold text-dark mb-1"
-                            subtitle={turno.especialidad}
-                            subtitleClassName="text-primary fw-normal mb-2"
-                            tipo={turno.tipo}
-                            tipoClassName="badge bg-warning text-dark fs-7 mb-2"
-                            detalles={[
-                              { label: "Fecha", value: turno.fecha },
-                              { label: "Horario", value: turno.horario },
-                              { label: "Lugar", value: turno.lugarDeAtencion },
-                            ]}
-                            detallesClassName="text-secondary small mb-2"
-                            botonTexto="Cancelar turno"
-                            onClick={() => cancelarTurno(turno)}
-                          />
-                        </Col>
-                      ))}
-                    </Row>
-                  ) : (
-                    <div className="text-center py-5 flex-grow-1 d-flex align-items-center justify-content-center">
-                      <div>
-                        <h5 className="text-muted mb-3">No hay turnos asignados a tus hijos</h5>
+            {afiTieneHijos && (
+              <Col md={6}>
+                <Card className="border shadow-sm h-100">
+                  <Card.Header className="bg-light">
+                    <h4 className="mb-0">Turnos Hijos</h4>
+                  </Card.Header>
+                  <Card.Body className="d-flex flex-column">
+                    {turnosOrdenadosHijos.length > 0 ? (
+                      <Row>
+                        {turnosOrdenadosHijos.map(turno => (
+                          <Col md={12} key={turno.id} className="mb-3">
+                            <CardPersonalizada
+                              header={turno.afiliado.nombre + " " + turno.afiliado.apellido}
+                              title={turno.nombreDelPrestador}
+                              titleClassName="h5 fw-bold text-dark mb-1"
+                              subtitle={turno.especialidad}
+                              subtitleClassName="text-primary fw-normal mb-2"
+                              tipo={turno.tipo}
+                              tipoClassName="badge bg-warning text-dark fs-7 mb-2"
+                              detalles={[
+                                { label: "Fecha", value: formatFecha(turno.fecha) },
+                                { label: "Horario", value: turno.horario },
+                                { label: "Lugar", value: turno.lugarDeAtencion },
+                              ]}
+                              detallesClassName="text-secondary small mb-2"
+                              botonTexto="Cancelar turno"
+                              onClick={() => cancelarTurno(turno)}
+                              cardClassName="border shadow-sm h-100" 
+                              bodyClassName="p-3"
+                            />
+                          </Col>
+                        ))}
+                      </Row>
+                    ) : (
+                      <div className="text-center py-5 flex-grow-1 d-flex align-items-center justify-content-center">
+                        <div>
+                          <h5 className="text-muted mb-3">No hay turnos asignados a tus hijos</h5>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>}
+                    )}
+                  </Card.Body>
+                </Card>
+              </Col>
+            )}
           </Row>
         </>
       ) : (
