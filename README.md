@@ -22,96 +22,145 @@ El proyecto de afiliados es una aplicación web desarrollada con el fin de que l
 
 ```
 Acceso-de-afiliados-y-grupo-familiar---FE/
-│
+├─ node_modules/
 ├─ public/
 │   ├─ vite.svg
-│   └─ imagenes/
-│       └─ prestadores/
-│           ├─ 1/
-│           │   ├─ 1.jpg
-│           │   ├─ 2.jpg
-│           │   └─ 3.jpg
-│           ├─ 2/
-│           │   ├─ 1.jpg
-│           │   ├─ 2.jpg
-│           │   └─ 3.jpg
-│           ├─ 3/
-│           │   ├─ 1.jpg
-│           │   ├─ 2.jpg
-│           │   └─ 3.jpg
-│           ├─ 4/
-│           │   ├─ 1.jpg
-│           │   ├─ 2.jpg
-│           │   └─ 3.jpg
-│           ├─ 5/
-│           │   ├─ 1.jpg
-│           │   ├─ 2.jpg
-│           │   └─ 3.jpg
-│           └─ 6/
-│               ├─ 1.jpg
-│               ├─ 2.jpg
-│               └─ 3.jpg
-│
+│   ├─ imagenes/
+│   │   ├─ prestadores/
+│   │   │   ├─ 1/
+│   │   │   │   ├─ 1.jpg
+│   │   │   │   ├─ 2.jpg
+│   │   │   │   └─ 3.jpg
+│   │   │   ├─ 2/
+│   │   │   │   ├─ 1.jpg
+│   │   │   │   ├─ 2.jpg
+│   │   │   │   └─ 3.jpg
+│   │   │   ├─ 3/
+│   │   │   │   ├─ 1.jpg
+│   │   │   │   ├─ 2.jpg
+│   │   │   │   └─ 3.jpg
+│   │   │   ├─ 4/
+│   │   │   │   ├─ 1.jpg
+│   │   │   │   ├─ 2.jpg
+│   │   │   │   └─ 3.jpg
+│   │   │   ├─ 5/
+│   │   │   │   ├─ 1.jpg
+│   │   │   │   ├─ 2.jpg
+│   │   │   │   └─ 3.jpg
+│   │   │   ├─ 6/
+│   │   │   │   ├─ 1.jpg
+│   │   │   │   ├─ 2.jpg
+│   │   │   │   └─ 3.jpg
+│   │   │   ├─ 7/
+│   │   │   │   ├─ 1.jpg
+│   │   │   │   ├─ 2.jpg
+│   │   │   │   └─ 3.jpg
+│   │   │   ├─ 8/
+│   │   │   │   ├─ 1.jpg
+│   │   │   │   ├─ 2.jpg
+│   │   │   │   └─ 3.jpg
+│   │   │   ├─ 9/
+│   │   │   │   ├─ 1.jpg
+│   │   │   │   ├─ 2.jpg
+│   │   │   │   └─ 3.jpg
+│   │   │   └─ 10/
+│   │   │       ├─ 1.jpg
+│   │   │       ├─ 2.jpg
+│   │   │       └─ 3.jpg
+│   │   └─ logoPDF/
+│   │       └─ LogoPDF.jpeg
 ├─ src/
 │   ├─ assets/
-│   │
+│   │   ├─ icons/
+│   │   │   ├─ autorizaciones-1.svg
+│   │   │   ├─ autorizaciones-2.svg
+│   │   │   ├─ home-1.svg
+│   │   │   ├─ home-2.svg
+│   │   │   ├─ prestadores-1.svg
+│   │   │   ├─ prestadores-2.svg
+│   │   │   ├─ recetas-1.svg
+│   │   │   ├─ recetas-2.svg
+│   │   │   ├─ reintegros-1.svg
+│   │   │   ├─ reintegros-2.svg
+│   │   │   ├─ turnos-1.svg
+│   │   │   └─ turnos-2.svg
+│   │   ├─ logo.png
+│   │   └─ react.svg
 │   ├─ components/
 │   │   ├─ Cards/
-│   │   │   └─ CardsPersonalizadas.jsx
+│   │   │   └─ CardPersonalizada.jsx
 │   │   ├─ Footer/
-│   │   │   └─ Footer.jsx
+│   │   │   ├─ Footer.jsx
+│   │   │   └─ Footer.css
 │   │   ├─ Form/
-│   │   │   └─ Form.jsx
+│   │   │   ├─ Form.jsx
+│   │   │   └─ Form.css
 │   │   ├─ Header/
 │   │   │   └─ Header.jsx
-│   │   └─ Navbar/
-│   │       └─ Navbar.jsx
-│   │
-│   ├─ protectedRoutes/
-│   │   └─ protectedRoutes.jsx
-│   │
-│   └─ pages/
-│       ├─ autorizaciones/
-│       │   └─ Autorizaciones.jsx
-│       ├─ home/
-│       │   └─ Home.jsx
-│       ├─ login/
-│       │   └─ Login.jsx
-│       ├─ prestadores/
-│       │   ├─ Prestadores.jsx
-│       │   ├─ PrestadorCard.jsx
-│       │   ├─ PrestadorDetallesModal.jsx
-│       │   ├─ PrestadorFilters.jsx
-│       │   ├─ PrestadorList.jsx
-│       │   └─ PrestadorModal.jsx
-│       └─ recetas/
-│           ├─ BuscarReceta.jsx
-│           ├─ CardReceta.jsx
-│           ├─ DescargarReceta.jsx
-│           ├─ NuevaReceta.jsx
-│           ├─ Receta.jsx
-│           └─ RenovarReceta.jsx
-│
-├─ data/
-│   └─ prestadores.json
-│
-├─ utils/
-│   ├─ filtro.jsx
-│   ├─ form.jsx
-│   └─ utils.jsx
-│
+│   │   ├─ Navbar/
+│   │   │   ├─ Navbar.jsx
+│   │   │   └─ Navbar.css
+│   │   └─ protectedRoutes/
+│   │       └─ protectedRoutes.jsx
+│   ├─ data/
+│   │   ├─ grupoFamiliar.json
+│   │   └─ reintegros.json
+│   ├─ pages/
+│   │   ├─ autorizaciones/
+│   │   │   ├─ autorizaciones.jsx
+│   │   │   ├─ buscarAutorizacion.jsx
+│   │   │   ├─ cardAutorizacion.jsx
+│   │   │   ├─ editarAutorizacion.jsx
+│   │   │   ├─ nuevaAutorizacion.jsx
+│   │   │   └─ verAutorizacion.jsx
+│   │   ├─ home/
+│   │   │   ├─ Home.jsx
+│   │   │   └─ home.css
+│   │   ├─ login/
+│   │   │   ├─ Login.jsx
+│   │   │   └─ login.css
+│   │   ├─ prestadores/
+│   │   │   ├─ PrestadorCard.jsx
+│   │   │   ├─ PrestadorDetallesModal.jsx
+│   │   │   ├─ PrestadorFilters.jsx
+│   │   │   ├─ PrestadorList.jsx
+│   │   │   ├─ PrestadorModal.jsx
+│   │   │   └─ prestadores.jsx
+│   │   ├─ recetas/
+│   │   │   ├─ buscarReceta.jsx
+│   │   │   ├─ cardReceta.jsx
+│   │   │   ├─ descargarReceta.jsx
+│   │   │   ├─ nuevaReceta.jsx
+│   │   │   ├─ recetas.jsx
+│   │   │   └─ renovarReceta.jsx
+│   │   ├─ register/
+│   │   │   ├─ Register.jsx
+│   │   │   └─ register.css
+│   │   ├─ reintegros/
+│   │   │   ├─ CardReintegro.jsx
+│   │   │   ├─ ModalDetalleReintegro.jsx
+│   │   │   ├─ ModalNuevoReintegro.jsx
+│   │   │   ├─ reintegros.jsx
+│   │   │   └─ reintegros.css
+│   │   └─ turnos/
+│   │       ├─ turnos.jsx
+│   │       ├─ nuevaTurno.jsx
+│   │       └─ turnos.css
+│   ├─ utils/
+│   │   ├─ filtro.js
+│   │   ├─ form.js
+│   │   └─ utils.js
+├─ App.css
 ├─ App.jsx
-├─ app.css
-├─ main.js
-├─ index.html
-├─ package.json
-├─ package-lock.json
-├─ vite.config.js
-├─ eslint.config.js
+├─ index.css
+├─ main.jsx
 ├─ .gitignore
-└─ README.md
-
-
+├─ eslint.config.js
+├─ index.html
+├─ package-lock.json
+├─ package.json
+├─ README.md
+└─ vite.config.js
 
 ```
 
