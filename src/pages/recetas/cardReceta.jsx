@@ -123,27 +123,56 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
                 </button>
               )
             )}
-
-            {/* ✔️ DESCARGAR SOLO SI ESTA APROBADO */}
-            {receta.estado === "Aprobado" && (
-              <button
-                className="btn btn-sm rounded-pill"
-                style={{
-                  border: "1px solid black",
-                  color: "black",
-                  backgroundColor: "white",
-                  borderRadius: "50px",
-                  padding: "3px 12px",
-                  fontSize: "0.9rem",
-                  transition: "all 0.2s ease-in-out",
-                }}
-                onMouseEnter={(e) => { e.target.style.backgroundColor = "#c5c5c5ff"; }}
-                onMouseLeave={(e) => { e.target.style.backgroundColor = "white"; }}
-                onClick={() => handleDescargar(receta)}
-              >
-                Descargar
-              </button>
-            )}
+{/* ✔️ DESCARGAR SOLO SI ESTA APROBADO Y CON CONTROL DE EDAD */}
+{receta.estado === "Aprobado" && (
+  desactivarBotonMenorDeEdad ? (
+    <OverlayTrigger
+      placement="top"
+      overlay={
+        <Tooltip>
+          Debes ser mayor de 16 años de edad para descargar recetas
+        </Tooltip>
+      }
+    >
+      <span className="d-inline-block">
+        <button
+          className="btn btn-sm rounded-pill"
+          style={{
+            border: "1px solid black",
+            color: "black",
+            backgroundColor: "white",
+            borderRadius: "50px",
+            padding: "3px 12px",
+            fontSize: "0.9rem",
+            opacity: 0.6,
+            cursor: "not-allowed",
+          }}
+          disabled
+        >
+          Descargar
+        </button>
+      </span>
+    </OverlayTrigger>
+  ) : (
+    <button
+      className="btn btn-sm rounded-pill"
+      style={{
+        border: "1px solid black",
+        color: "black",
+        backgroundColor: "white",
+        borderRadius: "50px",
+        padding: "3px 12px",
+        fontSize: "0.9rem",
+        transition: "all 0.2s ease-in-out",
+      }}
+      onMouseEnter={(e) => { e.target.style.backgroundColor = "#c5c5c5ff"; }}
+      onMouseLeave={(e) => { e.target.style.backgroundColor = "white"; }}
+      onClick={() => handleDescargar(receta)}
+    >
+      Descargar
+    </button>
+  )
+)}
 
           </div>
 
