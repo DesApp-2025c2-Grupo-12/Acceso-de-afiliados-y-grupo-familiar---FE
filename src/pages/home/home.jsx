@@ -313,6 +313,94 @@ export default function Home() {
 </div>
 
 
+{/* SECCIÓN SOBRE MEDICINA INTEGRAL */}
+<div className="mt-5">
+  <h3 className="fw-bold mb-4">Sobre Medicina Integral</h3>
+
+  <div className="row g-4">
+
+    {/* COLUMNA IZQUIERDA */}
+    <div className="col-md-4 d-flex flex-column gap-4">
+
+      {/* Tarjeta 1 */}
+      <div
+        className="p-4 rounded shadow-sm"
+        style={{ backgroundColor: "#e6e6f0" }}
+      >
+        <h5 className="fw-bold">Solicitar turnos de atención médica</h5>
+        <p className="m-0">
+          De acuerdo con la disponibilidad configurada por la empresa.
+          Los turnos pueden cancelarse hasta un día antes de la fecha asignada.
+        </p>
+      </div>
+
+      {/* Tarjeta 2 */}
+      <div
+        className="p-4 rounded shadow-sm"
+        style={{ backgroundColor: "#cbd8ff" }}
+      >
+        <h5 className="fw-bold">Gestionar reintegros</h5>
+        <p className="m-0">
+          Carga de factura, datos de la prestación y forma de pago del reintegro.
+          Compatible con cheque, efectivo o transferencia (CBU).
+        </p>
+      </div>
+
+    </div>
+
+    {/* COLUMNA CENTRAL (UNIFICADA) */}
+    <div className="col-md-4">
+      <div
+        className="p-4 rounded shadow-sm h-100"
+        style={{ backgroundColor: "#b6c4ff" }}
+      >
+        <h5 className="fw-bold">Registrar y renovar recetas</h5>
+
+        <p>Posibilidad de consultar recetas anteriores y medicamentos utilizados.</p>
+
+        <p className="fw-bold m-0">Accesos según perfil:</p>
+        <ul>
+          <li>Afiliado: ver y registrar operaciones propias y del grupo familiar.</li>
+          <li>Cónyuge: ver y registrar operaciones propias y de hijos menores.</li>
+          <li>Otros usuarios: registrar únicamente sus propias operaciones.</li>
+        </ul>
+      </div>
+    </div>
+
+    {/* COLUMNA DERECHA */}
+    <div className="col-md-4 d-flex flex-column gap-4">
+
+      {/* Tarjeta derecha 1 */}
+      <div
+        className="p-4 rounded shadow-sm"
+        style={{ backgroundColor: "#e6e6f0" }}
+      >
+        <h5 className="fw-bold">Solicitar turnos de atención médica</h5>
+        <p className="m-0">
+          De acuerdo con la disponibilidad configurada por la empresa.
+          Los turnos pueden cancelarse hasta un día antes de la fecha asignada.
+        </p>
+      </div>
+
+
+      {/* Tarjeta derecha 2 */}
+      <div
+        className="p-4 rounded shadow-sm"
+        style={{ backgroundColor: "#e6e6f0" }}
+      >
+        <h5 className="fw-bold">Solicitar turnos de atención médica</h5>
+        <p className="m-0">
+          De acuerdo con la disponibilidad configurada por la empresa.
+          Los turnos pueden cancelarse hasta un día antes de la fecha asignada.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+    
+
     </div>
   );
 }
