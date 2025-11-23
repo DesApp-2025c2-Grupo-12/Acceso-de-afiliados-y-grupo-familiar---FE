@@ -67,6 +67,12 @@ Acceso-de-afiliados-y-grupo-familiar---FE/
 │   │   │       ├─ 1.jpg
 │   │   │       ├─ 2.jpg
 │   │   │       └─ 3.jpg
+│   │   ├─ centroMedico/
+│   │   │   ├─ 1.jpg
+│   │   │   ├─ 2.jpg
+│   │   │   ├─ 3.jpg
+│   │   │   ├─ 4.jpg
+│   │   │   └─ 5.jpg
 │   │   └─ logoPDF/
 │   │       └─ LogoPDF.jpeg
 ├─ src/
@@ -161,7 +167,6 @@ Acceso-de-afiliados-y-grupo-familiar---FE/
 ├─ package.json
 ├─ README.md
 └─ vite.config.js
-
 ```
 
 # 🚀 Uso

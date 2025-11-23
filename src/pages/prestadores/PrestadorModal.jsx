@@ -5,9 +5,14 @@ export default function PrestadorModal({ prestador, onClose }) {
 
   return (
     <Modal show={!!prestador} onHide={onClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Perfil del Prestador</Modal.Title>
-      </Modal.Header>
+      <Modal.Header
+  closeButton
+  style={{ backgroundColor: "#132074", color: "white" }}
+>
+  <Modal.Title style={{ color: "white" }}>
+    Perfil del Prestador
+  </Modal.Title>
+</Modal.Header>
       <Modal.Body>
         <h5>{prestador.nombreCompleto}</h5>
         <p>
