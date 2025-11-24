@@ -312,6 +312,73 @@ export default function Home() {
   </div>
 </div>
 
+<div
+  style={{
+    width: "100%",
+    height: "4px",
+    backgroundColor: "#132074",
+    margin: "40px 0",
+    borderRadius: "2px"
+  }}
+></div>
+
+{/* Restricciones */}
+<div
+  className="mt-4 p-4 rounded shadow-sm"
+  style={{
+    backgroundColor: "#252e69ff",
+    textAlign: "left",
+    color: "white"
+  }}
+>
+  <h4 className="fw-bold mb-3" style={{ color: "white" }}>
+    Accesos según perfil de usuario
+  </h4>
+
+  <div className="mb-3">
+    <strong>
+      <i className="bi bi-person-fill me-2 text-white"></i>
+      Afiliado
+    </strong>
+    <p className="m-0" style={{ fontSize: "0.95rem" }}>
+      Puede ver sus operaciones y las de todo el grupo familiar. Puede registrar
+      operaciones para sí y para hijos menores de 18 años.
+    </p>
+  </div>
+
+  <div className="mb-3">
+    <strong>
+      <i className="bi bi-people-fill me-2 text-white"></i>
+      Cónyuge
+    </strong>
+    <p className="m-0" style={{ fontSize: "0.95rem" }}>
+      Puede ver y registrar operaciones para sí y para los hijos menores de 18 años.
+    </p>
+  </div>
+
+  <div>
+    <strong>
+      <i className="bi bi-lock-fill me-2 text-white"></i>
+      Otros usuarios
+    </strong>
+    <p className="m-0" style={{ fontSize: "0.95rem" }}>
+      Pueden ver y registrar únicamente sus propias operaciones.
+    </p>
+  </div>
+</div>
+
+
+
+<div
+  style={{
+    width: "100%",
+    height: "4px",
+    backgroundColor: "#132074",
+    margin: "40px 0",
+    borderRadius: "2px"
+  }}
+></div>
+
 
 {/* SECCIÓN SOBRE MEDICINA INTEGRAL */}
 <div className="mt-5">
@@ -355,15 +422,13 @@ export default function Home() {
         style={{ backgroundColor: "#b6c4ff" }}
       >
         <h5 className="fw-bold">Registrar y renovar recetas</h5>
-
-        <p>Posibilidad de consultar recetas anteriores y medicamentos utilizados.</p>
-
-        <p className="fw-bold m-0">Accesos según perfil:</p>
-        <ul>
-          <li>Afiliado: ver y registrar operaciones propias y del grupo familiar.</li>
-          <li>Cónyuge: ver y registrar operaciones propias y de hijos menores.</li>
-          <li>Otros usuarios: registrar únicamente sus propias operaciones.</li>
-        </ul>
+        
+        <p className="m-4">
+        Permite cargar y renovar recetas, consultar recetas anteriores y ver los medicamentos utilizados, 
+        facilitando la gestión desde la web o la app sin necesidad de acercarte a la sede, 
+        con estados actualizados en todo momento para un seguimiento claro de cada solicitud.
+        </p>
+      
       </div>
     </div>
 
@@ -375,10 +440,10 @@ export default function Home() {
         className="p-4 rounded shadow-sm"
         style={{ backgroundColor: "#e6e6f0" }}
       >
-        <h5 className="fw-bold">Solicitar turnos de atención médica</h5>
+        <h5 className="fw-bold">Consultar la cartilla de prestadores</h5>
         <p className="m-0">
-          De acuerdo con la disponibilidad configurada por la empresa.
-          Los turnos pueden cancelarse hasta un día antes de la fecha asignada.
+         Permite visualizar la cartilla actualizada de prestadores de Medicina Integral.
+         Incluye filtros de búsqueda por especialidad, zonas y ubicaciones.
         </p>
       </div>
 
@@ -388,10 +453,10 @@ export default function Home() {
         className="p-4 rounded shadow-sm"
         style={{ backgroundColor: "#e6e6f0" }}
       >
-        <h5 className="fw-bold">Solicitar turnos de atención médica</h5>
+        <h5 className="fw-bold">Gestionar autorizaciones</h5>
         <p className="m-0">
-          De acuerdo con la disponibilidad configurada por la empresa.
-          Los turnos pueden cancelarse hasta un día antes de la fecha asignada.
+        Carga y seguimiento ágil de solicitudes de autorización para prácticas médicas 
+        con estado actualizado en todo momento.
         </p>
       </div>
 
@@ -399,7 +464,6 @@ export default function Home() {
   </div>
 </div>
 
-    
 
     </div>
   );
