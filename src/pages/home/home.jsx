@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function Home() {
   const navigate = useNavigate();
 
-  //ahora toma el usuario correcto
+  
   const usuario = JSON.parse(localStorage.getItem("usuarioLogueado"));
 
   const [stats, setStats] = useState({
@@ -24,18 +24,18 @@ export default function Home() {
         setStats(data);
       })
       .catch(err => console.error("Error cargando dashboard:", err));
-  }, [usuario?.id]); //evita loops y ejecuta cuando corresponde
+  }, [usuario?.id]); 
 
   return (
     <div className="container my-2">
 
-      {/* TITULO */}
+     
       <h1 className="text-center mb-2 fw-bold">Bienvenido a Medicina Integral</h1>
       <p className="text-center text-muted mb-5">
         Recuerde mantener sus datos actualizados para una mejor atención.
       </p>
 
-      {/* GRID PRINCIPAL */}
+     
       <div className="row g-4 justify-content-center align-items-stretch ">
 
         {/* REINTEGROS */}
@@ -214,15 +214,51 @@ export default function Home() {
 
       </div>
  
+{/* CARD + CARRUSEL EN UNA MISMA FILA */}
+<div
+  className="mt-5 p-4 rounded shadow-sm d-flex flex-column flex-md-row"
+  style={{
+    backgroundColor: "#c4d5f5ff",
+    borderLeft: "6px solid #132074",
+    textAlign: "left",
+  }}
+>
+  {/* COLUMNA IZQUIERDA – INFORMACIÓN */}
+  <div style={{ flex: 1, paddingRight: "20px" }}>
+    <h4 className="fw-bold mb-3" style={{ color: "#132074" }}>
+      Información de Contacto
+    </h4>
 
-     {/* CARRUSEL DE IMÁGENES DEL CENTRO MÉDICO */}
-<div className="mt-5">
+    <div style={{ lineHeight: "2", fontSize: "1rem" }}>
+      <p className="mb-2"><strong>📞 Emergencias médicas:</strong> 0800-122-122</p>
+      <p className="mb-2"><strong>☎️ Atención al afiliado:</strong> 011-1212-1212</p>
+      <p className="mb-2"><strong>⏰ Horario de atención:</strong> Lunes a Viernes de 8:00 a 18:00 hs</p>
+      <p className="mb-2">
+        <strong>📍 Dirección:</strong> Centro Médico 12 – Av. Profesional 012, CABA
+      </p>
+    </div>
+  </div>
+
+ 
+  <div
+    className="d-none d-md-block"
+    style={{
+      width: "1px",
+      backgroundColor: "#b5b5b5",
+      margin: "0 25px",
+      opacity: 0.6,
+    }}
+  ></div>
+
+  {/* COLUMNA DERECHA – CARRUSEL */}
+  <div style={{ flex: 1 }} className="mt-4 mt-md-0">
   <div
     id="centroMedicoCarousel"
-    className="carousel slide position-relative"
+    className="carousel slide"
     data-bs-ride="carousel"
+    data-bs-interval="3000"    //segundos donde pasa la imagen
   >
-    {/* INDICADORES (puntitos) */}
+    
     <div className="carousel-indicators">
       {[0, 1, 2, 3, 4].map((i) => (
         <button
@@ -231,12 +267,11 @@ export default function Home() {
           data-bs-target="#centroMedicoCarousel"
           data-bs-slide-to={i}
           className={i === 0 ? "active" : ""}
-          aria-current={i === 0 ? "true" : undefined}
         ></button>
       ))}
     </div>
 
-    {/* IMÁGENES */}
+    
     <div className="carousel-inner rounded shadow">
       {[1, 2, 3, 4, 5].map((n, index) => (
         <div
@@ -245,51 +280,43 @@ export default function Home() {
         >
           <img
             src={`/imagenes/centroMedico/${n}.jpg`}
-            className="d-block w-100"
             alt={`Imagen ${n}`}
+            className="d-block w-100"
             style={{
-              height: "350px",
+              height: "260px",
               objectFit: "cover",
-              borderRadius: "10px"
+              borderRadius: "10px",
             }}
-            onError={(e) => { e.target.src = "/imagenes/centroMedico/placeholder.jpg" }}
           />
         </div>
       ))}
     </div>
 
 
-  
-  </div>
+    <button
+      className="carousel-control-prev"
+      type="button"
+      data-bs-target="#centroMedicoCarousel"
+      data-bs-slide="prev"
+    >
+      <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span className="visually-hidden">Anterior</span>
+    </button>
+
+    <button
+      className="carousel-control-next"
+      type="button"
+      data-bs-target="#centroMedicoCarousel"
+      data-bs-slide="next"
+    >
+      <span className="carousel-control-next-icon" aria-hidden="true"></span>
+      <span className="visually-hidden">Siguiente</span>
+    </button>
+
 </div>
 
-      {/* INFORMACIÓN ÚTIL */}
-<div
-  className="mt-5 p-4 rounded shadow-sm"
-  style={{
-    backgroundColor: "#c4d5f5ff",
-    borderLeft: "6px solid #132074",
-    textAlign: "left"
-  }}
->
-  <h4 className="fw-bold mb-3" style={{ color: "#132074" }}>
-    Información de Contacto  
-    </h4>
-
-  <ul style={{ lineHeight: "2", fontSize: "1rem", paddingLeft: "15px" }}>
-    <div className="mb-3">
-      <strong>📞 Emergencias médicas:</strong> 0800-122-122
-    </div>
-    <div className="mb-3">
-      <strong>☎️ Atención al afiliado:</strong> 011-1212-1212
-    </div>
-    <div className="mb-3">
-      <strong>⏰ Horario de atención:</strong> Lunes a Viernes de 8:00 a 18:00 hs
-    </div>
     
-    <div className="mb-3">
-<strong>📍 Dirección:</strong> Centro Médico 12 – Av. Profesional 012, Ciudad Autónoma de Buenos Aires</div>
-  </ul>
+  </div>
 </div>
 
 
