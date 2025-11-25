@@ -1,10 +1,23 @@
+import { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 
 export default function ModalDetalleReintegro({
   show,
   onHide,
-  reintegro
+  reintegroId
 }) {
+  const [reintegro, setReintegro] = useState(null);
+
+  useEffect(() => {
+    if (show && reintegroId) {
+      // Usa tu endpoint existente
+      fetch(`http://localhost:3000/refund/${reintegroId}`)
+      .then(response => response.json())
+      .then(setReintegro)
+      .catch(console.error);
+    }
+  }, [show, reintegroId]);
+
   if (!reintegro) return null;
 
   return (

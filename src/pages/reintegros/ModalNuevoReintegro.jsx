@@ -26,7 +26,7 @@ export default function ModalNuevoReintegro({
       return;
     }
 
-    const integrante = grupoFamiliar.find((m) => m.DNI === form.integranteDNI);
+    const integrante = grupoFamiliar.find((m) => m.numeroDeDocumento === form.integranteDNI);
 
     // Convertir al formato que espera el backend
     const nuevoReintegro = {
@@ -62,8 +62,8 @@ export default function ModalNuevoReintegro({
           <select className="form-select" name="integranteDNI" value={form.integranteDNI} onChange={handleInputChange}>
             <option value="">Seleccionar...</option>
             {grupoFamiliar.map((miembro) => (
-              <option key={miembro.DNI} value={miembro.DNI}>
-                {miembro.nombre} — {miembro.relacion}
+              <option key={miembro.numeroDeDocumento} value={miembro.numeroDeDocumento}>
+                {miembro.nombre} {miembro.apellido} — {miembro.parentesco}
               </option>
             ))}
           </select>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import "./reintegros.css";
-import grupoFamiliarInicial from "../../data/grupoFamiliar.json";
 import { normalizar, coincide } from "../../utils/filtros";
 import ModalNuevoReintegro from "./ModalNuevoReintegro";
 import ModalDetalleReintegro from "./ModalDetalleReintegro";
@@ -15,6 +14,7 @@ export default function Reintegros() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [desactivarBotonMenorDeEdad, setDesactivarBotonMenorDeEdad] = useState(null)
+    const [grupoFamiliar, setGrupoFamiliar] = useState([]);
 
     const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
 
@@ -30,7 +30,6 @@ export default function Reintegros() {
         (r) => !term || coincide(r, camposBusqueda, term)
     );
 
-    const grupoFamiliar = grupoFamiliarInicial;
 
     const agregarReintegro = async (nuevoReintegro) => {
         try {
@@ -69,7 +68,19 @@ export default function Reintegros() {
             }
 
         };
+        const fetchGrupoFamiliar = async () => {
+            try {
+                const response = await fetch(`http://localhost:3000/affiliate/grupo-familiar/${usuarioLogueado.numeroDeDocumento}`);
+                if (!response.ok) throw new Error("Error al cargar grupo familiar");
+                const data = await response.json();
+                setGrupoFamiliar(data);
+            } catch (err) {
+                console.error("Error fetching grupo familiar:", err);
+            }
+        };
+
         fetchReintegros();
+        fetchGrupoFamiliar();
         if (calcularEdad(usuarioLogueado.fechaDeNacimiento) <= 16) {
             setDesactivarBotonMenorDeEdad(true)
         } else {
@@ -176,7 +187,7 @@ export default function Reintegros() {
             <ModalDetalleReintegro
                 show={modalDetalleAbierto}
                 onHide={() => setModalDetalleAbierto(false)}
-                reintegro={reintegroSeleccionado}
+                reintegroId={reintegroSeleccionado?.id}
             />
         </Container>
     );
