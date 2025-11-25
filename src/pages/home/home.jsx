@@ -1,40 +1,61 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const navigate = useNavigate();
-  const ultimoTurno = JSON.parse(localStorage.getItem("ultimoTurno") || "null");
+
+  //ahora toma el usuario correcto
+  const usuario = JSON.parse(localStorage.getItem("usuarioLogueado"));
+
+  const [stats, setStats] = useState({
+    turnosPendientes: 0,
+    recetasAprobadas: 0,
+    reintegrosAprobados: 0,
+    autorizacionesAprobadas: 0
+  });
+
+  useEffect(() => {
+    if (!usuario || !usuario.id) return;
+
+    fetch(`http://localhost:3000/dashboard/resumen/${usuario.id}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log("Dashboard data recibida:", data);
+        setStats(data);
+      })
+      .catch(err => console.error("Error cargando dashboard:", err));
+  }, [usuario?.id]); //evita loops y ejecuta cuando corresponde
 
   return (
     <div className="container my-2">
 
       {/* TITULO */}
-      <h1 className="text-center mb-2">Bienvenido a Medicina Integral</h1>
+      <h1 className="text-center mb-2 fw-bold">Bienvenido a Medicina Integral</h1>
       <p className="text-center text-muted mb-5">
         Recuerde mantener sus datos actualizados para una mejor atención.
       </p>
 
-
       {/* GRID PRINCIPAL */}
       <div className="row g-4 justify-content-center align-items-stretch ">
 
-
-        {/* REINTEGRO */}
+        {/* REINTEGROS */}
         <div className="col-12 col-md-3 d-flex">
           <div
             className="card text-center shadow-sm p-4 h-100 w-100"
-            style={{ 
-              backgroundColor: "#132074", 
+            style={{
+              backgroundColor: "#132074",
               borderRadius: "20px",
               transition: "transform .2s"
             }}
             onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <h5 className="fw-bold mb-3 text-white">Mis Reintegros</h5>
-            <div className="display-5 fw-bold text-white">1</div>
+            <h5 className="fw-bold mb-2 text-white">Mis Reintegros</h5>
+             <p  className= "text-white">Aprobados</p>
+            <div className="display-5 fw-bold text-white">
+              {stats.reintegrosAprobados}
+            </div>
 
-            {/* Botón */}
             <button
               className="btn btn-sm rounded-pill mt-3"
               style={{
@@ -60,26 +81,23 @@ export default function Home() {
           </div>
         </div>
 
-
         {/* TURNOS */}
         <div className="col-12 col-md-3 d-flex">
           <div
             className="card text-center shadow-sm p-4 h-100 w-100"
-            style={{ 
-              backgroundColor: "#0010a1ff", 
+            style={{
+              backgroundColor: "#0010a1ff",
               borderRadius: "20px",
               transition: "transform .2s"
             }}
             onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <h5 className="fw-bold mb-3 text-white">Mis Turnos</h5>
-
-            {ultimoTurno ? (
-              <div className="display-5 fw-bold text-white">1</div>
-            ) : (
-              <div className="text-white mt-2">Sin turnos</div>
-            )}
+            <h5 className="fw-bold mb-2 text-white">Mis Turnos</h5>
+            <p  className= "text-white">Pendientes</p>
+            <div className="display-5 fw-bold text-white">
+              {stats.turnosPendientes}
+            </div>
 
             <button
               className="btn btn-sm rounded-pill mt-3"
@@ -110,21 +128,20 @@ export default function Home() {
         <div className="col-12 col-md-3 d-flex">
           <div
             className="card text-center shadow-sm p-4 h-100 w-100"
-            style={{ 
-              backgroundColor: "#132074", 
+            style={{
+              backgroundColor: "#132074",
               borderRadius: "20px",
               transition: "transform .2s"
             }}
             onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <h5 className="fw-bold mb-3 text-white">Mis Recetas</h5>
+            <h5 className="fw-bold mb-2 text-white">Mis Recetas</h5>
+            <p  className= "text-white">Aprobadas</p>
 
-            {ultimoTurno ? (
-              <div className="display-5 fw-bold text-white">1</div>
-            ) : (
-              <div className="text-white mt-2">Sin recetas</div>
-            )}
+            <div className="display-5 fw-bold text-white">
+              {stats.recetasAprobadas}
+            </div>
 
             <button
               className="btn btn-sm rounded-pill mt-3"
@@ -155,16 +172,20 @@ export default function Home() {
         <div className="col-12 col-md-3 d-flex">
           <div
             className="card text-center shadow-sm p-4 h-100 w-100"
-            style={{ 
-              backgroundColor: "#0010a1ff", 
+            style={{
+              backgroundColor: "#0010a1ff",
               borderRadius: "20px",
               transition: "transform .2s"
             }}
             onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <h5 className="fw-bold mb-3 text-white">Mis Autorizaciones</h5>
-            <div className="display-5 fw-bold text-white">1</div>
+            <h5 className="fw-bold mb-2 text-white">Mis Autorizaciones</h5>
+            <p  className= "text-white">Aprobadas</p>
+
+            <div className="display-5 fw-bold text-white">
+              {stats.autorizacionesAprobadas}
+            </div>
 
             <button
               className="btn btn-sm rounded-pill mt-3"
@@ -189,15 +210,10 @@ export default function Home() {
               Ver
             </button>
           </div>
-
-          
         </div>
 
       </div>
-
-
-
-      
+ 
 
      {/* CARRUSEL DE IMÁGENES DEL CENTRO MÉDICO */}
 <div className="mt-5">
@@ -257,8 +273,8 @@ export default function Home() {
   }}
 >
   <h4 className="fw-bold mb-3" style={{ color: "#132074" }}>
-    Información Útil
-  </h4>
+    Información de Contacto  
+    </h4>
 
   <ul style={{ lineHeight: "2", fontSize: "1rem", paddingLeft: "15px" }}>
     <div className="mb-3">
@@ -268,11 +284,11 @@ export default function Home() {
       <strong>☎️ Atención al afiliado:</strong> 011-1212-1212
     </div>
     <div className="mb-3">
-      <strong>⏰ Horario:</strong> Lunes a Viernes de 8:00 a 18:00 hs
+      <strong>⏰ Horario de atención:</strong> Lunes a Viernes de 8:00 a 18:00 hs
     </div>
     
     <div className="mb-3">
-<strong>📍 Dirección:</strong> Av. Siempre Viva 012, CABA    </div>
+<strong>📍 Dirección:</strong> Centro Médico 12 – Av. Profesional 012, Ciudad Autónoma de Buenos Aires</div>
   </ul>
 </div>
 
