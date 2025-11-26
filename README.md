@@ -24,8 +24,6 @@ facilitando la gestión desde la web o la app.
 
 ![Home](./ImagenesReadme/home.jpg)
 
-![Home](./ImagenesReadme/home2.jpg)
-
 -**Solicitar turnos de atención médica:** Permite solicitar turnos según disponibilidad. Los turnos pueden cancelarse hasta un día antes de la fecha asignada
 facilitando la gestión desde la web o la app.
 
