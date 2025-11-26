@@ -214,108 +214,125 @@ export default function Home() {
 
       </div>
  
-{/* CARD + CARRUSEL EN UNA MISMA FILA */}
+{/* CARD + CARRUSEL – ESTILO INSTITUCIONAL */}
 <div
   className="mt-5 p-4 rounded shadow-sm d-flex flex-column flex-md-row"
   style={{
-    backgroundColor: "#c4d5f5ff",
-    borderLeft: "6px solid #132074",
+    backgroundColor: "#d0daeeff",
+    borderLeft: "6px solid #1b2a59",
     textAlign: "left",
+    borderRadius: "12px"
   }}
 >
   {/* COLUMNA IZQUIERDA – INFORMACIÓN */}
-  <div style={{ flex: 1, paddingRight: "20px" }}>
-    <h4 className="fw-bold mb-3" style={{ color: "#132074" }}>
+  <div style={{ flex: 1, paddingRight: "24px" }}>
+    <h4 className="fw-bold mb-3" style={{ color: "#1b2a59" }}>
       Información de Contacto
     </h4>
 
-    <div style={{ lineHeight: "2", fontSize: "1rem" }}>
-      <p className="mb-2"><strong>📞 Emergencias médicas:</strong> 0800-122-122</p>
-      <p className="mb-2"><strong>☎️ Atención al afiliado:</strong> 011-1212-1212</p>
-      <p className="mb-2"><strong>⏰ Horario de atención:</strong> Lunes a Viernes de 8:00 a 18:00 hs</p>
+    <p className="text-muted" style={{ fontSize: "0.95rem" }}>
+      Nuestro centro médico brinda atención integral para todos los afiliados.
+    </p>
+
+    <div style={{ lineHeight: "1.9", fontSize: "0.96rem", marginTop: "12px" }}>
       <p className="mb-2">
-        <strong>📍 Dirección:</strong> Centro Médico 12 – Av. Profesional 012, CABA
+        <i className="bi bi-exclamation-triangle-fill me-2" style={{ color: "#1b2a59" }}></i>
+        <strong>Emergencias médicas:</strong> 0800-122-122
+      </p>
+
+      <p className="mb-2">
+        <i className="bi bi-telephone-fill me-2" style={{ color: "#1b2a59" }}></i>
+        <strong>Atención al afiliado:</strong> 011-1212-1212
+      </p>
+
+      <p className="mb-2">
+        <i className="bi bi-clock-fill me-2" style={{ color: "#1b2a59" }}></i>
+        <strong>Horario:</strong> Lunes a Viernes de 8:00 a 18:00 hs
+      </p>
+
+      <p className="mb-2">
+        <i className="bi bi-geo-alt-fill me-2" style={{ color: "#1b2a59" }}></i>
+        <strong>Dirección:</strong> Centro Médico 12 – Av. Profesional 012, CABA
       </p>
     </div>
+
+    
   </div>
 
- 
+  {/* DIVISOR */}
   <div
     className="d-none d-md-block"
     style={{
       width: "1px",
-      backgroundColor: "#b5b5b5",
-      margin: "0 25px",
-      opacity: 0.6,
+      backgroundColor: "#b0b6c4",
+      margin: "0 28px",
+      opacity: 0.35
     }}
   ></div>
 
   {/* COLUMNA DERECHA – CARRUSEL */}
   <div style={{ flex: 1 }} className="mt-4 mt-md-0">
-  <div
-    id="centroMedicoCarousel"
-    className="carousel slide"
-    data-bs-ride="carousel"
-    data-bs-interval="3000"    //segundos donde pasa la imagen
-  >
-    
-    <div className="carousel-indicators">
-      {[0, 1, 2, 3, 4].map((i) => (
-        <button
-          key={i}
-          type="button"
-          data-bs-target="#centroMedicoCarousel"
-          data-bs-slide-to={i}
-          className={i === 0 ? "active" : ""}
-        ></button>
-      ))}
-    </div>
-
-    
-    <div className="carousel-inner rounded shadow">
-      {[1, 2, 3, 4, 5].map((n, index) => (
-        <div
-          key={n}
-          className={`carousel-item ${index === 0 ? "active" : ""}`}
-        >
-          <img
-            src={`/imagenes/centroMedico/${n}.jpg`}
-            alt={`Imagen ${n}`}
-            className="d-block w-100"
-            style={{
-              height: "260px",
-              objectFit: "cover",
-              borderRadius: "10px",
-            }}
-          />
-        </div>
-      ))}
-    </div>
-
-
-    <button
-      className="carousel-control-prev"
-      type="button"
-      data-bs-target="#centroMedicoCarousel"
-      data-bs-slide="prev"
+    <div
+      id="centroMedicoCarousel"
+      className="carousel slide"
+      data-bs-ride="carousel"
+      data-bs-interval="3000"
     >
-      <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span className="visually-hidden">Anterior</span>
-    </button>
+      {/* Indicadores */}
+      <div className="carousel-indicators">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <button
+            key={i}
+            type="button"
+            data-bs-target="#centroMedicoCarousel"
+            data-bs-slide-to={i}
+            className={i === 0 ? "active" : ""}
+          ></button>
+        ))}
+      </div>
 
-    <button
-      className="carousel-control-next"
-      type="button"
-      data-bs-target="#centroMedicoCarousel"
-      data-bs-slide="next"
-    >
-      <span className="carousel-control-next-icon" aria-hidden="true"></span>
-      <span className="visually-hidden">Siguiente</span>
-    </button>
+      {/* Imágenes */}
+      <div className="carousel-inner rounded shadow-sm">
+        {[1, 2, 3, 4, 5].map((n, index) => (
+          <div
+            key={n}
+            className={`carousel-item ${index === 0 ? "active" : ""}`}
+          >
+            <img
+              src={`/imagenes/centroMedico/${n}.jpg`}
+              alt={`Imagen ${n}`}
+              className="d-block w-100"
+              style={{
+                height: "260px",
+                objectFit: "cover",
+                borderRadius: "10px"
+              }}
+            />
+          </div>
+        ))}
+      </div>
 
-</div>
+      {/* Controles */}
+      <button
+        className="carousel-control-prev"
+        type="button"
+        data-bs-target="#centroMedicoCarousel"
+        data-bs-slide="prev"
+      >
+        <span className="carousel-control-prev-icon"></span>
+        <span className="visually-hidden">Anterior</span>
+      </button>
 
-    
+      <button
+        className="carousel-control-next"
+        type="button"
+        data-bs-target="#centroMedicoCarousel"
+        data-bs-slide="next"
+      >
+        <span className="carousel-control-next-icon"></span>
+        <span className="visually-hidden">Siguiente</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -324,7 +341,7 @@ export default function Home() {
 <div
   className="mt-4 p-4 rounded shadow-sm"
   style={{
-    backgroundColor: "#d3d3d3ff",
+    backgroundColor: "#dee0e4ff",
     borderLeft: "6px solid #132074",
     textAlign: "left"
   }}
@@ -334,26 +351,41 @@ export default function Home() {
   </h4>
 
   <div className="mb-3">
-    <strong>💻 Nuevo sistema de turnos online</strong>
+    <strong>
+      <i className="bi bi-calendar-check me-2"></i>
+      Implementación del nuevo sistema de turnos online
+    </strong>
     <p className="text-muted m-0" style={{ fontSize: "0.95rem" }}>
-      Ahora podés gestionar tus turnos 24/7 desde la web.
+      Ya se encuentra disponible la gestión de turnos las 24 horas, todos los días.
     </p>
   </div>
+
+  <hr style={{ opacity: 0.15 }} />
 
   <div className="mb-3">
-    <strong>💉 Campaña de vacunación</strong>
+    <strong>
+      <i className="bi bi-droplet-fill me-2"></i>
+      Campaña de vacunación vigente
+    </strong>
     <p className="text-muted m-0" style={{ fontSize: "0.95rem" }}>
-      Acercate a cualquier sede con tu carnet.
+      Podés acercarte a cualquier sede con tu carnet para recibir la dosis correspondiente.
     </p>
   </div>
 
+  <hr style={{ opacity: 0.15 }} />
+
   <div>
-    <strong>🧪 Nuevo laboratorio incorporado</strong>
+    <strong>
+      <i className="bi bi-flask-fill me-2"></i>
+      Incorporación de nuevo laboratorio
+    </strong>
     <p className="text-muted m-0" style={{ fontSize: "0.95rem" }}>
-      Ya podés realizar tus análisis clínicos sin turno previo.
+      Ya están disponibles análisis clínicos sin necesidad de solicitar turno.
     </p>
   </div>
 </div>
+
+
 
 <div
   style={{
@@ -379,38 +411,46 @@ export default function Home() {
   </h4>
 
   <div className="mb-3">
-    <strong>
+    <strong className="d-flex align-items-center">
       <i className="bi bi-person-fill me-2 text-white"></i>
       Afiliado
     </strong>
     <p className="m-0" style={{ fontSize: "0.95rem" }}>
-      Puede ver sus operaciones y las de todo el grupo familiar. Puede registrar
-      operaciones para sí y para hijos menores de 18 años.
+      Acceso completo a sus operaciones y a las del grupo familiar. 
+      Puede registrar operaciones para sí y para hijos menores de edad.
     </p>
   </div>
 
   <div className="mb-3">
-    <strong>
+    <strong className="d-flex align-items-center">
       <i className="bi bi-people-fill me-2 text-white"></i>
       Cónyuge
     </strong>
     <p className="m-0" style={{ fontSize: "0.95rem" }}>
-      Puede ver y registrar operaciones para sí y para los hijos menores de 18 años.
+      Puede visualizar y registrar operaciones propias y de los hijos menores de edad.
+    </p>
+  </div>
+
+  <div className="mb-3">
+    <strong className="d-flex align-items-center">
+      <i className="bi bi-lock-fill me-2 text-white"></i>
+      Usuarios menores de 16 años
+    </strong>
+    <p className="m-0" style={{ fontSize: "0.95rem" }}>
+      Pueden acceder a la plataforma, pero no realizar ningún tipo de operación.
     </p>
   </div>
 
   <div>
-    <strong>
-      <i className="bi bi-lock-fill me-2 text-white"></i>
-      Otros usuarios
+    <strong className="d-flex align-items-center">
+      <i className="bi bi-unlock-fill me-2 text-white"></i>
+      Usuarios de 16 años o más
     </strong>
     <p className="m-0" style={{ fontSize: "0.95rem" }}>
-      Pueden ver y registrar únicamente sus propias operaciones.
+      Habilitados para solicitar turnos exclusivamente para sí mismos.
     </p>
   </div>
 </div>
-
-
 
 <div
   style={{
@@ -429,83 +469,79 @@ export default function Home() {
 
   <div className="row g-4">
 
-    {/* COLUMNA IZQUIERDA */}
-    <div className="col-md-4 d-flex flex-column gap-4">
-
-      {/* Tarjeta 1 */}
-      <div
-        className="p-4 rounded shadow-sm"
-        style={{ backgroundColor: "#e6e6f0" }}
-      >
-        <h5 className="fw-bold">Solicitar turnos de atención médica</h5>
-        <p className="m-0">
-          De acuerdo con la disponibilidad configurada por la empresa.
-          Los turnos pueden cancelarse hasta un día antes de la fecha asignada.
-        </p>
-      </div>
-
-      {/* Tarjeta 2 */}
-      <div
-        className="p-4 rounded shadow-sm"
-        style={{ backgroundColor: "#cbd8ff" }}
-      >
-        <h5 className="fw-bold">Gestionar reintegros</h5>
-        <p className="m-0">
-          Carga de factura, datos de la prestación y forma de pago del reintegro.
-          Compatible con cheque, efectivo o transferencia (CBU).
-        </p>
-      </div>
-
-    </div>
-
-    {/* COLUMNA CENTRAL (UNIFICADA) */}
+    {/* CARD 1 */}
     <div className="col-md-4">
       <div
         className="p-4 rounded shadow-sm h-100"
-        style={{ backgroundColor: "#b6c4ff" }}
+        style={{ backgroundColor: "#d7defaff" }}
       >
-        <h5 className="fw-bold">Registrar y renovar recetas</h5>
-        
-        <p className="m-4">
-        Permite cargar y renovar recetas, consultar recetas anteriores y ver los medicamentos utilizados, 
-        facilitando la gestión desde la web o la app sin necesidad de acercarte a la sede, 
-        con estados actualizados en todo momento para un seguimiento claro de cada solicitud.
+        <h5 className="fw-bold mb-2">Solicitar turnos de atención médica</h5>
+        <p className="m-0">
+          Solicitud de turnos según disponibilidad. Los turnos pueden cancelarse
+          hasta un día antes de la fecha asignada.
         </p>
-      
       </div>
     </div>
 
-    {/* COLUMNA DERECHA */}
-    <div className="col-md-4 d-flex flex-column gap-4">
-
-      {/* Tarjeta derecha 1 */}
+    {/* CARD 2 */}
+    <div className="col-md-4">
       <div
-        className="p-4 rounded shadow-sm"
-        style={{ backgroundColor: "#e6e6f0" }}
+        className="p-4 rounded shadow-sm h-100"
+        style={{ backgroundColor: "#bec6d8ff" }}
       >
-        <h5 className="fw-bold">Consultar la cartilla de prestadores</h5>
+        <h5 className="fw-bold mb-2">Registrar y renovar recetas</h5>
         <p className="m-0">
-         Permite visualizar la cartilla actualizada de prestadores de Medicina Integral.
-         Incluye filtros de búsqueda por especialidad, zonas y ubicaciones.
+          Permite cargar, renovar y consultar recetas previas, con estados
+          actualizados para un seguimiento claro desde la web o la app.
         </p>
       </div>
-
-
-      {/* Tarjeta derecha 2 */}
-      <div
-        className="p-4 rounded shadow-sm"
-        style={{ backgroundColor: "#e6e6f0" }}
-      >
-        <h5 className="fw-bold">Gestionar autorizaciones</h5>
-        <p className="m-0">
-        Carga y seguimiento ágil de solicitudes de autorización para prácticas médicas 
-        con estado actualizado en todo momento.
-        </p>
-      </div>
-
     </div>
+
+    {/* CARD 3 */}
+    <div className="col-md-4">
+      <div
+        className="p-4 rounded shadow-sm h-100"
+        style={{ backgroundColor: "#cbdcffff" }}
+      >
+        <h5 className="fw-bold mb-2">Gestionar reintegros</h5>
+        <p className="m-0">
+          Presentación de facturas, detalle de prestaciones y elección de forma de
+          pago. Compatible con cheque, efectivo, transferencia o deposito.
+        </p>
+      </div>
+    </div>
+
+    {/* CARD 4 */}
+    <div className="col-md-6">
+      <div
+        className="p-4 rounded shadow-sm h-100"
+        style={{ backgroundColor: "#dee1e2ff" }}
+      >
+        <h5 className="fw-bold mb-2">Consultar la cartilla de prestadores</h5>
+        <p className="m-0">
+          Visualización de la cartilla actualizada con filtros por especialidad,
+          zona y ubicación para una búsqueda más ágil.
+        </p>
+      </div>
+    </div>
+
+    {/* CARD 5 */}
+    <div className="col-md-6">
+      <div
+        className="p-4 rounded shadow-sm h-100"
+        style={{ backgroundColor: "#d7e6faff" }}
+      >
+        <h5 className="fw-bold mb-2">Gestionar autorizaciones</h5>
+        <p className="m-0">
+          Carga y seguimiento de solicitudes con notificaciones de estado para
+          asegurar un proceso claro y eficiente.
+        </p>
+      </div>
+    </div>
+
   </div>
 </div>
+
 
 
     </div>
