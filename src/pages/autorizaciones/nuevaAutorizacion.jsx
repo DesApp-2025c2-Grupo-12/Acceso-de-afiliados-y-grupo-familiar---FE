@@ -147,7 +147,7 @@ export default function NuevaAutorizacion({
                   <option value="">Seleccionar integrante</option>
                   {integrantesCuenta.map((i) => (
                     <option key={i.id} value={i.id}>
-                      {i.nombre} {i.apellido}
+                      {i.nombre} {i.apellido} ({i.parentesco})
                     </option>
                   ))}
                 </select>
