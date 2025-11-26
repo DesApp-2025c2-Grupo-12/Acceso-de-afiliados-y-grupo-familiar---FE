@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { formularioBase } from "../../utils/form";
 import { Modal } from "react-bootstrap";
 
@@ -8,8 +8,20 @@ export default function ModalNuevoReintegro({
   onSave,
   grupoFamiliar = [],
   initialForm = formularioBase,
+  error,
+  setError
 }) {
   const [form, setForm] = useState({ ...initialForm });
+  const errorRef = useRef(null);
+
+  useEffect(() => {
+    if (error && errorRef.current) {
+      errorRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }
+  }, [error]);
 
   const handleInputChange = (e) => {
     const { name, type, value, files } = e.target;
@@ -20,33 +32,44 @@ export default function ModalNuevoReintegro({
   };
 
   const handleSubmit = () => {
-    // Validar campos obligatorios
-    if (!form.integranteDNI || !form.monto || !form.facturacion_Cuit || !form.facturacion_Fecha || !form.formaPago) {
-      alert("Por favor completa todos los campos obligatorios.");
-      return;
+    try {
+      // Validar campos obligatorios
+      if (!form.integranteDNI) throw new Error("Debe seleccionar un integrante");
+      if (!form.fechaPrestacion) throw new Error("Debe ingresar fecha de prestación");
+      if (!form.facturacion_Cuit) throw new Error("Debe ingresar CUIT de facturación");
+      if (!form.facturacion_Fecha) throw new Error("Debe ingresar fecha de facturación");
+      if (!form.facturacion_NombreDePersonaACobrar) throw new Error("Debe ingresar nombre de persona a cobrar");
+      if (!form.medico) throw new Error("Debe ingresar médico");
+      if (!form.especialidad) throw new Error("Debe ingresar especialidad");
+      if (!form.monto || form.monto <= 0) throw new Error("Debe ingresar un monto válido");
+      if (!form.lugarAtencion) throw new Error("Debe ingresar lugar de atención");
+      if (!form.formaPago) throw new Error("Debe seleccionar forma de pago");
+      if (!form.cbuAlias) throw new Error("Debe ingresar CBU/Alias");
+
+      const integrante = grupoFamiliar.find((m) => m.numeroDeDocumento === form.integranteDNI);
+
+      const nuevoReintegro = {
+        fechaDePrestacion: form.fechaPrestacion,
+        nombreDelAfiliado: integrante ? `${integrante.nombre} ${integrante.apellido} (${integrante.parentesco})` : "",
+        nombreDelMedico: form.medico,
+        especialidad: form.especialidad,
+        lugarDeAtencion: form.lugarAtencion,
+        facturacion_Fecha: form.facturacion_Fecha,
+        facturacion_Cuit: form.facturacion_Cuit,
+        facturacion_ValorTotal: Number(form.monto),
+        facturacion_NombreDePersonaACobrar: form.facturacion_NombreDePersonaACobrar || (integrante ? integrante.nombre : ""),
+        formaDePago: form.formaPago,
+        cbu: form.cbuAlias,
+        observaciones: form.descripcion
+      };
+
+      onSave && onSave(nuevoReintegro);
+      onHide && onHide();
+      setForm({ ...initialForm });
+    } catch (error) {
+      setError(error.message);
     }
 
-    const integrante = grupoFamiliar.find((m) => m.numeroDeDocumento === form.integranteDNI);
-
-    // Convertir al formato que espera el backend
-    const nuevoReintegro = {
-      fechaDePrestacion: form.fechaPrestacion, // ← Ya viene en YYYY-MM-DD
-      nombreDelAfiliado: integrante ? integrante.nombre : "",
-      nombreDelMedico: form.medico,
-      especialidad: form.especialidad,
-      lugarDeAtencion: form.lugarAtencion,
-      facturacion_Fecha: form.facturacion_Fecha, // ← Ya viene en YYYY-MM-DD
-      facturacion_Cuit: form.facturacion_Cuit,
-      facturacion_ValorTotal: Number(form.monto),
-      facturacion_NombreDePersonaACobrar: form.facturacion_NombreDePersonaACobrar || (integrante ? integrante.nombre : ""),
-      formaDePago: form.formaPago,
-      cbu: form.cbuAlias,
-      observaciones: form.descripcion
-    };
-
-    onSave && onSave(nuevoReintegro);
-    onHide && onHide();
-    setForm({ ...initialForm }); // Ya incluye los nuevos campos
   };
 
   return (
@@ -56,6 +79,9 @@ export default function ModalNuevoReintegro({
       </Modal.Header>
 
       <Modal.Body>
+        <div ref={errorRef}>
+          {error && <div className="alert alert-danger">{error}</div>}
+        </div>
         {/* Campos existentes */}
         <div className="mb-3">
           <label className="form-label">Seleccionar integrante *</label>
@@ -63,7 +89,7 @@ export default function ModalNuevoReintegro({
             <option value="">Seleccionar...</option>
             {grupoFamiliar.map((miembro) => (
               <option key={miembro.numeroDeDocumento} value={miembro.numeroDeDocumento}>
-                {miembro.nombre} {miembro.apellido} — {miembro.parentesco}
+                {miembro.nombre} {miembro.apellido} ({miembro.parentesco})
               </option>
             ))}
           </select>
@@ -73,7 +99,10 @@ export default function ModalNuevoReintegro({
           <label className="form-label">Fecha de la prestación *</label>
           <input
             type="date"
-            className="form-control"
+            className="w-100 p-2 border rounded bg-white text-black"
+            style={{
+              colorScheme: 'light'
+            }}
             name="fechaPrestacion"
             value={form.fechaPrestacion}
             onChange={handleInputChange}
@@ -83,14 +112,25 @@ export default function ModalNuevoReintegro({
         {/* NUEVOS CAMPOS OBLIGATORIOS */}
         <div className="mb-3">
           <label className="form-label">CUIT de facturación *</label>
-          <input type="text" placeholder="XX-XXXXXXXX-X" className="form-control" name="facturacion_Cuit" value={form.facturacion_Cuit} onChange={handleInputChange} />
+          <input
+            type="text"
+            placeholder="XX-XXXXXXXX-X"
+            className="form-control"
+            name="facturacion_Cuit"
+            value={form.facturacion_Cuit}
+            onChange={handleInputChange}
+          />
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Fecha de facturación *</label>
+          <label
+            className="form-label">Fecha de facturación *</label>
           <input
             type="date"
-            className="form-control"
+            className="w-100 p-2 border rounded bg-white text-black"
+            style={{
+              colorScheme: 'light'
+            }}
             name="facturacion_Fecha"
             value={form.facturacion_Fecha}
             onChange={handleInputChange}
@@ -102,7 +142,6 @@ export default function ModalNuevoReintegro({
           <input type="text" className="form-control" name="facturacion_NombreDePersonaACobrar" value={form.facturacion_NombreDePersonaACobrar} onChange={handleInputChange} placeholder="Nombre completo" />
         </div>
 
-        {/* Campos existentes continuan... */}
         <div className="mb-3">
           <label className="form-label">Médico *</label>
           <input type="text" className="form-control" name="medico" value={form.medico} onChange={handleInputChange} />

@@ -26,7 +26,7 @@ export default function CardReintegro({ reintegroFiltrado, seleccionarReintegro,
   return (
     <div className=" col-12 col-sm-6 col-lg-4 mb-4">
       <div className="card h-100 shadow-sm" style={{ border: "1px solid #ccc" }}>
-        
+
         {/* Estado estilo receta */}
         <div
           style={{
@@ -54,7 +54,7 @@ export default function CardReintegro({ reintegroFiltrado, seleccionarReintegro,
 
           {/* Monto con estilo llamativo */}
           <div className="h4 text-success fw-bold mb-3">
-            ${reintegroFiltrado.facturacion_ValorTotal}
+            ${reintegroFiltrado.facturacion_ValorTotal?.toLocaleString('es-AR')}
           </div>
 
           {/* Botón Ver detalle */}

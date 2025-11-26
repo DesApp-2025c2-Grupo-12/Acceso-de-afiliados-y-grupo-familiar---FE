@@ -89,7 +89,7 @@ export default function Header() {
                         onClick={() => handleVerPerfilFamiliar(persona)}
                         className="text-primary"
                       >
-                        {persona.nombre + '(' + persona.parentesco+ ')'}
+                        {persona.nombre + ' (' + persona.parentesco+ ')'}
                       </Dropdown.Item>
                     ))}
                   </div>

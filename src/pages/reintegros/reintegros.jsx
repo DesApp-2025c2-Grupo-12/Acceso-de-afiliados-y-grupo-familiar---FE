@@ -12,6 +12,7 @@ export default function Reintegros() {
     const [busqueda, setBusqueda] = useState("");
     const [reintegros, setReintegros] = useState([]);
     const [error, setError] = useState("");
+    const [errorModal, setErrorModal] = useState("");
     const [success, setSuccess] = useState("");
     const [desactivarBotonMenorDeEdad, setDesactivarBotonMenorDeEdad] = useState(null)
     const [grupoFamiliar, setGrupoFamiliar] = useState([]);
@@ -177,6 +178,8 @@ export default function Reintegros() {
                 onHide={() => setModalAbierto(false)}
                 onSave={agregarReintegro}
                 grupoFamiliar={grupoFamiliar}
+                error={errorModal}        // ← Usa errorModal
+                setError={setErrorModal}
             />
 
             <ModalDetalleReintegro

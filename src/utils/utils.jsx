@@ -15,3 +15,7 @@ export function calcularEdad(fechaNacimiento) {
   }
   return edad;
 }
+
+export const capitalizar = (texto) => {
+  return texto?.charAt(0).toUpperCase() + texto?.slice(1) || '';
+};
