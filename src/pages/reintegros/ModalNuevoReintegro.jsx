@@ -13,12 +13,13 @@ export default function ModalNuevoReintegro({
 }) {
   const [form, setForm] = useState({ ...initialForm });
   const errorRef = useRef(null);
+  const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
 
   useEffect(() => {
     if (error && errorRef.current) {
-      errorRef.current.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'start' 
+      errorRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
       });
     }
   }, [error]);
@@ -47,6 +48,7 @@ export default function ModalNuevoReintegro({
       if (!form.cbuAlias) throw new Error("Debe ingresar CBU/Alias");
 
       const integrante = grupoFamiliar.find((m) => m.numeroDeDocumento === form.integranteDNI);
+    
 
       const nuevoReintegro = {
         fechaDePrestacion: form.fechaPrestacion,
@@ -60,8 +62,12 @@ export default function ModalNuevoReintegro({
         facturacion_NombreDePersonaACobrar: form.facturacion_NombreDePersonaACobrar || (integrante ? integrante.nombre : ""),
         formaDePago: form.formaPago,
         cbu: form.cbuAlias,
-        observaciones: form.descripcion
+        observaciones: form.descripcion,
+        usuarioLogueadoId: usuarioLogueado.id,
+        affiliateId: integrante.id
       };
+
+     
 
       onSave && onSave(nuevoReintegro);
       onHide && onHide();
