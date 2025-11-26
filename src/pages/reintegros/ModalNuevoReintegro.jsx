@@ -48,7 +48,10 @@ export default function ModalNuevoReintegro({
       if (!form.cbuAlias) throw new Error("Debe ingresar CBU/Alias");
 
       const integrante = grupoFamiliar.find((m) => m.numeroDeDocumento === form.integranteDNI);
-    
+      console.log("Datos ANTES de guardar:");
+      console.log("Médico:", form.medico);
+      console.log("Especialidad:", form.especialidad);
+      console.log("Integrante:", integrante);
 
       const nuevoReintegro = {
         fechaDePrestacion: form.fechaPrestacion,
@@ -63,12 +66,11 @@ export default function ModalNuevoReintegro({
         formaDePago: form.formaPago,
         cbu: form.cbuAlias,
         observaciones: form.descripcion,
+        estado: "Recibido",
         usuarioLogueadoId: usuarioLogueado.id,
         affiliateId: integrante.id
       };
-
-     
-
+      console.log("🎯 OBJETO FINAL a enviar:", JSON.stringify(nuevoReintegro, null, 2));
       onSave && onSave(nuevoReintegro);
       onHide && onHide();
       setForm({ ...initialForm });

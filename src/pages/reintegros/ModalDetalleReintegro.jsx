@@ -41,6 +41,7 @@ export default function ModalDetalleReintegro({
         <p><b>Forma de pago:</b> {capitalizar((reintegro.formaDePago))}</p>
         <p><b>CBU/Alias:</b> {reintegro.cbu}</p>
         <p><b>Observaciones generales:</b> {reintegro.observaciones}</p>
+        <p><b>Estado:</b> {reintegro.estado}</p>
         {reintegro.descripcion && <p><b>Descripción:</b> {reintegro.descripcion}</p>}
       </Modal.Body>
     </Modal>
