@@ -71,7 +71,7 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
               onMouseLeave={(e) => { e.target.style.backgroundColor = "white"; }}
               onClick={() => handleVer(receta)}
             >
-              Ver
+              Ver Detalle
             </button>
             {/* 🆕 RENOVAR SOLO SI ESTA APROBADO Y CON CONTROL DE EDAD */}
             {receta.estado === "Aprobado" && (
