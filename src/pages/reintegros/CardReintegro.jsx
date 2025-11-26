@@ -24,7 +24,7 @@ export default function CardReintegro({ reintegroFiltrado, seleccionarReintegro,
   };
 
   return (
-    <div className="col-md-3 mb-4">
+    <div className=" col-12 col-sm-6 col-lg-4 mb-4">
       <div className="card h-100 shadow-sm" style={{ border: "1px solid #ccc" }}>
         
         {/* Estado estilo receta */}

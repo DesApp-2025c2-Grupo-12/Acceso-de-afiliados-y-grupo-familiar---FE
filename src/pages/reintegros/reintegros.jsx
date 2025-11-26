@@ -106,7 +106,7 @@ export default function Reintegros() {
         <Container>
             <div className="container mt-4">
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h3 className="titulo-reintegros">MIS REINTEGROS</h3>
+                    <h3 className="fw-bold text-dark fs-3 mb-0">MIS REINTEGROS</h3>
                     {desactivarBotonMenorDeEdad ? (
                         <OverlayTrigger
                             placement="top"
@@ -148,33 +148,28 @@ export default function Reintegros() {
                 {error && <div className="alert alert-danger text-center">{error}</div>}
                 {success && <div className="alert alert-success text-center">{success}</div>}
 
-                <Card className="h-100 border shadow-sm">
-                    <Card.Header className="bg-light">
-                        <h4 className="mb-0">Todos los Reintegros</h4>
-                    </Card.Header>
-                    <Card.Body className="d-flex flex-column">
-                        {reintegrosFiltrados.length === 0 ? (
-                            <div className="text-center py-5 flex-grow-1 d-flex align-items-center justify-content-center">
-                                <div>
-                                    <h5 className="text-muted mb-3">No se encontraron reintegros</h5>
-                                </div>
+                <Card.Body className="d-flex flex-column">
+                    {reintegrosFiltrados.length === 0 ? (
+                        <div className="text-center py-4 flex-grow-1 d-flex align-items-center justify-content-center">
+                            <div>
+                                <h5 className="text-muted mb-3">No se encontraron reintegros</h5>
                             </div>
-                        ) : (
-                            <Row>
-                                <div className="row">
-                                    {reintegrosFiltrados.map(reintegroFiltrado => (
-                                        <CardReintegro
-                                            key={reintegroFiltrado.id}
-                                            reintegroFiltrado={reintegroFiltrado}
-                                            seleccionarReintegro={setReintegroSeleccionado}
-                                            abrirModalDetalle={setModalDetalleAbierto}
-                                        />
-                                    ))}
-                                </div>
-                            </Row>
-                        )}
-                    </Card.Body>
-                </Card>
+                        </div>
+                    ) : (
+                        <Row>
+                            <div className="row">
+                                {reintegrosFiltrados.map(reintegroFiltrado => (
+                                    <CardReintegro
+                                        key={reintegroFiltrado.id}
+                                        reintegroFiltrado={reintegroFiltrado}
+                                        seleccionarReintegro={setReintegroSeleccionado}
+                                        abrirModalDetalle={setModalDetalleAbierto}
+                                    />
+                                ))}
+                            </div>
+                        </Row>
+                    )}
+                </Card.Body>
             </div>
 
             <ModalNuevoReintegro
