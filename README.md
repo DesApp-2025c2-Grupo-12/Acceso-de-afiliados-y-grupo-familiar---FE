@@ -21,7 +21,12 @@ A través de esta aplicación web, los afiliados y algunos miembros del grupo fa
 -**Home / Inicio:** Permite solicitar turnos según disponibilidad. Los turnos pueden cancelarse hasta un día antes de la fecha asignada
 facilitando la gestión desde la web o la app.
 
+<<<<<<< Updated upstream
 ![Home](ImagenesReadme/home.jpg)
+=======
+![Home](./ImagenesReadme/home.jpg)
+![Home](./ImagenesReadme/home 2.jpg)
+>>>>>>> Stashed changes
 
 -**Solicitar turnos de atención médica:** Permite solicitar turnos según disponibilidad. Los turnos pueden cancelarse hasta un día antes de la fecha asignada
 facilitando la gestión desde la web o la app.
@@ -281,4 +286,7 @@ Proyecto académico desarrollado en el marco de la materia Desarrollo de Aplicac
 * Diego Andrés Primera.
 
 ---
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
