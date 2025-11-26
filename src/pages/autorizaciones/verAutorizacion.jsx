@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 export default function VerAutorizacion({
   autorizacion,
   setAutorizacionParaVer,
-  setSuccess, // viene del padre prop
+  setSuccess,
+  setError, // viene del padre prop
   setAutorizaciones, // viene del padre prop
 }) {
   const [show, setShow] = useState(false);
@@ -11,48 +12,56 @@ export default function VerAutorizacion({
   const [observacionText, setObservacionText] = useState("");
 
   const handleGuardarObservacion = async () => {
-  if (!observacionText.trim()) {
-    alert("Debe ingresar un texto de observación");
-    return;
-  }
+    if (!observacionText.trim()) {
+      alert("Debe ingresar un texto de observación");
+      return;
+    }
+    const currentUser = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
+    const usuarioLogueadoId = currentUser.id;
+    const targetAffiliateId = autorizacion.affiliateId;
+    try {
+      const res = await fetch(
+        `http://localhost:3000/authorization/${autorizacion.id}/usuario/${usuarioLogueadoId}/afiliado/${targetAffiliateId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            observaciones: observacionText,
+            estado: "En análisis",
+          }),
+        }
+      );
 
-  try {
-    const res = await fetch(
-      `http://localhost:3000/authorization/${autorizacion.id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          observaciones: observacionText,
-          estado: "En análisis",
-        }),
+      if (!res.ok) {
+        const errorData = await res.json();
+        const msg = errorData.error || errorData.message || `Error ${res.status}`;
+        throw new Error(msg);
       }
-    );
 
-    if (!res.ok) throw new Error("Error al guardar la observación");
+      const data = await res.json();
 
-    const data = await res.json();
+      // Actualiza correctamente el estado
+      setAutorizaciones((prev) =>
+        prev.map((a) =>
+          Number(a.id) === Number(data.id)
+            ? { ...a, observaciones: data.observaciones, estado: data.estado }
+            : a
+        )
+      );
 
-    // Actualiza correctamente el estado
-    setAutorizaciones((prev) =>
-      prev.map((a) =>
-        Number(a.id) === Number(data.id)
-          ? { ...a, observaciones: data.observaciones, estado: data.estado }
-          : a
-      )
-    );
+      setSuccess("Observación guardada y estado actualizado a 'En análisis'");
+      window.scrollTo({ top: 0, behavior: "smooth" }); // para que vuelva arriba y poder ver el msj
+      setTimeout(() => setSuccess(""), 4000);
 
-    setSuccess("Observación guardada y estado actualizado a 'En análisis'");
-    window.scrollTo({top: 0, behavior:"smooth"}); // para que vuelva arriba y poder ver el msj
-    setTimeout(() => setSuccess(""), 4000);
-
-    setShow(false);
-    setTimeout(() => setAutorizacionParaVer(null), 200);
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
-  }
-};
+      setShow(false);
+      setTimeout(() => setAutorizacionParaVer(null), 200);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setShow(false);
+    }
+  };
 
 
   useEffect(() => {
