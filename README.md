@@ -281,8 +281,3 @@ Proyecto académico desarrollado en el marco de la materia Desarrollo de Aplicac
 * Franco Cantero.
 * Diego Andrés Primera.
 
----
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
