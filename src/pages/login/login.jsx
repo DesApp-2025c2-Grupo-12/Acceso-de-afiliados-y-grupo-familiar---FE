@@ -173,9 +173,7 @@ export default function Login() {
         <p>
           ¿No tienes una cuenta? <Link to="/register">Crear una cuenta</Link>
         </p>
-        <p>
-          <a href="#">¿Olvidaste tu contraseña?</a>
-        </p>
+        
 
       </div>
     </>

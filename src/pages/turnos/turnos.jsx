@@ -163,6 +163,11 @@ export default function Turnos() {
     return `${dia}/${mes}/${año}`;
   };
 
+   const handleVolverDeNuevoTurno = () => {
+    setPantallaNuevoTurno(false);
+    setHoverTurno(false); 
+  };
+
 
   return (
     <Container className="my-4">
@@ -316,7 +321,7 @@ export default function Turnos() {
         </>
       ) : (
         <NuevoTurno
-          setPantallaNuevoTurno={setPantallaNuevoTurno}
+          setPantallaNuevoTurno={handleVolverDeNuevoTurno}
           setAlerta={setAlerta}
           integrantesCuenta={integrantesCuenta}
           pantallaNuevoTurno={pantallaNuevoTurno}

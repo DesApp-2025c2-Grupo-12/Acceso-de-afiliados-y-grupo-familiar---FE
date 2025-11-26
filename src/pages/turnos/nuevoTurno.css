@@ -1,0 +1,43 @@
+/* NuevoTurno.css */
+.dia-button {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover solo para desktop */
+@media (min-width: 768px) {
+  .dia-button:hover:not(.disabled):not(:active) {
+    background-color: #132074 !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Para móvil - desactivar cualquier efecto hover */
+@media (max-width: 767.98px) {
+  .dia-button:hover {
+    background-color: transparent !important;
+    color: inherit !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  
+  .dia-button:active {
+    background-color: #132074 !important;
+    color: white !important;
+  }
+}
+
+/* Estilos para botones deshabilitados */
+.dia-button:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+}
+
+/* Estilos para botón seleccionado */
+.dia-button:not(:disabled).btn-primary {
+  background-color: #132074 !important;
+  border-color: #132074 !important;
+  color: white !important;
+}
+

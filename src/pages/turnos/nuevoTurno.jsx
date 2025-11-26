@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import CardPersonalizada from "../../components/Cards/CardPersonalizada";
+import "./NuevoTurno.css"; 
 
 export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrantesCuenta, pantallaNuevoTurno }) {
   const [especialidades, setEspecialidades] = useState([])
@@ -41,11 +42,16 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
       const opcion = {
         fecha: fecha,
         fechaISO: fecha.toISOString().split('T')[0],
+        // Formato desktop
         label: fecha.toLocaleDateString('es-ES', {
           weekday: 'short',
           day: 'numeric',
           month: 'short'
         }),
+        // Información adicional para formato mobile
+        diaNumero: fecha.getDate(),
+        diaSemanaCorto: fecha.toLocaleDateString('es-ES', { weekday: 'short' }).replace('.', ''),
+        mesCorto: fecha.toLocaleDateString('es-ES', { month: 'short' }).replace('.', ''),
         mesAno: fecha.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }),
         esPasado: fecha < hoy,
         esHoy: fecha.toDateString() === hoy.toDateString()
@@ -173,7 +179,7 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
       obtenerTurnosNoReservados();
       setEspecialidad("");
       setDiaSeleccionado("");
-      setAfiliadoSeleccionado(""); // Reset del afiliado seleccionado
+      setAfiliadoSeleccionado("");
       setFechaInicioSemana(getLunesSemanaActual());
     }
   }, [pantallaNuevoTurno])
@@ -184,41 +190,51 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
   )
 
   const reservarTurno = async (turno) => {
-  try {
-    setErrorMessage("");
-    setSuccessMessage("");
+    try {
+      setErrorMessage("");
+      setSuccessMessage("");
 
-    if (!afiliadoSeleccionado) {
-      throw new Error("No se ha seleccionado un afiliado para reservar el turno");
+      if (!afiliadoSeleccionado) {
+        throw new Error("No se ha seleccionado un afiliado para reservar el turno");
+      }
+      const response = await fetch(`http://localhost:3000/appointment/${turno.id}/assign/${usuarioLogueado.id}/${afiliadoSeleccionado}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error en la respuesta del servidor");
+      }
+
+      setSuccessMessage("¡Turno reservado correctamente!");
+
+      setEspecialidad("");
+      setDiaSeleccionado("");
+      setAfiliadoSeleccionado("");
+
+      await obtenerTurnosNoReservados();
+      await cargarEspecialidades();
+
+      setTimeout(() => {
+        setPantallaNuevoTurno(false);
+      }, 2000);
+
+    } catch (error) {
+      console.error("Error:", error);
+      setErrorMessage(error.message || "Error al reservar el turno");
     }
-    const response = await fetch(`http://localhost:3000/appointment/${turno.id}/assign/${usuarioLogueado.id}/${afiliadoSeleccionado}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" }
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Error en la respuesta del servidor");
-    }
-
-    setSuccessMessage("¡Turno reservado correctamente!");
-
-    setEspecialidad("");
-    setDiaSeleccionado("");
-    setAfiliadoSeleccionado("");
-
-    await obtenerTurnosNoReservados();
-    await cargarEspecialidades();
-
-    setTimeout(() => {
-      setPantallaNuevoTurno(false);
-    }, 2000);
-
-  } catch (error) {
-    console.error("Error:", error);
-    setErrorMessage(error.message || "Error al reservar el turno");
   }
-}
+
+  const formatFecha = (fechaStr) => {
+    if (!fechaStr) return "-";
+    const fecha = new Date(fechaStr);
+    const dia = String(fecha.getDate()).padStart(2, "0");
+    const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+    const año = fecha.getFullYear();
+    return `${dia}/${mes}/${año}`;
+  };
+
 
   return (
     <Container className="my-4 border border-dark">
@@ -233,7 +249,7 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
           Volver
         </Button>
         <h2 className="mb-0">Nuevo Turno</h2>
-        <div style={{ width: "100px" }}></div> {/* Espacio vacío para balancear */}
+        <div style={{ width: "100px" }}></div>
       </div>
 
       {(errorMessage || successMessage) && (
@@ -279,8 +295,7 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
             onChange={(e) => {
               setAfiliadoSeleccionado(e.target.value);
               setErrorMessage("");
-            }
-            }
+            }}
           >
             <option value="">Selecciona un afiliado</option>
             {integrantesCuenta && integrantesCuenta.length > 0 ? (
@@ -303,50 +318,55 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
             <h5 className="mb-3 text-center">Selecciona un día:</h5>
 
             {/* Navegación de semanas y selector de mes */}
-            <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-              <Button
-                variant="outline-secondary"
-                onClick={semanaAnterior}
-                size="sm"
-              >
-                ← Semana anterior
-              </Button>
+            <Row className="align-items-center mb-3">
+              <Col xs={12} md={3} className="mb-2 mb-md-0">
+                <Button
+                  variant="outline-secondary"
+                  onClick={semanaAnterior}
+                  className="w-100"
+                >
+                  ← Semana anterior
+                </Button>
+              </Col>
 
-              <div className="text-center flex-grow-1">
+              <Col xs={12} md={6} className="text-center mb-2 mb-md-0">
                 <h6 className="mb-1">{getRangoFechas()}</h6>
                 {esSemanaActual() && (
                   <small className="text-muted">(Semana actual)</small>
                 )}
-              </div>
+              </Col>
 
-              <div className="d-flex gap-2">
+              <Col xs={12} md={3} className="mb-2 mb-md-0">
+                <Button
+                  variant="outline-secondary"
+                  onClick={semanaSiguiente}
+                  className="w-100"
+                >
+                  Semana siguiente →
+                </Button>
+              </Col>
+            </Row>
+
+            {/* Selector de mes */}
+            <Row className="mb-3">
+              <Col>
                 <Form.Select
-                  size="sm"
-                  style={{ width: '180px' }}
                   onChange={seleccionarMesSemana}
                   value={fechaInicioSemana.toISOString().split('T')[0]}
                 >
-                  <option value="">Ir a...</option>
+                  <option value="">Ir a semana específica...</option>
                   {opcionesMeses.map((opcion, index) => (
                     <option key={index} value={opcion.value}>
                       {opcion.label}
                     </option>
                   ))}
                 </Form.Select>
+              </Col>
+            </Row>
 
-                <Button
-                  variant="outline-secondary"
-                  onClick={semanaSiguiente}
-                  size="sm"
-                >
-                  Semana siguiente →
-                </Button>
-              </div>
-            </div>
-
-            {/* Contenedor con borde y centrado */}
+            {/* Días de la semana */}
             <div className="border rounded p-3 bg-light">
-              <div className="d-flex justify-content-center gap-2 overflow-auto">
+              <div className="d-flex justify-content-center gap-2 flex-wrap">
                 {proximosDias.map((dia) => (
                   <Button
                     key={dia.fechaISO}
@@ -355,32 +375,32 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
                         dia.esPasado ? "outline-secondary" : "outline-primary"
                     }
                     onClick={() => !dia.esPasado && setDiaSeleccionado(dia.fechaISO)}
-                    className="flex-shrink-0"
+                    className="flex-grow-1 flex-md-grow-0 text-center dia-button"
                     disabled={dia.esPasado}
                     style={{
-                      minWidth: "100px",
+                      minWidth: "70px",
+                      maxWidth: "140px",
+                      height: "60px",
                       fontWeight: "500",
                       backgroundColor: diaSeleccionado === dia.fechaISO ? "#132074" : "transparent",
                       borderColor: dia.esPasado ? "#6c757d" : "#132074",
                       color: diaSeleccionado === dia.fechaISO ? "white" :
                         dia.esPasado ? "#6c757d" : "#132074",
                       cursor: dia.esPasado ? "not-allowed" : "pointer",
-                      opacity: dia.esPasado ? 0.6 : 1
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!dia.esPasado && diaSeleccionado !== dia.fechaISO) {
-                        e.target.style.backgroundColor = "#132074";
-                        e.target.style.color = "white";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!dia.esPasado && diaSeleccionado !== dia.fechaISO) {
-                        e.target.style.backgroundColor = "transparent";
-                        e.target.style.color = "#132074";
-                      }
+                      opacity: dia.esPasado ? 0.6 : 1,
                     }}
                   >
-                    {dia.label}
+                    <div className="d-block d-md-none">
+                      <div className="fw-bold" style={{ fontSize: "1rem", lineHeight: "1.2" }}>
+                        {dia.diaNumero}
+                      </div>
+                      <div style={{ fontSize: "0.65rem", lineHeight: "1" }}>
+                        {dia.diaSemanaCorto}
+                      </div>
+                    </div>
+                    <span className="d-none d-md-inline" style={{ fontSize: "0.9rem" }}>
+                      {dia.label}
+                    </span>
                   </Button>
                 ))}
               </div>
@@ -396,22 +416,19 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
             Turnos disponibles para el {proximosDias.find(d => d.fechaISO === diaSeleccionado)?.label}:
           </h5>
 
-
-
           <Row>
             {turnosFiltrados.map(turno => (
-              <Col md={4} key={turno.id} className="mb-3">
+              <Col xs={12} sm={6} lg={4} key={turno.id} className="mb-3">
                 <CardPersonalizada
                   header={turno.nombreDelPrestador}
                   title={turno.especialidad}
                   detalles={[
-                    { label: "Fecha", value: turno.fecha },
+                    { label: "Fecha", value: formatFecha(turno.fecha) },
                     { label: "Hora", value: turno.horario },
                     { label: "Lugar", value: turno.lugarDeAtencion },
                   ]}
                   botonTexto="Reservar"
                   onClick={() => reservarTurno(turno)}
-                  // Mostrar mensaje si no hay afiliado seleccionado
                   disabled={!afiliadoSeleccionado}
                 />
               </Col>
