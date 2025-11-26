@@ -293,6 +293,7 @@ export default function Autorizaciones() {
           autorizacion={autorizacionParaVer}
           setAutorizacionParaVer={setAutorizacionParaVer}
           setSuccess={setSuccess}
+          setError = {setError}
           setAutorizaciones={setAutorizaciones}
           autorizaciones={autorizaciones}
         />
