@@ -21,31 +21,30 @@ A través de esta aplicación web, los afiliados y algunos miembros del grupo fa
 -**Home / Inicio:** Permite solicitar turnos según disponibilidad. Los turnos pueden cancelarse hasta un día antes de la fecha asignada
 facilitando la gestión desde la web o la app.
 
-![Home](/imagenes/ImagenesReadme/home.png)
-
+![Home](public/ImagenesReadme/home.jpg)
 
 -**Solicitar turnos de atención médica:** Permite solicitar turnos según disponibilidad. Los turnos pueden cancelarse hasta un día antes de la fecha asignada
 facilitando la gestión desde la web o la app.
 
-![Turnos](/imagenes/ImagenesReadme/turnos.png)
+![Turnos](public/ImagenesReadme/turnos.jpg)
 
 
 - **Gestionar reintegros:** Incluye la presentación de facturas, detalle de prestaciones y elección de forma de pago (cheque, efectivo, transferencia o depósito), garantizando un proceso ágil.
 
-![Reintegros](/imagenes/ImagenesReadme/reintegros.png)
+![Reintegros](public/ImagenesReadme/reintegros.jpg)
 
 - **Gestionar autorizaciones:** Permite cargar y dar seguimiento a solicitudes de autorización, con notificaciones de estado que aseguran un proceso claro y confiable.
 
-![Autorizaciones](/imagenes/ImagenesReadme/autorizaciones.png)
+![Autorizaciones](public/ImagenesReadme/autorizaciones.jpg)
 
 - **Registrar y renovar recetas:** Posibilita cargar, renovar y consultar recetas previas, mostrando los estados actualizados para un seguimiento claro y seguro.
 
-![Recetas](/imagenes/ImagenesReadme/recetas.png)
+![Recetas](public/ImagenesReadme/recetas.jpg)
 
 
 - **Consultar la cartilla de prestadores:** Ofrece acceso a la cartilla actualizada, con filtros por especialidad, zona y ubicación para una búsqueda más rápida y eficiente.
 
-![Prestadores](/imagenes/ImagenesReadme/prestadores.png)
+![Prestadores](public/ImagenesReadme/prestadores.jpg)
 
 ---
 
