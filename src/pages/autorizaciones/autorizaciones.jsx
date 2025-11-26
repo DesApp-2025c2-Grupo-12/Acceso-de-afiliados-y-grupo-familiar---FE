@@ -50,7 +50,7 @@ export default function Autorizaciones() {
         if (!res.ok) throw new Error("Error al obtener las autorizaciones");
 
         const data = await res.json();
-
+       
         const lista = data.map(item => {
           const fechaOriginal = item.fechaDePrestacion;
           let fechaFormateada = fechaOriginal;
@@ -69,6 +69,7 @@ export default function Autorizaciones() {
             internacion: item.diasDeInternacion,
             observaciones: item.observaciones,
             estado: item.estado || "Pendiente",
+            affiliateId: item.affiliateId
           };
         });
 
@@ -152,24 +153,43 @@ export default function Autorizaciones() {
     if (!autorizacionAEliminar) return;
 
     try {
+      const currentUser = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
+      const usuarioLogueadoId = currentUser.id;
+      const targetAffiliateId = autorizacionAEliminar.affiliateId;
+
+     
+
+     
       const res = await fetch(
-        `http://localhost:3000/authorization/${autorizacionAEliminar.id}`,
-        { method: "DELETE" }
+        `http://localhost:3000/authorization/${autorizacionAEliminar.id}/usuario/${usuarioLogueadoId}/afiliado/${targetAffiliateId}`,
+        {
+          method: "DELETE",
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
 
-      if (!res.ok) throw new Error("Error al eliminar la autorización");
+      if (!res.ok) {
+        const errorData = await res.json();
+        if (res.status === 403) {
+          throw new Error(errorData.error || "No tienes permisos para eliminar esta autorización");
+        }
+        throw new Error(errorData.error || "Error en la respuesta del servidor");
+      }
 
-      // quitar del estado local
       setAutorizaciones((prev) =>
         prev.filter((a) => a.id !== autorizacionAEliminar.id)
       );
 
       setSuccess("Autorización eliminada correctamente.");
       setTimeout(() => setSuccess(""), 3000);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error(err);
-      setError("No se pudo eliminar la autorización.");
+      setError(err.message);
       setTimeout(() => setError(""), 3000);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setShowDeleteModal(false);
       setAutorizacionAEliminar(null);
@@ -206,7 +226,7 @@ export default function Autorizaciones() {
         ) : (
           <button
             className="btn text-white px-4 py-2 fs-5"
-            style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
+            style={{ backgroundColor: hoverNueva ? "#2b47b9" : "#132074" }}
             onMouseEnter={() => setHoverNueva(true)}
             onMouseLeave={() => setHoverNueva(false)}
             onClick={() => setShowModal(true)}

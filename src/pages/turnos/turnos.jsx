@@ -209,7 +209,7 @@ export default function Turnos() {
                 variant="primary"
                 className="fw-bold px-4 py-2 fs-5 rounded-3"
                 style={{
-                  background: hoverTurno ? "#b0b0b0" : "#132074",
+                  background: hoverTurno ? "#2b47b9" : "#132074",
                   border: "none"
                 }}
                 onMouseEnter={() => setHoverTurno(true)}

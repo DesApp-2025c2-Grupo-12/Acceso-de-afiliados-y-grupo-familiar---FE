@@ -102,7 +102,7 @@ export default function Recetas() {
         ) : (
           <button
             className="btn text-white px-4 py-2 fs-5"
-            style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
+            style={{ backgroundColor: hoverNueva ? "#2b47b9" : "#132074" }}
             onMouseEnter={() => setHoverNueva(true)}
             onMouseLeave={() => setHoverNueva(false)}
             onClick={abrirModalNuevaReceta}

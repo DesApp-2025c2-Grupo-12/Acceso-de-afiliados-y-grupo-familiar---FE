@@ -46,7 +46,7 @@ export default function EditarAutorizacion({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // VALIDACIONES
+    
     if (!formData.fecha) return setError("La fecha es obligatoria");
     if (formData.fecha < today) return setError("La fecha no puede ser pasada");
     if (formData.fecha > maxDate) return setError("La fecha no puede superar los 2 años");
@@ -56,6 +56,11 @@ export default function EditarAutorizacion({
     if (!formData.lugar.trim()) return setError("Debe ingresar un lugar");
 
     try {
+      
+      const currentUser = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
+      const usuarioLogueadoId = currentUser.id;
+      const targetAffiliateId = formData.pacienteId; 
+
       const payload = {
         affiliateId: formData.pacienteId,
         fechaDePrestacion: formData.fecha,
@@ -67,18 +72,25 @@ export default function EditarAutorizacion({
         estado: "Pendiente",
       };
 
-      const res = await fetch(`http://localhost:3000/authorization/${data.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      
 
-      const updated = await res.json();
+      
+      const res = await fetch(
+        `http://localhost:3000/authorization/${data.id}/usuario/${usuarioLogueadoId}/afiliado/${targetAffiliateId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (!res.ok) {
-        const msg = updated.message || updated.error || `Error ${res.status}`;
+        const errorData = await res.json();
+        const msg = errorData.error || errorData.message || `Error ${res.status}`;
         throw new Error(msg);
       }
+
+      const updated = await res.json();
 
       // actualizar en lista
       onUpdate({
@@ -91,21 +103,25 @@ export default function EditarAutorizacion({
         internacion: formData.internacion,
         observaciones: formData.observaciones,
         estado: "Pendiente",
+        affiliateId: formData.pacienteId 
       });
 
       setSuccess("Autorización modificada correctamente y estado actualizado a 'Pendiente'");
       setError("");
       setShowModal(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error(err);
       setError(err.message);
       setSuccess("");
+      setShowModal(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   // Fallback mientras llegan los integrantes
-  const listaIntegrantes = integrantesCuenta.length > 0 
-    ? integrantesCuenta 
+  const listaIntegrantes = integrantesCuenta.length > 0
+    ? integrantesCuenta
     : [{ id: "", nombre: "Cargando...", apellido: "" }];
 
   return (
