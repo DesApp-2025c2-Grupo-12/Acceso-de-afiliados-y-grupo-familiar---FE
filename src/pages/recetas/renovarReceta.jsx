@@ -15,6 +15,7 @@ export default function RenovarReceta({
 }) {
   const [visible, setVisible] = useState(false);
   const [fade, setFade] = useState(false); // controla animación
+  const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
 
   // guardo valores previos del body para restaurar luego
   const prevBodyStateRef = React.useRef({ overflow: "", paddingRight: "" });
@@ -29,6 +30,7 @@ export default function RenovarReceta({
       cantidad: receta.cantidad ?? 1,
       presentacion: receta.presentacion || "",
       observaciones: receta.observaciones || "",
+      
     });
 
     // calcular ancho del scrollbar y guardar estado previo
@@ -114,7 +116,7 @@ export default function RenovarReceta({
         .filter(
           (r) =>
             r.nombreDelMedicamento?.toLowerCase() ===
-              formData.nombreDelMedicamento?.toLowerCase() &&
+            formData.nombreDelMedicamento?.toLowerCase() &&
             r.estado !== "Aprobado"
         )
         .reduce((s, r) => s + (r.cantidad || 0), 0);
@@ -137,7 +139,7 @@ export default function RenovarReceta({
         fechaDeEmision: new Date(),
       };
 
-      const resp = await fetch(`http://localhost:3000/recipes/${receta.id}`, {
+      const resp = await fetch(`http://localhost:3000/recipes/${receta.id}/usuario/${usuarioLogueado.id}/afiliado/${receta.affiliateId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(recetaNueva),
