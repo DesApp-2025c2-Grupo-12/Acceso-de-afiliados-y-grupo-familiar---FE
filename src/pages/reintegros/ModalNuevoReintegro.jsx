@@ -11,8 +11,16 @@ export default function ModalNuevoReintegro({
     error,
     setError
 }) {
-    const [form, setForm] = useState({ ...initialForm });
+    const [form, setForm] = useState({
+        ...initialForm,
+        cuitParte1: "",
+        cuitParte2: "",
+        cuitParte3: ""
+    });
     const errorRef = useRef(null);
+    const cuitInput1Ref = useRef(null);
+    const cuitInput2Ref = useRef(null);
+    const cuitInput3Ref = useRef(null);
     const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
     useEffect(() => {
         if (show) {
@@ -20,7 +28,10 @@ export default function ModalNuevoReintegro({
             setForm(prev => ({
                 ...prev,
                 fechaPrestacion: hoy,
-                facturacion_Fecha: hoy
+                facturacion_Fecha: hoy,
+                cuitParte1: "",
+                cuitParte2: "",
+                cuitParte3: ""
             }));
             setError("");
         }
@@ -34,6 +45,67 @@ export default function ModalNuevoReintegro({
             });
         }
     }, [error]);
+
+    // Función para obtener el CUIT completo como STRING formateado
+    const obtenerCUITCompleto = () => {
+        return `${form.cuitParte1}-${form.cuitParte2}-${form.cuitParte3}`;
+    };
+
+    // Función para validar el CUIT completo
+    const validarCUITCompleto = () => {
+        const cuitCompleto = obtenerCUITCompleto();
+        return cuitCompleto.length === 13; // "xx-xxxxxxxx-x" = 13 caracteres
+    };
+
+    const handleCUITChange = (e, parte) => {
+        const { value } = e.target;
+
+        // Permitir solo números
+        const soloNumeros = value.replace(/\D/g, '');
+
+        setForm(prev => {
+            const nuevoForm = { ...prev };
+
+            switch (parte) {
+                case 1:
+                    // Máximo 2 dígitos
+                    if (soloNumeros.length <= 2) {
+                        nuevoForm.cuitParte1 = soloNumeros;
+                        // Auto-avanzar al siguiente campo
+                        if (soloNumeros.length === 2) {
+                            setTimeout(() => cuitInput2Ref.current?.focus(), 10);
+                        }
+                    }
+                    break;
+
+                case 2:
+                    // Máximo 8 dígitos
+                    if (soloNumeros.length <= 8) {
+                        nuevoForm.cuitParte2 = soloNumeros;
+                        // Auto-avanzar o retroceder
+                        if (soloNumeros.length === 8) {
+                            setTimeout(() => cuitInput3Ref.current?.focus(), 10);
+                        } else if (soloNumeros.length === 0) {
+                            setTimeout(() => cuitInput1Ref.current?.focus(), 10);
+                        }
+                    }
+                    break;
+
+                case 3:
+                    // Máximo 1 dígito
+                    if (soloNumeros.length <= 1) {
+                        nuevoForm.cuitParte3 = soloNumeros;
+                        // Retroceder si se borra
+                        if (soloNumeros.length === 0) {
+                            setTimeout(() => cuitInput2Ref.current?.focus(), 10);
+                        }
+                    }
+                    break;
+            }
+
+            return nuevoForm;
+        });
+    };
 
     const handleInputChange = (e) => {
         const { name, type, value, files } = e.target;
@@ -68,7 +140,10 @@ export default function ModalNuevoReintegro({
             // Validar campos obligatorios
             if (!form.integranteDNI) throw new Error("Debe seleccionar un integrante");
             if (!form.fechaPrestacion) throw new Error("Debe ingresar fecha de prestación");
-            if (!form.facturacion_Cuit) throw new Error("Debe ingresar CUIT de facturación");
+            // Validar CUIT
+            if (!validarCUITCompleto()) {
+                throw new Error("El CUIT debe estar completo (formato: XX-XXXXXXXX-X)");
+            }
             if (!form.facturacion_Fecha) throw new Error("Debe ingresar fecha de facturación");
             if (!form.facturacion_NombreDePersonaACobrar) throw new Error("Debe ingresar nombre de persona a cobrar");
             if (!form.medico) throw new Error("Debe ingresar médico");
@@ -103,7 +178,7 @@ export default function ModalNuevoReintegro({
                 especialidad: form.especialidad,
                 lugarDeAtencion: form.lugarAtencion,
                 facturacion_Fecha: form.facturacion_Fecha,
-                facturacion_Cuit: form.facturacion_Cuit,
+                facturacion_Cuit: obtenerCUITCompleto(),
                 facturacion_ValorTotal: Number(form.monto),
                 facturacion_NombreDePersonaACobrar: form.facturacion_NombreDePersonaACobrar || (integrante ? integrante.nombre : ""),
                 formaDePago: form.formaPago,
@@ -113,10 +188,14 @@ export default function ModalNuevoReintegro({
                 usuarioLogueadoId: usuarioLogueado.id,
                 affiliateId: integrante.id
             };
-            console.log("🎯 OBJETO FINAL a enviar:", JSON.stringify(nuevoReintegro, null, 2));
             onSave && onSave(nuevoReintegro);
             onHide && onHide();
-            setForm({ ...initialForm });
+            setForm({
+                ...initialForm,
+                cuitParte1: "",
+                cuitParte2: "",
+                cuitParte3: ""
+            });
         } catch (error) {
             setError(error.message);
         }
@@ -133,7 +212,6 @@ export default function ModalNuevoReintegro({
                 <div ref={errorRef}>
                     {error && <div className="alert alert-danger">{error}</div>}
                 </div>
-                {/* Campos existentes */}
                 <div className="mb-3">
                     <label className="form-label">Seleccionar integrante *</label>
                     <select className="form-select" name="integranteDNI" value={form.integranteDNI} onChange={handleInputChange}>
@@ -161,16 +239,52 @@ export default function ModalNuevoReintegro({
                     />
                 </div>
 
+                {/* CAMPO CUIT MODIFICADO - 3 inputs separados */}
                 <div className="mb-3">
                     <label className="form-label">CUIT de facturación *</label>
-                    <input
-                        type="text"
-                        placeholder="XX-XXXXXXXX-X"
-                        className="form-control"
-                        name="facturacion_Cuit"
-                        value={form.facturacion_Cuit}
-                        onChange={handleInputChange}
-                    />
+                    <div className="d-flex align-items-center">
+                        <input
+                            ref={cuitInput1Ref}
+                            type="text"
+                            placeholder="20"
+                            className="form-control text-center"
+                            style={{ width: "60px" }}
+                            value={form.cuitParte1}
+                            onChange={(e) => handleCUITChange(e, 1)}
+                            maxLength={2}
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                        />
+                        <span className="mx-2">-</span>
+                        <input
+                            ref={cuitInput2Ref}
+                            type="text"
+                            placeholder="12345678"
+                            className="form-control text-center"
+                            style={{ width: "100px" }}
+                            value={form.cuitParte2}
+                            onChange={(e) => handleCUITChange(e, 2)}
+                            maxLength={8}
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                        />
+                        <span className="mx-2">-</span>
+                        <input
+                            ref={cuitInput3Ref}
+                            type="text"
+                            placeholder="9"
+                            className="form-control text-center"
+                            style={{ width: "40px" }}
+                            value={form.cuitParte3}
+                            onChange={(e) => handleCUITChange(e, 3)}
+                            maxLength={1}
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                        />
+                    </div>
+                    <small className="form-text text-muted">
+                        Se guardará como: <strong>{obtenerCUITCompleto() || "XX-XXXXXXXX-X"}</strong>
+                    </small>
                 </div>
 
                 <div className="mb-3">

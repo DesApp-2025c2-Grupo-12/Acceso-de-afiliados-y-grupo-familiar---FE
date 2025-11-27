@@ -40,15 +40,26 @@ export default function Reintegros() {
                 body: JSON.stringify(nuevoReintegro)
             });
 
-            if (!response.ok) throw new Error("Error al crear reintegro");
-
             const reintegroCreado = await response.json();
+
+            if (!response.ok) {
+                const mensajeError = reintegroCreado.message || reintegroCreado.error || `Error ${response.status}`;
+                const detalleError = reintegroCreado.errors ? reintegroCreado.errors.join(". ") : "";
+                throw new Error(`${mensajeError}${detalleError ? ": " + detalleError : ""}`);
+            }
+
             setReintegros((prev) => [reintegroCreado, ...prev]);
-            setSuccess("Reintegro guardado con éxito ✅"); // ← EN LUGAR DE alert()
+            setSuccess("Reintegro guardado con éxito ✅");
+            setModalAbierto(false);
 
         } catch (error) {
             console.error("Error completo:", error);
-            setError("Error al guardar el reintegro ❌"); // ← EN LUGAR DE alert()
+            if (error.message.includes("Solo puede gestionar para sus hijos menores")) {
+                setModalAbierto(false);
+                setError(error.message);
+            } else {
+                setError(error.message);
+            }
         }
     };
 
