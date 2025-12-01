@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import CardPersonalizada from "../../components/Cards/CardPersonalizada";
-import "./NuevoTurno.css"; 
+import "./NuevoTurno.css";
 
 export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrantesCuenta, pantallaNuevoTurno }) {
   const [especialidades, setEspecialidades] = useState([])
@@ -218,7 +218,7 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
 
       setTimeout(() => {
         setPantallaNuevoTurno(false);
-      }, 2000);
+      }, 3000);
 
     } catch (error) {
       console.error("Error:", error);
@@ -228,6 +228,12 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
 
   const formatFecha = (fechaStr) => {
     if (!fechaStr) return "-";
+
+    if (typeof fechaStr === 'string' && fechaStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [año, mes, dia] = fechaStr.split('-');
+      return `${dia}/${mes}/${año}`;
+    }
+    
     const fecha = new Date(fechaStr);
     const dia = String(fecha.getDate()).padStart(2, "0");
     const mes = String(fecha.getMonth() + 1).padStart(2, "0");

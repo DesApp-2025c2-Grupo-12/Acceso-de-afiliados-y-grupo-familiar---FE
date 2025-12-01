@@ -70,10 +70,22 @@ export default function Reintegros() {
     useEffect(() => {
         const fetchReintegros = async () => {
             try {
-                const response = await fetch("http://localhost:3000/refund");
-                if (!response.ok) throw new Error("Error al cargar reintegros");
-                const data = await response.json();
-                setReintegros(data);
+               
+                const resPropio = await fetch(`http://localhost:3000/refund/refundAffiliate/${usuarioLogueado.id}`);
+                if (!resPropio.ok) throw new Error("Error al cargar reintegros Propios");
+                const dataPropio = await resPropio.json();
+
+                const resHijos = await fetch(`http://localhost:3000/refund/refundChildren/${usuarioLogueado.id}`);
+                if (!resHijos.ok) throw new Error("Error al cargar reintegros Propios");
+                const dataHijos = await resHijos.json();
+
+                const reintegrosParaMostrar = [...dataPropio, ...dataHijos]
+
+
+
+
+
+                setReintegros(reintegrosParaMostrar);
             } catch (err) {
                 console.error("Error fetching reintegros:", err);
                 setError("No se pudieron cargar las reintegros");

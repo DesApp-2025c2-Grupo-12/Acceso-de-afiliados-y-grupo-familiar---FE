@@ -36,12 +36,23 @@ export default function Recetas() {
   useEffect(() => {
     const fetchRecetas = async () => {
       try {
-        const response = await fetch("http://localhost:3000/recipes");
-        if (!response.ok) throw new Error("Error al cargar recetas");
-        const data = await response.json();
-        setRecetas(data);
-        // also cache for validations if you want
-        localStorage.setItem("recetasCache", JSON.stringify(data));
+
+        const responsePropio = await fetch(`http://localhost:3000/recipes/affiliateId/${usuarioLogueado.id}`);
+
+        if (!responsePropio.ok) throw new Error("Error al cargar recetas Propias");
+        const dataPropia = await responsePropio.json();
+
+
+        const responseHijos = await fetch(`http://localhost:3000/recipes/childrensAffiliate/${usuarioLogueado.id}`);
+
+        if (!responseHijos.ok) throw new Error("Error al cargar recetas Hijos");
+        const datahijos = await responseHijos.json();
+
+
+        const recetasAMostrar = [...dataPropia, ...datahijos]
+        setRecetas(recetasAMostrar);
+
+        localStorage.setItem("recetasCache", JSON.stringify(recetasAMostrar));
       } catch (err) {
         console.error("Error fetching recetas:", err);
         setError("No se pudieron cargar las recetas");

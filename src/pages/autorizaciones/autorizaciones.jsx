@@ -46,12 +46,21 @@ export default function Autorizaciones() {
 
     const fetchAutorizaciones = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/authorization?numeroDeDocumento=${usuarioLogueado.numeroDeDocumento}`);
-        if (!res.ok) throw new Error("Error al obtener las autorizaciones");
+  
+        const resPropio = await fetch(`http://localhost:3000/authorization/affiliateId/${usuarioLogueado.id}`);
+        if (!resPropio.ok) throw new Error("Error al obtener las autorizaciones");
 
-        const data = await res.json();
+        const dataPropio = await resPropio.json()
+
+        const resHijos = await fetch(`http://localhost:3000/authorization/childrensAffiliate/${usuarioLogueado.id}`)
+        if (!resHijos.ok) throw new Error("Error al obtener las autorizaciones");
+
+        const dataHijos = await resHijos.json()
+
+
+        const authorizationParaMostrar = [...dataPropio, ...dataHijos]
        
-        const lista = data.map(item => {
+        const lista = authorizationParaMostrar.map(item => {
           const fechaOriginal = item.fechaDePrestacion;
           let fechaFormateada = fechaOriginal;
           if (fechaOriginal && fechaOriginal.includes("-")) {

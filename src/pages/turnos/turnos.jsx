@@ -156,16 +156,23 @@ export default function Turnos() {
 
   const formatFecha = (fechaStr) => {
     if (!fechaStr) return "-";
+
+    
+    if (typeof fechaStr === 'string' && fechaStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [año, mes, dia] = fechaStr.split('-');
+      return `${dia}/${mes}/${año}`;
+    }
+
+    
     const fecha = new Date(fechaStr);
     const dia = String(fecha.getDate()).padStart(2, "0");
     const mes = String(fecha.getMonth() + 1).padStart(2, "0");
     const año = fecha.getFullYear();
     return `${dia}/${mes}/${año}`;
   };
-
-   const handleVolverDeNuevoTurno = () => {
+  const handleVolverDeNuevoTurno = () => {
     setPantallaNuevoTurno(false);
-    setHoverTurno(false); 
+    setHoverTurno(false);
   };
 
 
@@ -300,7 +307,7 @@ export default function Turnos() {
                               detallesClassName="text-secondary small mb-2"
                               botonTexto="Cancelar turno"
                               onClick={() => cancelarTurno(turno)}
-                              cardClassName="border shadow-sm h-100" 
+                              cardClassName="border shadow-sm h-100"
                               bodyClassName="p-3"
                             />
                           </Col>
