@@ -233,7 +233,7 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
       const [año, mes, dia] = fechaStr.split('-');
       return `${dia}/${mes}/${año}`;
     }
-    
+
     const fecha = new Date(fechaStr);
     const dia = String(fecha.getDate()).padStart(2, "0");
     const mes = String(fecha.getMonth() + 1).padStart(2, "0");
@@ -430,7 +430,7 @@ export default function NuevoTurno({ setPantallaNuevoTurno, setAlerta, integrant
                   title={turno.especialidad}
                   detalles={[
                     { label: "Fecha", value: formatFecha(turno.fecha) },
-                    { label: "Hora", value: turno.horario },
+                    { label: "Hora", value: turno.horario.split(':').slice(0, 2).join(':') },
                     { label: "Lugar", value: turno.lugarDeAtencion },
                   ]}
                   botonTexto="Reservar"

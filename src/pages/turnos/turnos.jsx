@@ -256,7 +256,7 @@ export default function Turnos() {
                             tipoClassName="badge bg-warning text-dark fs-7 mb-2"
                             detalles={[
                               { label: "Fecha", value: formatFecha(turno.fecha) },
-                              { label: "Horario", value: turno.horario?.substring(0, 5) },
+                              { label: "Horario", value: turno.horario.split(':').slice(0, 2).join(':') },
                               { label: "Lugar", value: turno.lugarDeAtencion },
                             ]}
                             detallesClassName="text-secondary small mb-2"
@@ -300,7 +300,7 @@ export default function Turnos() {
                               tipoClassName="badge bg-warning text-dark fs-7 mb-2"
                               detalles={[
                                 { label: "Fecha", value: formatFecha(turno.fecha) },
-                                { label: "Horario", value: turno.horario },
+                                { label: "Horario", value: turno.horario.split(':').slice(0, 2).join(':') },
                                 { label: "Lugar", value: turno.lugarDeAtencion },
                               ]}
                               detallesClassName="text-secondary small mb-2"
