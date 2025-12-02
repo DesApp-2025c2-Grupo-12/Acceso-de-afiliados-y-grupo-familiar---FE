@@ -157,13 +157,13 @@ export default function Turnos() {
   const formatFecha = (fechaStr) => {
     if (!fechaStr) return "-";
 
-    
+
     if (typeof fechaStr === 'string' && fechaStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
       const [año, mes, dia] = fechaStr.split('-');
       return `${dia}/${mes}/${año}`;
     }
 
-    
+
     const fecha = new Date(fechaStr);
     const dia = String(fecha.getDate()).padStart(2, "0");
     const mes = String(fecha.getMonth() + 1).padStart(2, "0");
@@ -232,7 +232,6 @@ export default function Turnos() {
 
           <Row>
             {/* Columna Mis Turnos */}
-            {/* Columna Mis Turnos */}
             <Col md={!afiTieneHijos ? 12 : 6}>
               <Card className="border shadow-sm h-100">
                 <Card.Header className="bg-light">
@@ -261,8 +260,8 @@ export default function Turnos() {
                               { label: "Lugar", value: turno.lugarDeAtencion },
                             ]}
                             detallesClassName="text-secondary small mb-2"
-                            botonTexto="Cancelar turno"
-                            onClick={() => cancelarTurno(turno)}
+                            botonTexto={!desactivarBotonMenorDeEdad ? "Cancelar turno" : null}
+                            onClick={!desactivarBotonMenorDeEdad ? () => cancelarTurno(turno) : null}
                             cardClassName="border shadow-sm h-100"
                             bodyClassName="p-3"
                           />

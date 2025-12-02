@@ -8,7 +8,7 @@ export default function BuscarAutorizacion({ searchTerm, setSearchTerm}) {
       <input
         className="form-control"
         type="search"
-        placeholder="Buscar por nombre de paciente o médico..."
+        placeholder="Buscar por nombre de Afiliado o médico..."
         aria-label="Buscar"
         value={searchTerm}                
         onChange={(e) => setSearchTerm(e.target.value)} 

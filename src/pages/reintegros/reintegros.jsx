@@ -164,7 +164,7 @@ export default function Reintegros() {
                     <input
                         className="form-control"
                         type="search"
-                        placeholder="Buscar por paciente, médico, especialidad..."
+                        placeholder="Buscar por Afiliado, médico, especialidad..."
                         value={busqueda}
                         onChange={(e) => setBusqueda(e.target.value)}
                     />
