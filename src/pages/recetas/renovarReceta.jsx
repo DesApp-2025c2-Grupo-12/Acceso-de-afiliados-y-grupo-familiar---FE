@@ -57,21 +57,21 @@ export default function RenovarReceta({
       document.body.style.overflow = prevBodyStateRef.current.overflow || "";
       document.body.style.paddingRight = prevBodyStateRef.current.paddingRight || "";
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [receta]);
 
   const cerrarYDesmontar = () => {
-    setFade(false); // iniciar fade-out
+    setFade(false); 
 
     setTimeout(() => {
-      setVisible(false); // ocultar
+      setVisible(false);
 
-      // restaurar estilos previos del body (si acaso el useEffect no lo hizo)
+  
       document.body.style.overflow = prevBodyStateRef.current.overflow || "";
       document.body.style.paddingRight = prevBodyStateRef.current.paddingRight || "";
 
       if (typeof setRecetaRenovar === "function") setRecetaRenovar(null);
-    }, 250); // duración animación
+    }, 250); 
   };
 
   if (!receta) return null;
@@ -168,7 +168,7 @@ export default function RenovarReceta({
 
   return (
     <>
-      {/* Backdrop con fade */}
+
       {visible && (
         <div
           className={`modal-backdrop fade ${fade ? "show" : ""}`}
@@ -176,7 +176,7 @@ export default function RenovarReceta({
         />
       )}
 
-      {/* Modal */}
+ 
       <div
         className={`modal fade ${fade ? "show d-block" : "d-block"}`}
         style={{ zIndex: 1050 }}

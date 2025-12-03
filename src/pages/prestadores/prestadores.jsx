@@ -105,22 +105,11 @@ export default function Prestadores() {
 {!loading && !fetchError && prestadores.length === 0 && (
   <Card className="text-center my-4 p-4 border-0 shadow-sm bg-light">
     <Card.Body>
-      <div
-        className="d-inline-flex align-items-center justify-content-center mb-3 rounded-circle"
-        style={{
-          width: "70px",
-          height: "70px",
-          backgroundColor: "#001F87",
-          color: "white",
-          fontSize: "2rem",
-        }}
-      >
-        🔍
-      </div>
+
       <Card.Text
         className="fst-italic"
         style={{
-          color: "#001F87",
+          color: "#001F87", 
           fontWeight: "500",
           fontSize: "1.1rem",
           border: "1px solid #001F87",

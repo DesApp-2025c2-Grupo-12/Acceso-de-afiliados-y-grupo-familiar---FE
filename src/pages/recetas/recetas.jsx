@@ -28,6 +28,10 @@ export default function Recetas() {
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
   const [recetaRenovar, setRecetaRenovar] = useState(null);
   const [desactivarBotonMenorDeEdad, setDesactivarBotonMenorDeEdad] = useState(null)
+  
+  
+  //NUEVOOOOOO
+  const [estadoFilter, setEstadoFilter] = useState("Todos");
 
   const nuevaRecetaRef = useRef(null);
 
@@ -69,19 +73,36 @@ export default function Recetas() {
     }
   }, []);
 
-  // alert timeouts (sin cambios)
   useEffect(() => { if (error) { const t = setTimeout(() => setError(""), 3000); return () => clearTimeout(t); } }, [error]);
   useEffect(() => { if (success) { const t = setTimeout(() => setSuccess(""), 3000); return () => clearTimeout(t); } }, [success]);
   useEffect(() => { if (alertaDescarga) { const t = setTimeout(() => setAlertaDescarga(""), 3000); return () => clearTimeout(t); } }, [alertaDescarga]);
 
-  const recetasFiltradas = recetas.filter((receta) =>
-    receta.nombreDelMedicamento?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+/////NUEVOOOO
+const recetasFiltradas = recetas.filter((receta) => {
+
+  const termino = searchTerm.trim().toLowerCase();
+  const nombreMedicamento = (receta.nombreDelMedicamento || "").toLowerCase();
+  const nombrePaciente = (receta.paciente || "").toLowerCase();
+  const estadoReceta = (receta.estado || "").toLowerCase();
+
+  const coincideTexto =
+    termino === "" ||
+    nombreMedicamento.includes(termino) ||
+    nombrePaciente.includes(termino);
+
+  const coincideEstado =
+    estadoFilter === "Todos" ||
+    estadoReceta === estadoFilter.toLowerCase();
+
+  return coincideTexto && coincideEstado;
+});
+
+//FIN NUEVOOOOOO
 
   const abrirModalNuevaReceta = () => nuevaRecetaRef.current?.show();
   const abrirModalVer = (receta) => setRecetaSeleccionada(receta);
 
-  // <<-- cambio clave: pasar una copia para forzar nueva referencia
+  
   const abrirModalRenovar = (receta) => setRecetaRenovar(receta ? { ...receta } : null);
 
   return (
@@ -128,24 +149,56 @@ export default function Recetas() {
       {success && <div className="alert alert-success text-center">{success}</div>}
       {alertaDescarga && <div className="alert alert-warning text-center">{alertaDescarga}</div>}
 
-      <BuscarReceta
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        hoverBuscar={hoverBuscar}
-        setHoverBuscar={setHoverBuscar}
-      />
 
-      <div className="row">
-        {recetasFiltradas.map((receta) => (
-          <CardReceta
-            key={receta.id}
-            receta={receta}
-            handleVer={abrirModalVer}
-            handleRenovar={abrirModalRenovar}
-            handleDescargar={(r) => handleDescargar(r, setAlertaDescarga)}
-          />
-        ))}
+
+    <BuscarReceta
+  searchTerm={searchTerm}
+  setSearchTerm={setSearchTerm}
+  estadoFilter={estadoFilter}
+  setEstadoFilter={setEstadoFilter}
+  hoverBuscar={hoverBuscar}
+  setHoverBuscar={setHoverBuscar}
+  />
+  
+
+
+    <div className="row">
+  {recetasFiltradas.length === 0 ? (
+    <div className="col-12 d-flex flex-column align-items-center mt-4">
+
+   
+
+      {/* MENSAJE DE ERROR NUEVOOOOO*/}
+      <div
+        className="fst-italic text-center"
+        style={{
+          color: "#001F87",
+          fontWeight: "500",
+          fontSize: "1.1rem",
+          border: "1px solid #001F87",
+          borderRadius: "50px",
+          padding: "0.8rem 1.5rem",
+          backgroundColor: "white",
+          display: "inline-block",
+        }}
+      >
+        No se encontraron recetas que coincidan con tu búsqueda.
       </div>
+    </div>
+  ) : (
+    recetasFiltradas.map((receta) => (
+      <CardReceta
+        key={receta.id}
+        receta={receta}
+        handleVer={abrirModalVer}
+        handleRenovar={abrirModalRenovar}
+        handleDescargar={(r) => handleDescargar(r, setAlertaDescarga)}
+      />
+    ))
+  )}
+</div>
+
+
 
       <NuevaReceta
         refModal={nuevaRecetaRef}

@@ -10,6 +10,10 @@ export default function Autorizaciones() {
   const [autorizaciones, setAutorizaciones] = useState([]);
   const [hoverNueva, setHoverNueva] = useState(false);
   const [hoverBuscar, setHoverBuscar] = useState(false);
+
+//NUEVOOO
+  const [estadoFilter, setEstadoFilter] = useState("Todos");
+
   const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
   const [formData, setFormData] = useState({
     fecha: "",
@@ -127,11 +131,24 @@ export default function Autorizaciones() {
     fetchIntegrantes();
   }, []);
 
-  const autorizacionesFiltradas = autorizaciones.filter(
-    (a) =>
-      a.paciente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.medico?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+const autorizacionesFiltradas = autorizaciones.filter((a) => {
+  const termino = searchTerm.trim().toLowerCase();
+  const paciente = (a.paciente || "").toLowerCase();
+  const medico = (a.medico || "").toLowerCase();
+  const estado = (a.estado || "").toLowerCase();
+
+  const coincideTexto =
+    termino === "" ||
+    paciente.includes(termino) ||
+    medico.includes(termino);
+
+  const coincideEstado =
+    estadoFilter === "Todos" ||
+    estado === estadoFilter.toLowerCase();
+
+  return coincideTexto && coincideEstado;
+});
+
 
   //  FUNCIÓN para abrir el modal al presionar el tachito
   const handleRequestDelete = (autorizacion) => {
@@ -248,30 +265,52 @@ export default function Autorizaciones() {
       {error && <div className="alert alert-danger text-center mb-4">{error}</div>}
       {success && <div className="alert alert-success text-center mb-4">{success}</div>}
 
-      <BuscarAutorizacion
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        hoverBuscar={hoverBuscar}
-        setHoverBuscar={setHoverBuscar}
-      />
+
+
+<BuscarAutorizacion
+  searchTerm={searchTerm}
+  setSearchTerm={setSearchTerm}
+  estadoFilter={estadoFilter}
+  setEstadoFilter={setEstadoFilter}
+  hoverBuscar={hoverBuscar}
+  setHoverBuscar={setHoverBuscar}
+/>
+
 
       <div className="row">
-        {autorizacionesFiltradas.length > 0 ? (
-          autorizacionesFiltradas.map((auto) => (
-            <CardAutorizacion
-              key={auto.id}
-              autorizacion={auto}
-              setAutorizacionParaVer={setAutorizacionParaVer}
-              onRequestDelete={handleRequestDelete} // pasamos la función al card
-              onRequestEdit={onRequestEdit}  // se lo paso a la card
-            />
-          ))
-        ) : (
-          <p className="text-center text-muted mt-4">
-            No se encontraron autorizaciones.
-          </p>
-        )}
+  {autorizacionesFiltradas.length > 0 ? (
+    autorizacionesFiltradas.map((auto) => (
+      <CardAutorizacion
+        key={auto.id}
+        autorizacion={auto}
+        setAutorizacionParaVer={setAutorizacionParaVer}
+        onRequestDelete={handleRequestDelete}
+        onRequestEdit={onRequestEdit}
+      />
+    ))
+  ) : (
+    <div className="col-12 d-flex flex-column align-items-center mt-4">
+      {/* MENSAJE */}
+      <div
+        className="fst-italic text-center"
+        style={{
+          color: "#001F87",
+          fontWeight: "500",
+          fontSize: "1.1rem",
+          border: "1px solid #001F87",
+          borderRadius: "50px",
+          padding: "0.8rem 1.5rem",
+          backgroundColor: "white",
+          display: "inline-block",
+        }}
+      >
+        No se encontraron autorizaciones que coincidan con tu búsqueda.
       </div>
+
+    </div>
+  )}
+</div>
+
 
       <NuevaAutorizacion
         showModal={showModal}

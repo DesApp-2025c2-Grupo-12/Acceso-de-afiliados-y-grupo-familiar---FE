@@ -15,8 +15,16 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
   const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
   const desactivarBotonMenorDeEdad = calcularEdad(usuarioLogueado?.fechaDeNacimiento) <= 16;
 
-  const formatFecha = (fechaStr) => {
+const formatFecha = (fechaStr) => {
     if (!fechaStr) return "-";
+
+
+    if (typeof fechaStr === 'string' && fechaStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [año, mes, dia] = fechaStr.split('-');
+      return `${dia}/${mes}/${año}`;
+    }
+
+
     const fecha = new Date(fechaStr);
     const dia = String(fecha.getDate()).padStart(2, "0");
     const mes = String(fecha.getMonth() + 1).padStart(2, "0");
@@ -24,14 +32,13 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
     return `${dia}/${mes}/${año}`;
   };
 
-  const fechaAprobacion = receta.fechaDeAprobacion || receta.fechaDeEmision || null;
+  const fechaAprobacion = receta.fechaDeAprobacion || null;
   const fechaAMostrar = receta.estado === "Aprobado" ? formatFecha(fechaAprobacion) : "***";
 
   return (
     <div className="col-md-6 mb-4">
       <div className="card h-100 shadow-sm" style={{ border: "1px solid #ccc" }}>
 
-        {/* Franja superior con el estado */}
         <div
           style={{
             ...estadoColores[receta.estado],
@@ -48,14 +55,14 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
         <div className="card-body text-center">
           <h5 className="card-title fw-bold">
             {receta.nombreDelMedicamento} {" - "}
-            <small className="text-muted">{fechaAMostrar}</small>
+            <small className="text-muted">{formatFecha(fechaAprobacion)}</small>
           </h5>
 
           <p className="text-muted mb-3">{receta.paciente}</p>
 
           <div className="d-flex justify-content-center flex-wrap gap-2">
 
-            {/* ✔️ VER SIEMPRE DISPONIBLE */}
+           
             <button
               className="btn btn-sm rounded-pill"
               style={{
@@ -73,7 +80,7 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
             >
               Ver Detalle
             </button>
-            {/* 🆕 RENOVAR SOLO SI ESTA APROBADO Y CON CONTROL DE EDAD */}
+            {/* RENOVAR SOLO SI ESTA APROBADO Y CON CONTROL DE EDAD */}
             {receta.estado === "Aprobado" && (
               desactivarBotonMenorDeEdad ? (
                 <OverlayTrigger
@@ -123,7 +130,7 @@ export default function CardReceta({ receta, handleVer, handleRenovar, handleDes
                 </button>
               )
             )}
-{/* ✔️ DESCARGAR SOLO SI ESTA APROBADO Y CON CONTROL DE EDAD */}
+{/*  DESCARGAR SOLO SI ESTA APROBADO Y CON CONTROL DE EDAD */}
 {receta.estado === "Aprobado" && (
   desactivarBotonMenorDeEdad ? (
     <OverlayTrigger

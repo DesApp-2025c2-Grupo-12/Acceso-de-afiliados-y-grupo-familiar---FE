@@ -15,15 +15,22 @@ export default function VerReceta({ receta, setRecetaSeleccionada }) {
     setRecetaSeleccionada(null);
   };
 
-  const formatFecha = (fechaStr) => {
+ const formatFecha = (fechaStr) => {
     if (!fechaStr) return "-";
+
+
+    if (typeof fechaStr === 'string' && fechaStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [año, mes, dia] = fechaStr.split('-');
+      return `${dia}/${mes}/${año}`;
+    }
+
+
     const fecha = new Date(fechaStr);
     const dia = String(fecha.getDate()).padStart(2, "0");
     const mes = String(fecha.getMonth() + 1).padStart(2, "0");
     const año = fecha.getFullYear();
     return `${dia}/${mes}/${año}`;
   };
-
   const fechaAprobacion = receta?.fechaDeAprobacion || receta?.fechaDeEmision || null;
 
   return (
