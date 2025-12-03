@@ -43,7 +43,7 @@ export default function PrestadorFilters({
             value={location}
             onChange={(e) => {
               setLocation(e.target.value);
-              setZona(""); // reset zona al cambiar ubicación
+              setZona(""); 
             }}
           >
             <option value="">Todas las ubicaciones</option>

@@ -28,7 +28,7 @@ export default function Prestadores() {
   const [fetchError, setFetchError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Validación del input nombre
+
   const handleNombreChange = (value) => {
     const valueTrimmed = value.trim();
     if (/^[a-zA-ZáéíóúÁÉÍÓÚüÜ\s]*$/.test(valueTrimmed)) {
@@ -43,7 +43,7 @@ export default function Prestadores() {
     }
   };
 
-  // Fetch seguro con validación
+  
   useEffect(() => {
     const fetchPrestadores = async () => {
       setLoading(true);
@@ -81,7 +81,7 @@ export default function Prestadores() {
 
   return (
     <Container className="my-5">
-      {/* 🔹 Encabezado estilo MIS RECETAS */}
+
       <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
         <h2 className="fw-bold text-dark fs-3 mb-0">PRESTADORES</h2>
       </div>
@@ -101,7 +101,6 @@ export default function Prestadores() {
       {loading && <p className="text-center">Cargando prestadores...</p>}
       {fetchError && <p className="text-danger text-center">{fetchError}</p>}
 
-      {/* Mensaje cuando no hay resultados */}
 {!loading && !fetchError && prestadores.length === 0 && (
   <Card className="text-center my-4 p-4 border-0 shadow-sm bg-light">
     <Card.Body>

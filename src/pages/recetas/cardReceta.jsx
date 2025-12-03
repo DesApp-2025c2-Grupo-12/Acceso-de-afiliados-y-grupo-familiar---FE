@@ -3,6 +3,7 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { calcularEdad } from "../../utils/utils";
 
 
+
 export default function CardReceta({ receta, handleVer, handleRenovar, handleDescargar }) {
   const estadoColores = {
     "Recibido": { backgroundColor: "#90BFEA", color: "black" },

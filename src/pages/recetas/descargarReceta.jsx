@@ -26,9 +26,7 @@ export const handleDescargar = async (receta, setAlertaDescarga) => {
 
   let y = 40;
 
-  // ============================
-  // ENCABEZADO
-  // ============================
+  
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(18);
   doc.text(
@@ -38,9 +36,7 @@ export const handleDescargar = async (receta, setAlertaDescarga) => {
   );
   y += 35;
 
-  // ============================
-  // ESTADO + FECHA DE APROBACIÓN
-  // ============================
+
   doc.setFontSize(14);
   doc.setFont("Helvetica", "bold");
   doc.text("Estado:", 40, y);
@@ -68,9 +64,7 @@ export const handleDescargar = async (receta, setAlertaDescarga) => {
 
   y += 30;
 
-  // ============================
-  // MEDICAMENTO
-  // ============================
+
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(14);
   doc.text("Medicamento:", 40, y);
@@ -96,9 +90,7 @@ export const handleDescargar = async (receta, setAlertaDescarga) => {
 
   y += 25;
 
-  // ============================
-  // OBSERVACIONES
-  // ============================
+ 
   doc.setFont("Helvetica", "bold");
   doc.text("Observaciones:", 40, y);
 
@@ -114,9 +106,7 @@ export const handleDescargar = async (receta, setAlertaDescarga) => {
   doc.line(40, y, pageWidth - 40, y);
   y += 30;
 
-  // ============================
-  // FIRMA DIGITAL
-  // ============================
+
   doc.setFont("Helvetica", "bold");
   doc.text("Firma digital:", 40, y);
   y += 18;
@@ -132,9 +122,7 @@ export const handleDescargar = async (receta, setAlertaDescarga) => {
 
   y += 60;
 
-  // ============================
-  // VIGENCIA
-  // ============================
+  
   doc.setFont("Helvetica", "bold");
   doc.text("Vigencia:", 40, y);
   y += 18;
@@ -149,9 +137,7 @@ export const handleDescargar = async (receta, setAlertaDescarga) => {
 
   y += 60;
 
-  // ============================
-  // LECTRA
-  // ============================
+ 
   doc.setFont("Helvetica", "bold");
   doc.text("Lectura obligatoria:", 40, y);
   y += 18;
@@ -164,9 +150,7 @@ export const handleDescargar = async (receta, setAlertaDescarga) => {
     { maxWidth: pageWidth - 80 }
   );
 
-  // =========================================
-  // LOGO CENTRADO AL FINAL DE LA PÁGINA
-  // =========================================
+  
   const logoURL = "/logoPDF/LogoPDF.jpeg";
 
   try {
@@ -190,8 +174,6 @@ export const handleDescargar = async (receta, setAlertaDescarga) => {
     console.warn("No se pudo cargar el logo para el PDF:", error);
   }
 
-  // ============================
-  // GUARDAR
-  // ============================
+ 
   doc.save(`Receta_${receta.paciente}_${receta.numeroDeDocumento}.pdf`);
 };

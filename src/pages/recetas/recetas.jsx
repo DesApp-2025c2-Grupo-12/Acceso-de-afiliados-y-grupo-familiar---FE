@@ -30,7 +30,7 @@ export default function Recetas() {
   const [desactivarBotonMenorDeEdad, setDesactivarBotonMenorDeEdad] = useState(null)
   
   
-  //NUEVOOOOOO
+
   const [estadoFilter, setEstadoFilter] = useState("Todos los estados");
 
   const nuevaRecetaRef = useRef(null);
@@ -77,7 +77,7 @@ export default function Recetas() {
   useEffect(() => { if (success) { const t = setTimeout(() => setSuccess(""), 3000); return () => clearTimeout(t); } }, [success]);
   useEffect(() => { if (alertaDescarga) { const t = setTimeout(() => setAlertaDescarga(""), 3000); return () => clearTimeout(t); } }, [alertaDescarga]);
 
-/////NUEVOOOO
+
 const recetasFiltradas = recetas.filter((receta) => {
 
   const termino = searchTerm.trim().toLowerCase();
@@ -97,7 +97,7 @@ const recetasFiltradas = recetas.filter((receta) => {
   return coincideTexto && coincideEstado;
 });
 
-//FIN NUEVOOOOOO
+
 
   const abrirModalNuevaReceta = () => nuevaRecetaRef.current?.show();
   const abrirModalVer = (receta) => setRecetaSeleccionada(receta);
@@ -144,7 +144,7 @@ const recetasFiltradas = recetas.filter((receta) => {
         )}
       </div>
 
-      {/* Mensajes */}
+      
       {error && <div className="alert alert-danger text-center">{error}</div>}
       {success && <div className="alert alert-success text-center">{success}</div>}
       {alertaDescarga && <div className="alert alert-warning text-center">{alertaDescarga}</div>}
@@ -168,7 +168,6 @@ const recetasFiltradas = recetas.filter((receta) => {
 
    
 
-      {/* MENSAJE DE ERROR NUEVOOOOO*/}
       <div
         className="fst-italic text-center"
         style={{
@@ -215,9 +214,12 @@ const recetasFiltradas = recetas.filter((receta) => {
       />
 
       <VerReceta
-        receta={recetaSeleccionada}
-        setRecetaSeleccionada={setRecetaSeleccionada}
-      />
+  receta={recetaSeleccionada}
+  setRecetaSeleccionada={setRecetaSeleccionada}
+  setSuccess={setSuccess}
+  setError={setError}
+/>
+
 
       <RenovarReceta
         receta={recetaRenovar}

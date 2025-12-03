@@ -14,13 +14,12 @@ export default function RenovarReceta({
   setHoverGuardar,
 }) {
   const [visible, setVisible] = useState(false);
-  const [fade, setFade] = useState(false); // controla animación
+  const [fade, setFade] = useState(false); 
   const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
 
-  // guardo valores previos del body para restaurar luego
+  
   const prevBodyStateRef = React.useRef({ overflow: "", paddingRight: "" });
 
-  // Cuando llega `receta`, cargar datos y animar apertura
   useEffect(() => {
     if (!receta) return;
 
@@ -33,27 +32,24 @@ export default function RenovarReceta({
       
     });
 
-    // calcular ancho del scrollbar y guardar estado previo
     const prevOverflow = document.body.style.overflow;
     const prevPaddingRight = document.body.style.paddingRight;
 
-    // ancho de scrollbar: diferencia entre innerWidth y clientWidth
     const scrollbarWidth = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
 
-    // aplicar bloqueo de scroll y compensación para evitar salto
+
     document.body.style.overflow = "hidden";
-    // si ya tenía paddingRight inline lo respetamos guardándolo y luego restauramos
+ 
     document.body.style.paddingRight = `${scrollbarWidth}px`;
 
     prevBodyStateRef.current = { overflow: prevOverflow, paddingRight: prevPaddingRight };
 
-    // Mostrar modal con fade
     setVisible(true);
-    // pequeña demora para que el fade funcione
+ 
     setTimeout(() => setFade(true), 10);
 
     return () => {
-      // cleanup: restaurar estilos previos del body
+      
       document.body.style.overflow = prevBodyStateRef.current.overflow || "";
       document.body.style.paddingRight = prevBodyStateRef.current.paddingRight || "";
     };

@@ -21,7 +21,7 @@ const PrestadorCard = ({ prestador, onVerDetalles }) => {
   return (
     <Card className="mb-3 border shadow-sm" style={{ borderRadius: "8px" }}>
       <Card.Body>
-        {/* Nombre arriba alineado a la izquierda */}
+      
         <Card.Title
           className="fw-bold text-dark mb-2"
           style={{ fontSize: "1.1rem", textAlign: "left" }}
@@ -32,7 +32,6 @@ const PrestadorCard = ({ prestador, onVerDetalles }) => {
         <hr className="mt-0 mb-3" />
 
         <Row className="align-items-center">
-          {/* Imagen con flechas laterales */}
           <Col xs={12} md={5} className="text-center position-relative">
             <div
               style={{
@@ -56,7 +55,6 @@ const PrestadorCard = ({ prestador, onVerDetalles }) => {
               />
             </div>
 
-            {/* Botones de navegación más formales */}
             <Button
               variant="light"
               className="position-absolute top-50 start-0 translate-middle-y"
@@ -92,14 +90,12 @@ const PrestadorCard = ({ prestador, onVerDetalles }) => {
             </Button>
           </Col>
 
-          {/* Texto a la derecha */}
           <Col xs={12} md={7} className="text-center text-md-start mt-3 mt-md-0">
             <p className="fw-semibold mb-3 text-dark" style={{ fontSize: "0.95rem" }}>
               {prestador.direccion || "Dirección no disponible"}
               {prestador.localidad ? `, ${prestador.localidad}` : ""}
             </p>
 
-            {/* Botón Ver Detalles azul oscuro */}
             <div className="d-flex justify-content-center justify-content-md-start">
               <Button
                 variant="primary"

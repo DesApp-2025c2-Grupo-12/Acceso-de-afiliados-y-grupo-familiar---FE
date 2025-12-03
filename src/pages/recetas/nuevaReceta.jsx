@@ -41,13 +41,12 @@ export default function NuevaReceta({
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    //Valida cantidad en frontend
+
     if (name === "cantidad") {
       const num = parseInt(value);
       if (isNaN(num) || num < 1 || num > 2) return;
     }
 
-    //Limit observaciones a 300 caracteres
     if (name === "observaciones" && value.length > 300) return;
 
     setFormData({ ...formData, [name]: value });
@@ -55,7 +54,6 @@ export default function NuevaReceta({
 
 const handleGuardar = async () => {
   try {
-    // Validaciones básicas
     if (!formData.paciente) throw new Error("Debe seleccionar un paciente");
     if (!formData.nombreDelMedicamento)
       throw new Error("Debe ingresar el nombre del medicamento");
@@ -75,7 +73,6 @@ const handleGuardar = async () => {
     if (!integrantesCuenta || integrantesCuenta.length === 0)
       throw new Error("No se pudo cargar la información del grupo familiar");
 
-    // Traer paciente completo
     const pacienteSeleccionado = integrantesCuenta.find(
       (p) => p.numeroDeDocumento === formData.paciente
     );
@@ -84,12 +81,10 @@ const handleGuardar = async () => {
 
     const pacienteNombre = `${pacienteSeleccionado.nombre} ${pacienteSeleccionado.apellido}`;
 
-    // 1️⃣ Traer todas las recetas desde el backend
     const responseFetch = await fetch("http://localhost:3000/recipes");
     if (!responseFetch.ok) throw new Error("Error al cargar recetas");
     const allRecetas = await responseFetch.json();
 
-    // 2️⃣ Filtrar las del mismo paciente y mes actual
     const hoy = new Date();
     const mesActual = hoy.getMonth();
     const anioActual = hoy.getFullYear();
@@ -103,7 +98,6 @@ const handleGuardar = async () => {
       );
     });
 
-    // 3️⃣ Validación de duplicado
     const recetaDuplicada = recetasMes.find(
       (r) =>
         r.nombreDelMedicamento.toLowerCase() ===
@@ -115,7 +109,6 @@ const handleGuardar = async () => {
       );
     }
 
-    // 4️⃣ Validación de cantidad total
     const totalCantidad = recetasMes
       .filter(
         (r) =>
@@ -131,7 +124,6 @@ const handleGuardar = async () => {
       );
     }
     const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado"))
-    // 5️⃣ Preparar receta para enviar
     const recetaParaEnviar = {
       paciente: pacienteNombre,
       nombreDelMedicamento: formData.nombreDelMedicamento,
@@ -140,11 +132,11 @@ const handleGuardar = async () => {
       observaciones: formData.observaciones,
       estado: "Recibido",
       numeroDeDocumento: formData.paciente,
-      affiliateId: pacienteSeleccionado.id, // clave FK correcta,
+      affiliateId: pacienteSeleccionado.id, 
       usuarioLogueadoId: usuarioLogueado.id
     };
 
-    // 6️⃣ Guardar en backend
+ 
     const response = await fetch("http://localhost:3000/recipes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -154,7 +146,7 @@ const handleGuardar = async () => {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Error al crear receta");
 
-    // 7️⃣ Actualizar estado y localStorage
+
     setRecetas((prev) => [...prev, data]);
     localStorage.setItem(
       "recetasCache",
@@ -164,7 +156,7 @@ const handleGuardar = async () => {
     setSuccess("Receta creada con éxito");
     setError("");
 
-    // 8️⃣ Reset del form
+    
     setFormData({
       paciente: "",
       nombreDelMedicamento: "",
