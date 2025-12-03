@@ -9,7 +9,7 @@ export default function BuscarReceta({
   setHoverBuscar,
 }) {
   const estados = [
-    "Todos",
+    "Todos los estados",
     "Recibido",
     "En análisis",
     "Observado",
@@ -51,7 +51,7 @@ export default function BuscarReceta({
             className="w-100"
             onClick={() => {
               setSearchTerm("");
-              setEstadoFilter("Todos");
+              setEstadoFilter("Todos los estados");
             }}
             onMouseEnter={() => setHoverBuscar && setHoverBuscar(true)}
             onMouseLeave={() => setHoverBuscar && setHoverBuscar(false)}

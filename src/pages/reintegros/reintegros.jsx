@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import "./reintegros.css";
-import { normalizar, coincide } from "../../utils/filtros";
 import ModalNuevoReintegro from "./ModalNuevoReintegro";
 import ModalDetalleReintegro from "./ModalDetalleReintegro";
 import CardReintegro from "./CardReintegro";
+import BuscarReintegro from "./BuscarReintegro";
 import { calcularEdad } from "../../utils/utils";
 
 export default function Reintegros() {
@@ -14,23 +14,33 @@ export default function Reintegros() {
     const [error, setError] = useState("");
     const [errorModal, setErrorModal] = useState("");
     const [success, setSuccess] = useState("");
-    const [desactivarBotonMenorDeEdad, setDesactivarBotonMenorDeEdad] = useState(null)
+    const [desactivarBotonMenorDeEdad, setDesactivarBotonMenorDeEdad] = useState(null);
     const [grupoFamiliar, setGrupoFamiliar] = useState([]);
+    const [estadoFilter, setEstadoFilter] = useState("Todos los estados");
+    const [hoverBuscar, setHoverBuscar] = useState(false);
+    const [reintegroSeleccionado, setReintegroSeleccionado] = useState(null);
+    const [modalDetalleAbierto, setModalDetalleAbierto] = useState(false);
 
     const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
 
-    const term = normalizar(busqueda.trim());
-    const camposBusqueda = [
-        "nombreDelAfiliado",
-        "nombreDelMedico",
-        "especialidad",
-        "facturacion_Fecha",
-        "facturacion_ValorTotal"];
+    const reintegrosFiltrados = reintegros.filter((r) => {
+        const termino = busqueda.trim().toLowerCase();
+        const camposBusqueda = [
+            "nombreDelAfiliado",
+            "nombreDelMedico",
+            "especialidad"
+        ];
 
-    const reintegrosFiltrados = reintegros.filter(
-        (r) => !term || coincide(r, camposBusqueda, term)
-    );
+        const coincideTexto = !termino || camposBusqueda.some(campo =>
+            (r[campo] || "").toLowerCase().includes(termino)
+        );
+        
+        const coincideEstado =
+            estadoFilter === "Todos los estados" ||
+            (r.estado || "").toLowerCase() === estadoFilter.toLowerCase();
 
+        return coincideTexto && coincideEstado;
+    });
 
     const agregarReintegro = async (nuevoReintegro) => {
         try {
@@ -63,35 +73,25 @@ export default function Reintegros() {
         }
     };
 
-
-    const [reintegroSeleccionado, setReintegroSeleccionado] = useState(null);
-    const [modalDetalleAbierto, setModalDetalleAbierto] = useState(false);
-
     useEffect(() => {
         const fetchReintegros = async () => {
             try {
-               
                 const resPropio = await fetch(`http://localhost:3000/refund/refundAffiliate/${usuarioLogueado.id}`);
                 if (!resPropio.ok) throw new Error("Error al cargar reintegros Propios");
                 const dataPropio = await resPropio.json();
 
                 const resHijos = await fetch(`http://localhost:3000/refund/refundChildren/${usuarioLogueado.id}`);
-                if (!resHijos.ok) throw new Error("Error al cargar reintegros Propios");
+                if (!resHijos.ok) throw new Error("Error al cargar reintegros Hijos");
                 const dataHijos = await resHijos.json();
 
-                const reintegrosParaMostrar = [...dataPropio, ...dataHijos]
-
-
-
-
-
+                const reintegrosParaMostrar = [...dataPropio, ...dataHijos];
                 setReintegros(reintegrosParaMostrar);
             } catch (err) {
                 console.error("Error fetching reintegros:", err);
-                setError("No se pudieron cargar las reintegros");
+                setError("No se pudieron cargar los reintegros");
             }
-
         };
+
         const fetchGrupoFamiliar = async () => {
             try {
                 const response = await fetch(`http://localhost:3000/affiliate/grupo-familiar/${usuarioLogueado.numeroDeDocumento}`);
@@ -106,11 +106,11 @@ export default function Reintegros() {
         fetchReintegros();
         fetchGrupoFamiliar();
         if (calcularEdad(usuarioLogueado.fechaDeNacimiento) <= 16) {
-            setDesactivarBotonMenorDeEdad(true)
+            setDesactivarBotonMenorDeEdad(true);
         } else {
-            setDesactivarBotonMenorDeEdad(false)
+            setDesactivarBotonMenorDeEdad(false);
         }
-    }, [])
+    }, []);
 
     useEffect(() => {
         if (error) {
@@ -129,6 +129,7 @@ export default function Reintegros() {
     return (
         <Container>
             <div className="container mt-4">
+                {/* Header con botón */}
                 <div className="d-flex justify-content-between align-items-center mb-3">
                     <h3 className="fw-bold text-dark fs-3 mb-0">MIS REINTEGROS</h3>
                     {desactivarBotonMenorDeEdad ? (
@@ -160,48 +161,57 @@ export default function Reintegros() {
                     )}
                 </div>
 
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <input
-                        className="form-control"
-                        type="search"
-                        placeholder="Buscar por Afiliado, médico, especialidad..."
-                        value={busqueda}
-                        onChange={(e) => setBusqueda(e.target.value)}
-                    />
-                </div>
+                <BuscarReintegro
+                    searchTerm={busqueda}
+                    setSearchTerm={setBusqueda}
+                    estadoFilter={estadoFilter}
+                    setEstadoFilter={setEstadoFilter}
+                    hoverBuscar={hoverBuscar}
+                    setHoverBuscar={setHoverBuscar}
+                />
+
                 {error && <div className="alert alert-danger text-center">{error}</div>}
                 {success && <div className="alert alert-success text-center">{success}</div>}
 
-                <Card.Body className="d-flex flex-column">
-                    {reintegrosFiltrados.length === 0 ? (
-                        <div className="text-center py-4 flex-grow-1 d-flex align-items-center justify-content-center">
-                            <div>
-                                <h5 className="text-muted mb-3">No se encontraron reintegros</h5>
-                            </div>
+                {reintegrosFiltrados.length === 0 ? (
+                    <div className="col-12 d-flex flex-column align-items-center mt-4">
+                        <div
+                            className="fst-italic text-center"
+                            style={{
+                                color: "#001F87",
+                                fontWeight: "500",
+                                fontSize: "1.1rem",
+                                border: "1px solid #001F87",
+                                borderRadius: "50px",
+                                padding: "0.8rem 1.5rem",
+                                backgroundColor: "white",
+                                display: "inline-block",
+                            }}
+                        >
+                            No se encontraron reintegros que coincidan con tu búsqueda.
                         </div>
-                    ) : (
-                        <Row>
-                            <div className="row">
-                                {reintegrosFiltrados.map(reintegroFiltrado => (
-                                    <CardReintegro
-                                        key={reintegroFiltrado.id}
-                                        reintegroFiltrado={reintegroFiltrado}
-                                        seleccionarReintegro={setReintegroSeleccionado}
-                                        abrirModalDetalle={setModalDetalleAbierto}
-                                    />
-                                ))}
-                            </div>
-                        </Row>
-                    )}
-                </Card.Body>
+                    </div>
+                ) : (
+                    <Row>
+                        {reintegrosFiltrados.map(reintegroFiltrado => (
+                            <CardReintegro
+                                key={reintegroFiltrado.id}
+                                reintegroFiltrado={reintegroFiltrado}
+                                seleccionarReintegro={setReintegroSeleccionado}
+                                abrirModalDetalle={setModalDetalleAbierto}
+                            />
+                        ))}
+                    </Row>
+                )}
             </div>
 
+            {/* Modales */}
             <ModalNuevoReintegro
                 show={modalAbierto}
                 onHide={() => setModalAbierto(false)}
                 onSave={agregarReintegro}
                 grupoFamiliar={grupoFamiliar}
-                error={errorModal}        // ← Usa errorModal
+                error={errorModal}
                 setError={setErrorModal}
             />
 

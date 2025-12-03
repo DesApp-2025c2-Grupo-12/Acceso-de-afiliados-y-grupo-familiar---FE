@@ -1,6 +1,7 @@
+import React from "react";
 import { Row, Col, Form, Button } from "react-bootstrap";
 
-export default function BuscarAutorizacion({
+export default function BuscarReintegro({
   searchTerm,
   setSearchTerm,
   estadoFilter,
@@ -8,42 +9,38 @@ export default function BuscarAutorizacion({
   hoverBuscar,
   setHoverBuscar,
 }) {
- const estados = [
+  const estados = [
     "Todos los estados",
     "Recibido",
     "En análisis",
-    "Observada",
-    "Aprobada",
-    "Rechazada",
-    "Pendiente",
+    "Observado",
+    "Aprobado",
+    "Rechazado",
   ];
 
   return (
     <Row className="mb-4">
-
       <Col md={6} className="mb-2">
         <Form.Control
           type="search"
-          placeholder="Buscar por nombre de afiliado o médico..."
+          placeholder="Buscar por afiliado, rol, médico o especialidad"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </Col>
 
-  
       <Col md={4} className="mb-2">
         <Form.Select
           value={estadoFilter}
           onChange={(e) => setEstadoFilter(e.target.value)}
         >
-          {estados.map((e) => (
-            <option key={e} value={e}>
-              {e}
+          {estados.map((estado) => (
+            <option key={estado} value={estado}>
+              {estado}
             </option>
           ))}
         </Form.Select>
       </Col>
-
 
       <Col md={2} className="mb-2">
         <Button
@@ -53,8 +50,8 @@ export default function BuscarAutorizacion({
             setSearchTerm("");
             setEstadoFilter("Todos los estados");
           }}
-          onMouseEnter={() => setHoverBuscar(true)}
-          onMouseLeave={() => setHoverBuscar(false)}
+          onMouseEnter={() => setHoverBuscar && setHoverBuscar(true)}
+          onMouseLeave={() => setHoverBuscar && setHoverBuscar(false)}
         >
           Limpiar
         </Button>

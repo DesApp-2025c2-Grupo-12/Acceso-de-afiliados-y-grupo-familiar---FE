@@ -12,7 +12,7 @@ export default function Autorizaciones() {
   const [hoverBuscar, setHoverBuscar] = useState(false);
 
 //NUEVOOO
-  const [estadoFilter, setEstadoFilter] = useState("Todos");
+  const [estadoFilter, setEstadoFilter] = useState("Todos los estados");
 
   const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
   const [formData, setFormData] = useState({
@@ -143,7 +143,7 @@ const autorizacionesFiltradas = autorizaciones.filter((a) => {
     medico.includes(termino);
 
   const coincideEstado =
-    estadoFilter === "Todos" ||
+    estadoFilter === "Todos los estados" ||
     estado === estadoFilter.toLowerCase();
 
   return coincideTexto && coincideEstado;

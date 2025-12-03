@@ -31,7 +31,7 @@ export default function Recetas() {
   
   
   //NUEVOOOOOO
-  const [estadoFilter, setEstadoFilter] = useState("Todos");
+  const [estadoFilter, setEstadoFilter] = useState("Todos los estados");
 
   const nuevaRecetaRef = useRef(null);
 
@@ -91,7 +91,7 @@ const recetasFiltradas = recetas.filter((receta) => {
     nombrePaciente.includes(termino);
 
   const coincideEstado =
-    estadoFilter === "Todos" ||
+    estadoFilter === "Todos los estados" ||
     estadoReceta === estadoFilter.toLowerCase();
 
   return coincideTexto && coincideEstado;
