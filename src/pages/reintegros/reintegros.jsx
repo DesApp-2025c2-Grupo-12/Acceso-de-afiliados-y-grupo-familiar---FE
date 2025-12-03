@@ -23,7 +23,21 @@ export default function Reintegros() {
 
     const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
 
+    const esFechaValida = (fechaPrestacion) => {
+        if (!fechaPrestacion) return false;
+
+        const fechaReintegro = new Date(fechaPrestacion);
+
+        const fechaLimite = new Date();
+        fechaLimite.setMonth(fechaLimite.getMonth() - 6);
+
+        return fechaLimite <= fechaReintegro;
+    };
+
     const reintegrosFiltrados = reintegros.filter((r) => {
+        if (!esFechaValida(r.fechaDePrestacion)) {
+            return false;
+        }
         const termino = busqueda.trim().toLowerCase();
         const camposBusqueda = [
             "nombreDelAfiliado",
@@ -34,7 +48,7 @@ export default function Reintegros() {
         const coincideTexto = !termino || camposBusqueda.some(campo =>
             (r[campo] || "").toLowerCase().includes(termino)
         );
-        
+
         const coincideEstado =
             estadoFilter === "Todos los estados" ||
             (r.estado || "").toLowerCase() === estadoFilter.toLowerCase();

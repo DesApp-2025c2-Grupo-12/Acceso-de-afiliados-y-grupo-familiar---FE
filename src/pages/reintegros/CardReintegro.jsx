@@ -1,4 +1,5 @@
 import React from "react";
+import { Card, Button } from "react-bootstrap";
 
 export default function CardReintegro({ reintegroFiltrado, seleccionarReintegro, abrirModalDetalle }) {
 
@@ -24,7 +25,7 @@ export default function CardReintegro({ reintegroFiltrado, seleccionarReintegro,
   };
 
   return (
-    <div className=" col-12 col-sm-6 col-lg-4 mb-4">
+    <div className=" col-md-6 mb-4">
       <div className="card h-100 shadow-sm" style={{ border: "1px solid #ccc" }}>
 
         {/* Estado estilo receta */}
@@ -42,22 +43,15 @@ export default function CardReintegro({ reintegroFiltrado, seleccionarReintegro,
         </div>
 
         <div className="card-body text-center">
-          {/* Persona atendida - Persona que cobra (estilo nombre de receta) */}
           <h5 className="card-title fw-bold">
-            <small className="text-muted">{reintegroFiltrado.nombreDelAfiliado}</small>
+            {reintegroFiltrado.nombreDelAfiliado} {" - "}
+            <small className="text-muted">{formatFecha(reintegroFiltrado.facturacion_Fecha)}</small>
           </h5>
 
-          {/* Fecha de factura (sin texto descriptivo, estilo receta) */}
-          <p className="text-muted mb-3">
-            {formatFecha(reintegroFiltrado.facturacion_Fecha)}
-          </p>
-
-          {/* Monto con estilo llamativo */}
           <div className="h4 text-success fw-bold mb-3">
             ${reintegroFiltrado.facturacion_ValorTotal?.toLocaleString('es-AR')}
           </div>
 
-          {/* Botón Ver detalle */}
           <div className="d-flex justify-content-center">
             <button
               className="btn btn-sm rounded-pill"
