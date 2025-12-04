@@ -6,14 +6,13 @@ import BuscarAutorizacion from "./buscarAutorizacion";
 import EditarAutorizacion from "./editarAutorizacion";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { calcularEdad } from "../../utils/utils";
+
 export default function Autorizaciones() {
   const [autorizaciones, setAutorizaciones] = useState([]);
   const [hoverNueva, setHoverNueva] = useState(false);
   const [hoverBuscar, setHoverBuscar] = useState(false);
 
-  //NUEVOOO
   const [estadoFilter, setEstadoFilter] = useState("Todos los estados");
-
   const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
   const [formData, setFormData] = useState({
     fecha: "",
@@ -35,47 +34,53 @@ export default function Autorizaciones() {
   const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
   const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar") || "[]");
   const integrantesCuentaStorage = usuarioLogueado ? [usuarioLogueado, ...grupoFamiliar] : [];
-  const [desactivarBotonMenorDeEdad, setDesactivarBotonMenorDeEdad] = useState(null)
+  const [desactivarBotonMenorDeEdad, setDesactivarBotonMenorDeEdad] = useState(null);
 
-
-  // ESTADOS NUEVOS para el modal de confirmación de borrado y modificacion
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [autorizacionAEliminar, setAutorizacionAEliminar] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [autorizacionParaVer, setAutorizacionParaVer] = useState(null);
 
+  // Convertir fecha a Date
+  const toDate = (fecha) => {
+    if (!fecha) return new Date(0);
+    if (fecha instanceof Date) return fecha;
+    if (typeof fecha === "string") {
+      if (fecha.includes("-")) return new Date(fecha);
+      if (fecha.includes("/")) {
+        const [dd, mm, yyyy] = fecha.split("/");
+        return new Date(`${yyyy}-${mm}-${dd}`);
+      }
+    }
+    return new Date(fecha);
+  };
 
-
+  // Cargar autorizaciones
   useEffect(() => {
     if (!usuarioLogueado) return;
 
     const fetchAutorizaciones = async () => {
       try {
-
         const resPropio = await fetch(`http://localhost:3000/authorization/affiliateId/${usuarioLogueado.id}`);
         if (!resPropio.ok) throw new Error("Error al obtener las autorizaciones");
+        const dataPropio = await resPropio.json();
 
-        const dataPropio = await resPropio.json()
-
-        const resHijos = await fetch(`http://localhost:3000/authorization/childrensAffiliate/${usuarioLogueado.id}`)
+        const resHijos = await fetch(`http://localhost:3000/authorization/childrensAffiliate/${usuarioLogueado.id}`);
         if (!resHijos.ok) throw new Error("Error al obtener las autorizaciones");
+        const dataHijos = await resHijos.json();
 
-        const dataHijos = await resHijos.json()
-
-
-        const authorizationParaMostrar = [...dataPropio, ...dataHijos]
-
-        const lista = authorizationParaMostrar.map(item => {
+        const lista = [...dataPropio, ...dataHijos].map(item => {
           const fechaOriginal = item.fechaDePrestacion;
           let fechaFormateada = fechaOriginal;
           if (fechaOriginal && fechaOriginal.includes("-")) {
             const [yyyy, mm, dd] = fechaOriginal.split("-");
             fechaFormateada = `${dd}/${mm}/${yyyy}`;
           }
-
           return {
+            ...item,
             id: item.id,
             fecha: fechaFormateada,
+            fechaOriginal,
             paciente: item.nombreDelAfiliado,
             medico: item.nombreDelMedico,
             especialidad: item.especialidad,
@@ -87,23 +92,21 @@ export default function Autorizaciones() {
           };
         });
 
+        lista.sort((a, b) => toDate(a.fechaOriginal) - toDate(b.fechaOriginal));
         setAutorizaciones(lista);
-      } catch (error) {
-        console.error(error);
+
+      } catch (err) {
+        console.error(err);
         setError("No se pudieron cargar las autorizaciones");
       }
     };
 
     fetchAutorizaciones();
-    if (calcularEdad(usuarioLogueado.fechaDeNacimiento) <= 16) {
-      setDesactivarBotonMenorDeEdad(true)
-    } else {
-      setDesactivarBotonMenorDeEdad(false)
-    }
+
+    setDesactivarBotonMenorDeEdad(calcularEdad(usuarioLogueado.fechaDeNacimiento) <= 16);
   }, [usuarioLogueado?.numeroDeDocumento]);
 
-
-
+  // Cargar integrantes de la cuenta
   useEffect(() => {
     const fetchIntegrantes = async () => {
       try {
@@ -112,11 +115,8 @@ export default function Autorizaciones() {
         const data = await res.json();
 
         const userDoc = (localStorage.getItem("documentoUsuario") || "").trim();
-        if (!userDoc) {
-          //   console.warn("No se encontró el documento del usuario logueado");
-          return;
-        }
-        // solo familiares, excluye el titular aunque tenga perteneceA igual a su documento
+        if (!userDoc) return;
+
         const familiares = data.filter((afiliado) => {
           const perteneceA = String(afiliado.perteneceA || "").trim();
           const doc = String(afiliado.numeroDeDocumento || "").trim();
@@ -124,8 +124,8 @@ export default function Autorizaciones() {
         });
 
         setIntegrantesCuenta(familiares);
-      } catch (error) {
-        console.error("Error al cargar integrantes:", error);
+      } catch (err) {
+        console.error("Error al cargar integrantes:", err);
       }
     };
 
@@ -138,29 +138,19 @@ export default function Autorizaciones() {
     const medico = (a.medico || "").toLowerCase();
     const estado = (a.estado || "").toLowerCase();
 
-    const coincideTexto =
-      termino === "" ||
-      paciente.includes(termino) ||
-      medico.includes(termino);
-
-    const coincideEstado =
-      estadoFilter === "Todos los estados" ||
-      estado === estadoFilter.toLowerCase();
+    const coincideTexto = termino === "" || paciente.includes(termino) || medico.includes(termino);
+    const coincideEstado = estadoFilter === "Todos los estados" || estado === estadoFilter.toLowerCase();
 
     return coincideTexto && coincideEstado;
   });
 
+  // Funciones de modales
   const manejarErrorMiddleware = (mensajeError) => {
     setError(mensajeError);
     setShowModal(false);
-
-    setTimeout(() => {
-      setError("");
-    }, 3000);
+    setTimeout(() => setError(""), 3000);
   };
 
-
-  //  FUNCIÓN para abrir el modal al presionar el tachito
   const handleRequestDelete = (autorizacion) => {
     setAutorizacionAEliminar(autorizacion);
     setShowDeleteModal(true);
@@ -171,20 +161,18 @@ export default function Autorizaciones() {
     setShowEditModal(true);
   };
 
-
-  //  FUNCIÓN para cancelar el modal
   const handleCancelDelete = () => {
     setShowDeleteModal(false);
     setAutorizacionAEliminar(null);
   };
 
   const handleUpdateAuthorization = (updated) => {
-    setAutorizaciones(prev =>
-      prev.map(a => a.id === updated.id ? updated : a)
-    );
+    setAutorizaciones(prev => {
+      const nuevaLista = prev.map(a => a.id === updated.id ? updated : a);
+      return nuevaLista.sort((a, b) => toDate(b.fechaOriginal) - toDate(a.fechaOriginal));
+    });
   };
 
-  //  FUNCIÓN para confirmar y ejecutar el DELETE
   const handleConfirmDelete = async () => {
     if (!autorizacionAEliminar) return;
 
@@ -193,35 +181,26 @@ export default function Autorizaciones() {
       const usuarioLogueadoId = currentUser.id;
       const targetAffiliateId = autorizacionAEliminar.affiliateId;
 
-
       const res = await fetch(
         `http://localhost:3000/authorization/${autorizacionAEliminar.id}/usuario/${usuarioLogueadoId}/afiliado/${targetAffiliateId}`,
-        {
-          method: "DELETE",
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+        { method: "DELETE", headers: { 'Content-Type': 'application/json' } }
       );
 
       if (!res.ok) {
         const errorData = await res.json();
-        if (res.status === 403) {
-          throw new Error(errorData.error || "No tienes permisos para eliminar esta autorización");
-        }
+        if (res.status === 403) throw new Error(errorData.error || "No tienes permisos");
         throw new Error(errorData.error || "Error en la respuesta del servidor");
       }
 
-      setAutorizaciones((prev) =>
-        prev.filter((a) => a.id !== autorizacionAEliminar.id)
-      );
-
+      setAutorizaciones(prev => prev.filter(a => a.id !== autorizacionAEliminar.id));
       setSuccess("Autorización eliminada correctamente.");
       setTimeout(() => setSuccess(""), 3000);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
     } catch (err) {
       console.error(err);
       setError(err.message);
+      setTimeout(() => setError(""), 3000);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setShowDeleteModal(false);
@@ -230,31 +209,20 @@ export default function Autorizaciones() {
   };
 
   return (
-    <div className="container mt-4">
+    <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
         <h2 className="fw-bold text-dark fs-3 mb-0">MIS AUTORIZACIONES</h2>
 
         {desactivarBotonMenorDeEdad ? (
-          <OverlayTrigger
-            placement="top"
-            overlay={
-              <Tooltip>
-                Debes ser mayor de edad para crear una nueva autorización
-              </Tooltip>
-            }
-          >
+          <OverlayTrigger placement="top" overlay={<Tooltip>Debes ser mayor de edad para crear una nueva autorización</Tooltip>}>
             <span className="d-inline-block">
               <button
-                disabled={desactivarBotonMenorDeEdad}
+                disabled
                 className="btn text-white px-4 py-2 fs-5"
                 style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
                 onMouseEnter={() => setHoverNueva(true)}
                 onMouseLeave={() => setHoverNueva(false)}
-                onClick={() => {
-                  setErrorModal("");
-                  setError("");
-                  setShowModal(true);
-                }}
+                onClick={() => setShowModal(true)}
               >
                 + Nueva Autorización
               </button>
@@ -266,10 +234,7 @@ export default function Autorizaciones() {
             style={{ backgroundColor: hoverNueva ? "#2b47b9" : "#132074" }}
             onMouseEnter={() => setHoverNueva(true)}
             onMouseLeave={() => setHoverNueva(false)}
-            onClick={() => {
-              setErrorModal("");
-              setShowModal(true);
-            }}
+            onClick={() => setShowModal(true)}
           >
             + Nueva Autorización
           </button>
@@ -279,8 +244,6 @@ export default function Autorizaciones() {
       {error && <div className="alert alert-danger text-center mb-4">{error}</div>}
       {success && <div className="alert alert-success text-center mb-4">{success}</div>}
 
-
-
       <BuscarAutorizacion
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
@@ -289,7 +252,6 @@ export default function Autorizaciones() {
         hoverBuscar={hoverBuscar}
         setHoverBuscar={setHoverBuscar}
       />
-
 
       <div className="row">
         {autorizacionesFiltradas.length > 0 ? (
@@ -304,7 +266,6 @@ export default function Autorizaciones() {
           ))
         ) : (
           <div className="col-12 d-flex flex-column align-items-center mt-4">
-            {/* MENSAJE */}
             <div
               className="fst-italic text-center"
               style={{
@@ -320,18 +281,15 @@ export default function Autorizaciones() {
             >
               No se encontraron autorizaciones que coincidan con tu búsqueda.
             </div>
-
           </div>
         )}
       </div>
-
 
       <NuevaAutorizacion
         showModal={showModal}
         setShowModal={setShowModal}
         integrantesCuenta={(() => {
           const lista = integrantesCuenta.length > 0 ? integrantesCuenta : integrantesCuentaStorage;
-          // eliminar duplicados por documento o id
           const vistos = new Set();
           return lista.filter((i) => {
             const doc = i.numeroDeDocumento || i.documento || "";
@@ -362,64 +320,32 @@ export default function Autorizaciones() {
         />
       )}
 
-      {/*  MODAL de confirmación de borrado */}
       {showDeleteModal && autorizacionAEliminar && (
         <>
           <div className="modal-backdrop fade show" style={{ zIndex: 1040 }}></div>
-
-          <div
-            className="modal d-block"
-            tabIndex="-1"
-            role="dialog"
-            style={{ zIndex: 1050 }}
-            onClick={handleCancelDelete}
-          >
-            <div
-              className="modal-dialog modal-dialog-centered"
-              role="document"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="modal d-block" tabIndex="-1" role="dialog" style={{ zIndex: 1050 }} onClick={handleCancelDelete}>
+            <div className="modal-dialog modal-dialog-centered" role="document" onClick={(e) => e.stopPropagation()}>
               <div className="modal-content">
                 <div className="modal-header">
                   <h5 className="modal-title">Confirmar eliminación</h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    aria-label="Close"
-                    onClick={handleCancelDelete}
-                  ></button>
+                  <button type="button" className="btn-close" aria-label="Close" onClick={handleCancelDelete}></button>
                 </div>
                 <div className="modal-body">
                   <p>
-                    ¿Querés eliminar la autorización de{" "}
-                    <strong>{autorizacionAEliminar.paciente}</strong> con fecha{" "}
-                    <strong>{autorizacionAEliminar.fecha}</strong>?
+                    ¿Querés eliminar la autorización de <strong>{autorizacionAEliminar.paciente}</strong> con fecha <strong>{autorizacionAEliminar.fecha}</strong>?
                   </p>
-                  <p className="text-muted small">
-                    Esta acción no se puede deshacer.
-                  </p>
+                  <p className="text-muted small">Esta acción no se puede deshacer.</p>
                 </div>
                 <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={handleCancelDelete}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={handleConfirmDelete}
-                  >
-                    Eliminar
-                  </button>
+                  <button type="button" className="btn btn-secondary" onClick={handleCancelDelete}>Cancelar</button>
+                  <button type="button" className="btn btn-danger" onClick={handleConfirmDelete}>Eliminar</button>
                 </div>
               </div>
             </div>
           </div>
         </>
       )}
+
       {showEditModal && autorizacionSeleccionada && (
         <EditarAutorizacion
           showModal={showEditModal}
@@ -427,7 +353,6 @@ export default function Autorizaciones() {
           data={autorizacionSeleccionada}
           integrantesCuenta={(() => {
             const lista = integrantesCuenta.length > 0 ? integrantesCuenta : integrantesCuentaStorage;
-            // eliminar duplicados por documento o id
             const vistos = new Set();
             return lista.filter((i) => {
               const doc = i.numeroDeDocumento || i.documento || "";
@@ -442,7 +367,6 @@ export default function Autorizaciones() {
           onMiddlewareError={manejarErrorMiddleware}
         />
       )}
-
 
     </div>
   );
