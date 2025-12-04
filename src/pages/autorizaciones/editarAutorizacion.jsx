@@ -8,6 +8,7 @@ export default function EditarAutorizacion({
   onUpdate,
   setSuccess,
   setError,
+  onMiddlewareError,
 }) {
   const [formData, setFormData] = useState({
     fecha: "",
@@ -46,7 +47,7 @@ export default function EditarAutorizacion({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    
+
     if (!formData.fecha) return setError("La fecha es obligatoria");
     if (formData.fecha < today) return setError("La fecha no puede ser pasada");
     if (formData.fecha > maxDate) return setError("La fecha no puede superar los 2 años");
@@ -56,10 +57,10 @@ export default function EditarAutorizacion({
     if (!formData.lugar.trim()) return setError("Debe ingresar un lugar");
 
     try {
-      
+
       const currentUser = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
       const usuarioLogueadoId = currentUser.id;
-      const targetAffiliateId = formData.pacienteId; 
+      const targetAffiliateId = formData.pacienteId;
 
       const payload = {
         affiliateId: formData.pacienteId,
@@ -72,9 +73,6 @@ export default function EditarAutorizacion({
         estado: "Pendiente",
       };
 
-      
-
-      
       const res = await fetch(
         `http://localhost:3000/authorization/${data.id}/usuario/${usuarioLogueadoId}/afiliado/${targetAffiliateId}`,
         {
@@ -87,12 +85,20 @@ export default function EditarAutorizacion({
       if (!res.ok) {
         const errorData = await res.json();
         const msg = errorData.error || errorData.message || `Error ${res.status}`;
+
+        if (msg.includes("Solo puede gestionar para sus hijos menores")) {
+          if (onMiddlewareError) {
+            onMiddlewareError(msg);
+          }
+          setShowModal(false);
+          return;
+        }
+
         throw new Error(msg);
       }
 
       const updated = await res.json();
 
-      // actualizar en lista
       onUpdate({
         id: data.id,
         fecha: formData.fecha.split("-").reverse().join("/"),
@@ -103,7 +109,7 @@ export default function EditarAutorizacion({
         internacion: formData.internacion,
         observaciones: formData.observaciones,
         estado: "Pendiente",
-        affiliateId: formData.pacienteId 
+        affiliateId: formData.pacienteId
       });
 
       setSuccess("Autorización modificada correctamente y estado actualizado a 'Pendiente'");
@@ -119,7 +125,6 @@ export default function EditarAutorizacion({
     }
   };
 
-  // Fallback mientras llegan los integrantes
   const listaIntegrantes = integrantesCuenta.length > 0
     ? integrantesCuenta
     : [{ id: "", nombre: "Cargando...", apellido: "" }];

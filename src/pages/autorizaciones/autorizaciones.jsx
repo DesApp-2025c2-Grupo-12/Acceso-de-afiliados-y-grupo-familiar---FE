@@ -439,6 +439,7 @@ export default function Autorizaciones() {
           onUpdate={handleUpdateAuthorization}
           setSuccess={setSuccess}
           setError={setError}
+          onMiddlewareError={manejarErrorMiddleware}
         />
       )}
 
