@@ -12,6 +12,7 @@ export default function RenovarReceta({
   setSuccess,
   hoverGuardar,
   setHoverGuardar,
+  fetchRecetas
 }) {
   const [visible, setVisible] = useState(false);
   const [fade, setFade] = useState(false); 
@@ -131,6 +132,7 @@ export default function RenovarReceta({
         observaciones: formData.observaciones,
         estado: "Recibido",
         numeroDeDocumento: receta.numeroDeDocumento,
+        fechaDeAprobacion: null,
         affiliateId: receta.affiliateId,
         fechaDeEmision: new Date(),
       };
@@ -144,14 +146,15 @@ export default function RenovarReceta({
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.error || "Error al renovar receta");
 
-      setRecetas((prev) => prev.map((r) => (r.id === receta.id ? data : r)));
+    //  setRecetas((prev) => prev.map((r) => (r.id === receta.id ? data : r)));
 
-      try {
+      /* try {
         const cache = JSON.parse(localStorage.getItem("recetasCache")) || [];
         const nuevo = cache.map((r) => (r.id === receta.id ? data : r));
         localStorage.setItem("recetasCache", JSON.stringify(nuevo));
-      } catch {}
+      } catch {} */
 
+      fetchRecetas();
       setSuccess("Receta renovada con éxito");
       setError("");
 

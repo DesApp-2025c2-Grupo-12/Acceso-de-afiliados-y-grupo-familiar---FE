@@ -37,8 +37,7 @@ export default function Recetas() {
 
     const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
 
-    useEffect(() => {
-        const fetchRecetas = async () => {
+    const fetchRecetas = async () => {
             try {
 
                 const responsePropio = await fetch(`http://localhost:3000/recipes/affiliateId/${usuarioLogueado.id}`);
@@ -62,6 +61,9 @@ export default function Recetas() {
                 setError("No se pudieron cargar las recetas");
             }
         };
+
+    useEffect(() => {
+        
         fetchRecetas();
 
         const grupoFamiliar = JSON.parse(localStorage.getItem("grupoFamiliar")) || [];
@@ -263,6 +265,7 @@ export default function Recetas() {
                 setSuccess={setSuccess}
                 hoverGuardar={hoverGuardar}
                 setHoverGuardar={setHoverGuardar}
+                fetchRecetas={fetchRecetas}
             />
         </div>
     );
