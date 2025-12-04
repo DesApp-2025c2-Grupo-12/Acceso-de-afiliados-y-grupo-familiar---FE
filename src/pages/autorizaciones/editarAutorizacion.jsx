@@ -38,7 +38,7 @@ export default function EditarAutorizacion({
   // fechas válidas
   const today = new Date().toISOString().split("T")[0];
   const twoYearsLater = new Date();
-  twoYearsLater.setFullYear(twoYearsLater.getFullYear() + 2);
+  twoYearsLater.setFullYear(twoYearsLater.getFullYear() + 1);
   const maxDate = twoYearsLater.toISOString().split("T")[0];
 
   if (!showModal) return null;
@@ -49,7 +49,7 @@ export default function EditarAutorizacion({
     
     if (!formData.fecha) return setError("La fecha es obligatoria");
     if (formData.fecha < today) return setError("La fecha no puede ser pasada");
-    if (formData.fecha > maxDate) return setError("La fecha no puede superar los 2 años");
+    if (formData.fecha > maxDate) return setError("La fecha no puede superar 1 año");
     if (!formData.pacienteId) return setError("Debe seleccionar un integrante");
     if (!formData.medico.trim()) return setError("Debe ingresar un médico");
     if (!formData.especialidad.trim()) return setError("Debe ingresar una especialidad");
@@ -181,7 +181,7 @@ export default function EditarAutorizacion({
                   <option value="">Seleccionar integrante</option>
                   {listaIntegrantes.map((i) => (
                     <option key={i.id} value={i.id}>
-                      {i.nombre} {i.apellido}
+                      {i.nombre} {i.apellido}({i.parentesco})
                     </option>
                   ))}
                 </select>

@@ -15,13 +15,14 @@ export default function NuevaAutorizacion({
   onMiddlewareError,
 }) {
   useEffect(() => {
-    if (success) {
-      const timer = setTimeout(() => {
-        setSuccess("");
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [success, setSuccess]);
+  if (success) {
+    const timer = setTimeout(() => {
+      setSuccess("");
+      window.location.reload(); 
+    }, 3000);
+    return () => clearTimeout(timer);
+  }
+}, [success, setSuccess]);
 
   useEffect(() => {
     setError("");
@@ -107,7 +108,7 @@ export default function NuevaAutorizacion({
   if (!showModal) return null;
   const today = new Date().toISOString().split("T")[0];
   const twoYearsLater = new Date();
-  twoYearsLater.setFullYear(twoYearsLater.getFullYear() + 2);
+  twoYearsLater.setFullYear(twoYearsLater.getFullYear() + 1);
   const maxDate = twoYearsLater.toISOString().split("T")[0];
   return (
     <div
