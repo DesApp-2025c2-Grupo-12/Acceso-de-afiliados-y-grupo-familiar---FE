@@ -138,9 +138,10 @@ export default function Recetas() {
     const abrirModalRenovar = (receta) => setRecetaRenovar(receta ? { ...receta } : null);
 
     return (
-        <div className="container">
+        <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
                 <h2 className="fw-bold text-dark fs-3 mb-0">MIS RECETAS</h2>
+
                 {desactivarBotonMenorDeEdad ? (
                     <OverlayTrigger
                         placement="top"

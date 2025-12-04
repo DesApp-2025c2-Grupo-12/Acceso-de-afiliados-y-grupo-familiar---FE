@@ -11,7 +11,7 @@ export default function Autorizaciones() {
   const [hoverNueva, setHoverNueva] = useState(false);
   const [hoverBuscar, setHoverBuscar] = useState(false);
 
-//NUEVOOO
+  //NUEVOOO
   const [estadoFilter, setEstadoFilter] = useState("Todos los estados");
 
   const [integrantesCuenta, setIntegrantesCuenta] = useState([]);
@@ -28,6 +28,7 @@ export default function Autorizaciones() {
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState("");
+  const [errorModal, setErrorModal] = useState("");
   const [success, setSuccess] = useState("");
   const [autorizacionSeleccionada, setAutorizacionSeleccionada] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -50,7 +51,7 @@ export default function Autorizaciones() {
 
     const fetchAutorizaciones = async () => {
       try {
-  
+
         const resPropio = await fetch(`http://localhost:3000/authorization/affiliateId/${usuarioLogueado.id}`);
         if (!resPropio.ok) throw new Error("Error al obtener las autorizaciones");
 
@@ -63,7 +64,7 @@ export default function Autorizaciones() {
 
 
         const authorizationParaMostrar = [...dataPropio, ...dataHijos]
-       
+
         const lista = authorizationParaMostrar.map(item => {
           const fechaOriginal = item.fechaDePrestacion;
           let fechaFormateada = fechaOriginal;
@@ -131,23 +132,32 @@ export default function Autorizaciones() {
     fetchIntegrantes();
   }, []);
 
-const autorizacionesFiltradas = autorizaciones.filter((a) => {
-  const termino = searchTerm.trim().toLowerCase();
-  const paciente = (a.paciente || "").toLowerCase();
-  const medico = (a.medico || "").toLowerCase();
-  const estado = (a.estado || "").toLowerCase();
+  const autorizacionesFiltradas = autorizaciones.filter((a) => {
+    const termino = searchTerm.trim().toLowerCase();
+    const paciente = (a.paciente || "").toLowerCase();
+    const medico = (a.medico || "").toLowerCase();
+    const estado = (a.estado || "").toLowerCase();
 
-  const coincideTexto =
-    termino === "" ||
-    paciente.includes(termino) ||
-    medico.includes(termino);
+    const coincideTexto =
+      termino === "" ||
+      paciente.includes(termino) ||
+      medico.includes(termino);
 
-  const coincideEstado =
-    estadoFilter === "Todos los estados" ||
-    estado === estadoFilter.toLowerCase();
+    const coincideEstado =
+      estadoFilter === "Todos los estados" ||
+      estado === estadoFilter.toLowerCase();
 
-  return coincideTexto && coincideEstado;
-});
+    return coincideTexto && coincideEstado;
+  });
+
+  const manejarErrorMiddleware = (mensajeError) => {
+    setError(mensajeError);
+    setShowModal(false);
+
+    setTimeout(() => {
+      setError("");
+    }, 3000);
+  };
 
 
   //  FUNCIÓN para abrir el modal al presionar el tachito
@@ -183,9 +193,7 @@ const autorizacionesFiltradas = autorizaciones.filter((a) => {
       const usuarioLogueadoId = currentUser.id;
       const targetAffiliateId = autorizacionAEliminar.affiliateId;
 
-     
 
-     
       const res = await fetch(
         `http://localhost:3000/authorization/${autorizacionAEliminar.id}/usuario/${usuarioLogueadoId}/afiliado/${targetAffiliateId}`,
         {
@@ -214,7 +222,6 @@ const autorizacionesFiltradas = autorizaciones.filter((a) => {
     } catch (err) {
       console.error(err);
       setError(err.message);
-      setTimeout(() => setError(""), 3000);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setShowDeleteModal(false);
@@ -223,7 +230,7 @@ const autorizacionesFiltradas = autorizaciones.filter((a) => {
   };
 
   return (
-    <div className="container py-4">
+    <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4 flex-nowrap">
         <h2 className="fw-bold text-dark fs-3 mb-0">MIS AUTORIZACIONES</h2>
 
@@ -243,7 +250,11 @@ const autorizacionesFiltradas = autorizaciones.filter((a) => {
                 style={{ backgroundColor: hoverNueva ? "#b0b0b0" : "#132074" }}
                 onMouseEnter={() => setHoverNueva(true)}
                 onMouseLeave={() => setHoverNueva(false)}
-                onClick={() => setShowModal(true)}
+                onClick={() => {
+                  setErrorModal("");
+                  setError("");
+                  setShowModal(true);
+                }}
               >
                 + Nueva Autorización
               </button>
@@ -255,7 +266,10 @@ const autorizacionesFiltradas = autorizaciones.filter((a) => {
             style={{ backgroundColor: hoverNueva ? "#2b47b9" : "#132074" }}
             onMouseEnter={() => setHoverNueva(true)}
             onMouseLeave={() => setHoverNueva(false)}
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              setErrorModal("");
+              setShowModal(true);
+            }}
           >
             + Nueva Autorización
           </button>
@@ -267,49 +281,49 @@ const autorizacionesFiltradas = autorizaciones.filter((a) => {
 
 
 
-<BuscarAutorizacion
-  searchTerm={searchTerm}
-  setSearchTerm={setSearchTerm}
-  estadoFilter={estadoFilter}
-  setEstadoFilter={setEstadoFilter}
-  hoverBuscar={hoverBuscar}
-  setHoverBuscar={setHoverBuscar}
-/>
+      <BuscarAutorizacion
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        estadoFilter={estadoFilter}
+        setEstadoFilter={setEstadoFilter}
+        hoverBuscar={hoverBuscar}
+        setHoverBuscar={setHoverBuscar}
+      />
 
 
       <div className="row">
-  {autorizacionesFiltradas.length > 0 ? (
-    autorizacionesFiltradas.map((auto) => (
-      <CardAutorizacion
-        key={auto.id}
-        autorizacion={auto}
-        setAutorizacionParaVer={setAutorizacionParaVer}
-        onRequestDelete={handleRequestDelete}
-        onRequestEdit={onRequestEdit}
-      />
-    ))
-  ) : (
-    <div className="col-12 d-flex flex-column align-items-center mt-4">
-      {/* MENSAJE */}
-      <div
-        className="fst-italic text-center"
-        style={{
-          color: "#001F87",
-          fontWeight: "500",
-          fontSize: "1.1rem",
-          border: "1px solid #001F87",
-          borderRadius: "50px",
-          padding: "0.8rem 1.5rem",
-          backgroundColor: "white",
-          display: "inline-block",
-        }}
-      >
-        No se encontraron autorizaciones que coincidan con tu búsqueda.
-      </div>
+        {autorizacionesFiltradas.length > 0 ? (
+          autorizacionesFiltradas.map((auto) => (
+            <CardAutorizacion
+              key={auto.id}
+              autorizacion={auto}
+              setAutorizacionParaVer={setAutorizacionParaVer}
+              onRequestDelete={handleRequestDelete}
+              onRequestEdit={onRequestEdit}
+            />
+          ))
+        ) : (
+          <div className="col-12 d-flex flex-column align-items-center mt-4">
+            {/* MENSAJE */}
+            <div
+              className="fst-italic text-center"
+              style={{
+                color: "#001F87",
+                fontWeight: "500",
+                fontSize: "1.1rem",
+                border: "1px solid #001F87",
+                borderRadius: "50px",
+                padding: "0.8rem 1.5rem",
+                backgroundColor: "white",
+                display: "inline-block",
+              }}
+            >
+              No se encontraron autorizaciones que coincidan con tu búsqueda.
+            </div>
 
-    </div>
-  )}
-</div>
+          </div>
+        )}
+      </div>
 
 
       <NuevaAutorizacion
@@ -330,10 +344,11 @@ const autorizacionesFiltradas = autorizaciones.filter((a) => {
         setFormData={setFormData}
         autorizaciones={autorizaciones}
         setAutorizaciones={setAutorizaciones}
-        error={error}
-        setError={setError}
+        error={errorModal}
+        setError={setErrorModal}
         success={success}
         setSuccess={setSuccess}
+        onMiddlewareError={manejarErrorMiddleware}
       />
 
       {autorizacionParaVer && (
@@ -341,7 +356,7 @@ const autorizacionesFiltradas = autorizaciones.filter((a) => {
           autorizacion={autorizacionParaVer}
           setAutorizacionParaVer={setAutorizacionParaVer}
           setSuccess={setSuccess}
-          setError = {setError}
+          setError={setError}
           setAutorizaciones={setAutorizaciones}
           autorizaciones={autorizaciones}
         />

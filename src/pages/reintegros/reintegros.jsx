@@ -141,9 +141,8 @@ export default function Reintegros() {
     }, [success]);
 
     return (
-        <Container>
+        <div className="p-0 m-0">
             <div className="container mt-4">
-                {/* Header con botón */}
                 <div className="d-flex justify-content-between align-items-center mb-3">
                     <h3 className="fw-bold text-dark fs-3 mb-0">MIS REINTEGROS</h3>
                     {desactivarBotonMenorDeEdad ? (
@@ -234,6 +233,6 @@ export default function Reintegros() {
                 onHide={() => setModalDetalleAbierto(false)}
                 reintegroId={reintegroSeleccionado?.id}
             />
-        </Container>
+        </div>
     );
 }

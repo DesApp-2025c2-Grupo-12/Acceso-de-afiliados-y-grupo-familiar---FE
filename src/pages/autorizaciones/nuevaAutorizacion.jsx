@@ -12,6 +12,7 @@ export default function NuevaAutorizacion({
   setError,
   success,
   setSuccess,
+  onMiddlewareError,
 }) {
   useEffect(() => {
     if (success) {
@@ -21,6 +22,18 @@ export default function NuevaAutorizacion({
       return () => clearTimeout(timer);
     }
   }, [success, setSuccess]);
+
+  useEffect(() => {
+    setError("");
+  }, [setError, showModal]);
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado"))
   const handleSubmit = async (e) => {
@@ -79,7 +92,15 @@ export default function NuevaAutorizacion({
       setShowModal(false);
     } catch (err) {
       console.error(err);
-      setError(err.message);
+      if (err.message.includes("Solo puede gestionar para sus hijos menores")) {
+        setError("");
+        if (onMiddlewareError) {
+          onMiddlewareError(err.message);
+        }
+        setShowModal(false);
+      } else {
+        setError(err.message);
+      }
       setSuccess("");
     }
   };
